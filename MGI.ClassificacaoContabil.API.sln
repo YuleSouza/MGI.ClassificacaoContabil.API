@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGI.ClassificacaoContabil.API", "MGI.ClassificacaoContabil.API\MGI.ClassificacaoContabil.API.csproj", "{4070B144-E6B6-4F7F-BA91-8EE7EFE50B72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Infra", "1-Infra", "{FAEA9A73-24E3-4A23-B253-CA64FEA3AAC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Service", "2-Service", "{903D7D7F-18D0-48DF-AA33-1FE19BD19BA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Repository", "3-Repository", "{6112A665-64B7-48D3-A540-370981D65930}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4-API", "4-API", "{E156A01E-39E9-4E8A-9865-A9C595E047BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGI.ClassificacaoContabil.Infra", "MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra.csproj", "{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGI.ClassificacaoContabil.Service", "MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service.csproj", "{F057AB31-9EA6-4B6C-B891-7506C193CF8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGI.ClassificacaoContabil.Repository", "MGI.ClassificacaoContabil.Repository\MGI.ClassificacaoContabil.Repository\MGI.ClassificacaoContabil.Repository.csproj", "{C68F110E-2472-40C7-93F5-73B8CFC1038D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4070B144-E6B6-4F7F-BA91-8EE7EFE50B72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4070B144-E6B6-4F7F-BA91-8EE7EFE50B72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4070B144-E6B6-4F7F-BA91-8EE7EFE50B72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4070B144-E6B6-4F7F-BA91-8EE7EFE50B72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F057AB31-9EA6-4B6C-B891-7506C193CF8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F057AB31-9EA6-4B6C-B891-7506C193CF8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F057AB31-9EA6-4B6C-B891-7506C193CF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F057AB31-9EA6-4B6C-B891-7506C193CF8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C68F110E-2472-40C7-93F5-73B8CFC1038D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C68F110E-2472-40C7-93F5-73B8CFC1038D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C68F110E-2472-40C7-93F5-73B8CFC1038D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C68F110E-2472-40C7-93F5-73B8CFC1038D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4070B144-E6B6-4F7F-BA91-8EE7EFE50B72} = {E156A01E-39E9-4E8A-9865-A9C595E047BA}
+		{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F} = {FAEA9A73-24E3-4A23-B253-CA64FEA3AAC1}
+		{F057AB31-9EA6-4B6C-B891-7506C193CF8B} = {903D7D7F-18D0-48DF-AA33-1FE19BD19BA0}
+		{C68F110E-2472-40C7-93F5-73B8CFC1038D} = {6112A665-64B7-48D3-A540-370981D65930}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AD17183F-99EC-4F28-81B2-78A9D4DFCC52}
+	EndGlobalSection
+EndGlobal

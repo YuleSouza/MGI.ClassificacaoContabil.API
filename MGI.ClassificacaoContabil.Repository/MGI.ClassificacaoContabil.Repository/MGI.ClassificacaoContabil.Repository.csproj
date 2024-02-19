@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.151" />
+    <PackageReference Include="Dapper.Oracle" Version="2.0.3" />
+    <PackageReference Include="LinqKit" Version="1.2.4" />
+    <PackageReference Include="Z.Dapper.Plus" Version="6.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra.csproj" />
+    <ProjectReference Include="..\..\MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service.csproj" />
+  </ItemGroup>
+
+</Project>
