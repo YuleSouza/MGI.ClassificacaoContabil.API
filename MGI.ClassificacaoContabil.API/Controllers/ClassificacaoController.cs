@@ -8,7 +8,6 @@ using DTO.Payload;
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
     public class ClassificacaoController : ControllerBase
     {
         private readonly IClassificacaoService _service;
@@ -22,7 +21,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         #region Contábil
         [HttpPost]
-        [Route("v1/classificacao-contabil-inserir")]
+        [Route("v1/contabil/inserir")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
@@ -42,7 +41,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost]
-        [Route("v1/classificacao-contabil-alterar")]
+        [Route("v1/contabil/alterar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
@@ -62,7 +61,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost]
-        [Route("v1/classificacao-contabil-consultar")]
+        [Route("v1/contabil/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] ClassificacaoContabilFiltro filtro)
         {
@@ -73,7 +72,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         #region ESG
         [HttpPost]
-        [Route("v1/classificacao-esg-inserir")]
+        [Route("v1/esg/inserir")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoEsgDTO classificacao)
         {
@@ -93,7 +92,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost]
-        [Route("v1/classificacao-esg-alterar")]
+        [Route("v1/esg/alterar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoEsgDTO classificacao)
         {
@@ -113,7 +112,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost]
-        [Route("v1/classificacao-esg-consultar")]
+        [Route("v1/esg/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] ClassificacaoEsgFiltro filtro)
         {
