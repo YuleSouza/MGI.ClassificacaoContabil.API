@@ -1,5 +1,5 @@
 ﻿using Infra.Interface;
-using Service.DTO.Payload;
+using DTO.Payload;
 using Service.Interface.Empresa;
 using Service.Repository.Empresa;
 

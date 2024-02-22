@@ -1,4 +1,4 @@
-﻿using Service.DTO.Payload;
+﻿using DTO.Payload;
 
 namespace Service.Interface.Empresa
 {

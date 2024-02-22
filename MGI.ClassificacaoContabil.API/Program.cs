@@ -45,7 +45,7 @@ builder.Services.AddSwaggerGen(options =>
     });
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath);
+    //options.IncludeXmlComments(xmlPath);
 });
 builder.Services.AddEndpointsApiExplorer();
 

@@ -1,4 +1,4 @@
-﻿namespace Service.DTO.Payload
+﻿namespace DTO.Payload
 {
     public class PayloadDTO
     {

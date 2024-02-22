@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTO\DTOFiltros\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra.csproj" />
   </ItemGroup>
 
