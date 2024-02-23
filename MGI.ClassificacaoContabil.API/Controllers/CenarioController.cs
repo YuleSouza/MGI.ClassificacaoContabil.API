@@ -9,6 +9,8 @@ using Service.DTO.Classificacao;
 
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class CenarioController : ControllerBase
     {
         private readonly ICenarioService _service;

@@ -13,11 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Repository", "3-Repositor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4-API", "4-API", "{E156A01E-39E9-4E8A-9865-A9C595E047BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGI.ClassificacaoContabil.Infra", "MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra.csproj", "{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGI.ClassificacaoContabil.Infra", "MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra.csproj", "{D5ED7030-6748-44DB-9E4C-F745B8CC6B7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGI.ClassificacaoContabil.Service", "MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service.csproj", "{F057AB31-9EA6-4B6C-B891-7506C193CF8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGI.ClassificacaoContabil.Service", "MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service\MGI.ClassificacaoContabil.Service.csproj", "{F057AB31-9EA6-4B6C-B891-7506C193CF8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGI.ClassificacaoContabil.Repository", "MGI.ClassificacaoContabil.Repository\MGI.ClassificacaoContabil.Repository\MGI.ClassificacaoContabil.Repository.csproj", "{C68F110E-2472-40C7-93F5-73B8CFC1038D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGI.ClassificacaoContabil.Repository", "MGI.ClassificacaoContabil.Repository\MGI.ClassificacaoContabil.Repository\MGI.ClassificacaoContabil.Repository.csproj", "{C68F110E-2472-40C7-93F5-73B8CFC1038D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

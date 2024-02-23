@@ -8,6 +8,7 @@ using DTO.Payload;
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     public class ClassificacaoController : ControllerBase
     {
         private readonly IClassificacaoService _service;

@@ -20,7 +20,7 @@ namespace Repository.Cenario
         public async Task<bool> InserirCenario(CenarioDTO cenario)
         {
             int result = await _session.Connection.ExecuteAsync(@"insert into cenario_classif_contabil (nome, status, uscriacao, dtcriacao) 
-                                                                  values (:nome,:operador,:status, :uscriacao, sysdate)",
+                                                                  values (:nome, :status, :uscriacao, sysdate)",
             new
             {
                 nome = cenario.Nome,
