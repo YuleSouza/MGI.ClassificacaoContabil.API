@@ -27,6 +27,7 @@ namespace Repository.Cenario
                 status = cenario.Status,
                 uscriacao = cenario.Usuario?.UsuarioCriacao
             });
+
             return result == 1;
         }
         public async Task<bool> AlterarCenario(CenarioDTO cenario)
@@ -35,16 +36,16 @@ namespace Repository.Cenario
                                                                      set nome = nvl(:nome,nome),  
                                                                          status = nvl(:status,status), 
                                                                          usalteracao = :usalteracao, 
-                                                                         dtalteracao = :dtalteracao
+                                                                         dtalteracao = sysdate
                                                                    where id_cenario_classif_contabil = :idcenario",
             new
             {
                 idcenario = cenario.IdCenario,
                 nome = cenario.Nome,
                 status = cenario.Status,
-                usalteracao = cenario.Usuario?.UsuarioModificacao,
-                dtalteracao = cenario.Usuario?.DataModificacao
+                usalteracao = cenario.Usuario?.UsuarioModificacao
             });
+
             return result == 1;
         }
         public async Task<IEnumerable<CenarioDTO>> ConsultarCenario(CenarioFiltro filtro)

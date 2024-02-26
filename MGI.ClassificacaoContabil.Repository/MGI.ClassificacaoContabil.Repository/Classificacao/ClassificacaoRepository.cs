@@ -160,12 +160,12 @@ namespace Repository.Classificacao
                                                 uscriacao           as UsuarioCriacao,
                                                 dtalteracao         as DataModificacao,
                                                 usalteracao         as UsuarioModificacao
-                                            from cenario_classif_contabil
+                                            from classificacao_esg
                                             where 1 = 1
                                            {parametros}
                                         ", new
             {
-                idcenario = filtro.IdClassificacaoEsg,
+                idclassificacaoesg = filtro.IdClassificacaoEsg,
                 nome = $"%{filtro.Nome}%",
                 status = filtro.Status
             });
