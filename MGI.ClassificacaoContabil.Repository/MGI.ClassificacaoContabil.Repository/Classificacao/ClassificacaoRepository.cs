@@ -39,11 +39,11 @@ namespace Repository.Classificacao
         public async Task<bool> AlterarClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
             int result = await _session.Connection.ExecuteAsync(@"update classificacao_contabil 
-                                                                     set id_empresa      = :idempresa
+                                                                     set id_empresa      = :idempresa,
                                                                          nome            = nvl(:nome,nome),  
                                                                          status          = nvl(:status,status), 
                                                                          mesano_inicio   = :dataInicial,
-                                                                         mesano_fim      = :dataFim,
+                                                                         mesano_fim      = :dataFinal,
                                                                          usalteracao     = :usalteracao, 
                                                                          dtalteracao     = :dtalteracao
                                                                    where id_classificacao_contabil = :idclassificacao",
@@ -55,7 +55,8 @@ namespace Repository.Classificacao
                 status = classificacao.Status,
                 dataInicial = classificacao.MesAnoInicio,
                 dataFinal = classificacao.MesAnoFim,
-                uscriacao = classificacao.Usuario?.UsuarioCriacao
+                usalteracao = classificacao.Usuario?.UsuarioModificacao,
+                dtalteracao = classificacao.Usuario?.DataModificacao
             });
             return result == 1;
         }
