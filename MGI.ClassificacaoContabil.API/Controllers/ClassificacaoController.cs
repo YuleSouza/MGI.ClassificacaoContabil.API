@@ -5,7 +5,7 @@ using Service.DTO.Filtros;
 using Microsoft.AspNetCore.Mvc;
 using DTO.Payload;
 
-namespace MGI.ClassificacaoContabil.API.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

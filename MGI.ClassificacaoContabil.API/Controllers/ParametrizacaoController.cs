@@ -1,12 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DTO.Payload;
+using Service.Interface.Parametrizacao;
+using Service.DTO.Parametrizacao;
+using Service.DTO.Filtros;
 
-namespace MGI.ClassificacaoContabil.API.Controllers
+using Microsoft.AspNetCore.Mvc;
+
+namespace API.Controllers
 {
-    public class ParametrizacaoController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ParametrizacaoController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IParametrizacaoService _service;
+        private readonly ILogger<ParametrizacaoController> _logger;
+
+        public ParametrizacaoController(IParametrizacaoService service, ILogger<ParametrizacaoController> logger)
         {
-            return View();
+            _service = service;
+            _logger = logger;
         }
     }
 }

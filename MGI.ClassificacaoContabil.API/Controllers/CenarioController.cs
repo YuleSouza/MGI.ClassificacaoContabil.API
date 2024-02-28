@@ -4,10 +4,9 @@ using Service.DTO.Cenario;
 using Service.DTO.Filtros;
 
 using Microsoft.AspNetCore.Mvc;
-using Service.DTO.Classificacao;
 
 
-namespace MGI.ClassificacaoContabil.API.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
