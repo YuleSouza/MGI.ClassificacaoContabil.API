@@ -62,12 +62,23 @@ namespace API.Controllers
             }
         }
 
+
         [HttpPost]
         [Route("v1/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosCenario([FromBody] CenarioFiltro filtro)
         {
             var retorno = await _service.ConsultarCenario(filtro);
+            return Ok(retorno);
+        }
+
+
+        [HttpGet]
+        [Route("v1/consultar")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadosCenario()
+        {
+            var retorno = await _service.ConsultarCenario();
             return Ok(retorno);
         }
     }

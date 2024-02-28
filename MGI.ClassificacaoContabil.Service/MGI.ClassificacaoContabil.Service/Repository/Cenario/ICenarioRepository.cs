@@ -1,5 +1,4 @@
 ﻿using Service.DTO.Cenario;
-using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
 
 namespace Service.Repository.Cenario
@@ -8,6 +7,7 @@ namespace Service.Repository.Cenario
     {
         Task<bool> InserirCenario(CenarioDTO classificacao);
         Task<bool> AlterarCenario(CenarioDTO classificacao);
+        Task<IEnumerable<CenarioDTO>> ConsultarCenario();
         Task<IEnumerable<CenarioDTO>> ConsultarCenario(CenarioFiltro filtro);
     }
 }

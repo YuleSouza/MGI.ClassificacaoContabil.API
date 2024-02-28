@@ -4,7 +4,6 @@ using Service.Interface.Cenario;
 using Service.Repository.Cenario;
 using Service.DTO.Cenario;
 using Service.DTO.Filtros;
-using Service.Repository.Classificacao;
 
 namespace Service.Cenario
 {
@@ -53,6 +52,11 @@ namespace Service.Cenario
                     return new PayloadDTO("Erro na alteração Cenário", false, ex.Message);
                 }
             }
+        }
+        public async Task<PayloadDTO> ConsultarCenario()
+        {
+            var resultado = await _repository.ConsultarCenario();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> ConsultarCenario(CenarioFiltro filtro)
         {

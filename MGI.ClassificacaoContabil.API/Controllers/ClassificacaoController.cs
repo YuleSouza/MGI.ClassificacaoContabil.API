@@ -69,6 +69,16 @@ namespace API.Controllers
             var retorno = await _service.ConsultarClassificacaoContabil(filtro);
             return Ok(retorno);
         }
+
+        [HttpGet]
+        [Route("v1/contabil/consultar")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadosClassificacao()
+        {
+            var retorno = await _service.ConsultarClassificacaoContabil();
+            return Ok(retorno);
+        }
+
         #endregion
 
         #region ESG
@@ -115,13 +125,20 @@ namespace API.Controllers
         [HttpPost]
         [Route("v1/esg/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] ClassificacaoEsgFiltro filtro)
+        public async Task<IActionResult> ConsultarDadosClassificacaoEsg([FromBody] ClassificacaoEsgFiltro filtro)
         {
             var retorno = await _service.ConsultarClassificacaoEsg(filtro);
             return Ok(retorno);
         }
 
+        [HttpGet]
+        [Route("v1/esg/consultar")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadosClassificacaoEsg()
+        {
+            var retorno = await _service.ConsultarClassificacaoEsg();
+            return Ok(retorno);
+        }
         #endregion
-
     }
 }

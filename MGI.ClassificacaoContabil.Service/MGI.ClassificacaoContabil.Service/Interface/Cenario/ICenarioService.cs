@@ -8,6 +8,7 @@ namespace Service.Interface.Cenario
     {
         Task<PayloadDTO> InserirCenario(CenarioDTO classificacao);
         Task<PayloadDTO> AlterarCenario(CenarioDTO classificacao);
+        Task<PayloadDTO> ConsultarCenario();
         Task<PayloadDTO> ConsultarCenario(CenarioFiltro filtro);
     }
 }

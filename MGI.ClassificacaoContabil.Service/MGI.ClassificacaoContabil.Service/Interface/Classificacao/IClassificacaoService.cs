@@ -9,12 +9,14 @@ namespace Service.Interface.Classificacao
         #region Contabil
         Task<PayloadDTO> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao);
         Task<PayloadDTO> AlterarClassificacaoContabil(ClassificacaoContabilDTO classificacao);
+        Task<PayloadDTO> ConsultarClassificacaoContabil();
         Task<PayloadDTO> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro);
         #endregion
 
         #region ESG
         Task<PayloadDTO> InserirClassificacaoEsg(ClassificacaoEsgDTO classificacao);
         Task<PayloadDTO> AlterarClassificacaoEsg(ClassificacaoEsgDTO classificacao);
+        Task<PayloadDTO> ConsultarClassificacaoEsg();
         Task<PayloadDTO> ConsultarClassificacaoEsg(ClassificacaoEsgFiltro filtro);
         #endregion
     }

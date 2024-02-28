@@ -55,6 +55,11 @@ namespace Service.Classificacao
                 }
             }
         }
+        public async Task<PayloadDTO> ConsultarClassificacaoContabil()
+        {
+            var resultado = await _repository.ConsultarClassificacaoContabil();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
         public async Task<PayloadDTO> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro)
         {
             var resultado = await _repository.ConsultarClassificacaoContabil(filtro);
@@ -98,6 +103,11 @@ namespace Service.Classificacao
                     return new PayloadDTO("Erro na alteração Classificação Contábil", false, ex.Message);
                 }
             }
+        }
+        public async Task<PayloadDTO> ConsultarClassificacaoEsg()
+        {
+            var resultado = await _repository.ConsultarClassificacaoEsg();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> ConsultarClassificacaoEsg(ClassificacaoEsgFiltro filtro)
         {

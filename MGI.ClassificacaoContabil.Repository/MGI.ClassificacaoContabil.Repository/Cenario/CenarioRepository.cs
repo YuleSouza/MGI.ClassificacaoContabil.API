@@ -48,6 +48,22 @@ namespace Repository.Cenario
 
             return result == 1;
         }
+        public async Task<IEnumerable<CenarioDTO>> ConsultarCenario()
+        {
+            
+            var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
+                                           select 
+                                                id_cenario_classif_contabil  as IdCenario,
+                                                nome                as Nome,
+                                                status              as Status,
+                                                dtcriacao           as DataCriacao,
+                                                uscriacao           as UsuarioCriacao,
+                                                dtalteracao         as DataModificacao,
+                                                usalteracao         as UsuarioModificacao
+                                            from cenario_classif_contabil
+                                            where 1 = 1");
+            return resultado;
+        }
         public async Task<IEnumerable<CenarioDTO>> ConsultarCenario(CenarioFiltro filtro)
         {
             var parametros = string.Empty;

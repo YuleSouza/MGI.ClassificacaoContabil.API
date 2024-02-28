@@ -7,7 +7,6 @@ using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
 using Service.Repository.Classificacao;
 
-
 namespace Repository.Classificacao
 {
     public class ClassificacaoRepository : IClassificacaoRepository
@@ -59,6 +58,25 @@ namespace Repository.Classificacao
                 dtalteracao = classificacao.Usuario?.DataModificacao
             });
             return result == 1;
+        }
+        public async Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil()
+        {
+
+            var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
+                                                    select id_classificacao_contabil  as IdClassificacaoContabil, 
+                                                           id_empresa                 as IdEmpresa,
+                                                           nome                       as Nome,
+                                                           status                     as Status, 
+                                                           mesano_inicio              as MesAnoInicio,
+                                                           mesano_fim                 as MesAnoFim,
+                                                           dtcriacao                  as DataCriacao,
+                                                           uscriacao                  as UsuarioCriacao,
+                                                           dtalteracao                as DataModificacao,
+                                                           usalteracao                as UsuarioModificacao
+                                                      from classificacao_contabil 
+                                                     where 1 = 1
+                                                     order by mesano_fim");
+            return resultado;
         }
         public async Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro)
         {
@@ -135,6 +153,22 @@ namespace Repository.Classificacao
                 dtalteracao = classificacao.Usuario?.DataModificacao
             });
             return result == 1;
+        }
+        public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
+        {
+
+            var resultado = await _session.Connection.QueryAsync<ClassificacaoEsgDTO>($@"
+                                           select 
+                                                id_classificacao_esg  as IdClassificacaoEsg,
+                                                nome                as Nome,
+                                                status              as Status,
+                                                dtcriacao           as DataCriacao,
+                                                uscriacao           as UsuarioCriacao,
+                                                dtalteracao         as DataModificacao,
+                                                usalteracao         as UsuarioModificacao
+                                            from classificacao_esg
+                                            where 1 = 1");
+            return resultado;
         }
         public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg(ClassificacaoEsgFiltro filtro)
         {
