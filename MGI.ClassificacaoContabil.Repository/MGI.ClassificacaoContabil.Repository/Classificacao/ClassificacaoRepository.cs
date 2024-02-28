@@ -14,19 +14,21 @@ namespace Repository.Classificacao
         private readonly IUnitOfWork _unitOfWork;
         private readonly DbSession _session;
 
-        #region Contabil
         public ClassificacaoRepository(IUnitOfWork unitOfWork, DbSession session)
         {
             _unitOfWork = unitOfWork;
             _session = session;
         }
+
+        #region Contabil
         public async Task<bool> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into classificacao_contabil (id_empresa, nome, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao) 
-                                                                  values (:idempresa, :nome, :status, :dataInicial, :dataFinal, :uscriacao, sysdate)",
+            int result = await _session.Connection.ExecuteAsync(@"insert into classificacao_contabil (id_empresa, id_projeto, nome, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao) 
+                                                                  values (:idempresa, :idprojeto, :nome, :status, :dataInicial, :dataFinal, :uscriacao, sysdate)",
             new
             {
                 idempresa = classificacao.IdEmpresa,
+                idprojeto = classificacao.IdProjeto,
                 nome = classificacao.Nome,
                 status = classificacao.Status,
                 dataInicial = classificacao.MesAnoInicio,
@@ -39,6 +41,7 @@ namespace Repository.Classificacao
         {
             int result = await _session.Connection.ExecuteAsync(@"update classificacao_contabil 
                                                                      set id_empresa      = :idempresa,
+                                                                         id_projeto       = :idprojeto,
                                                                          nome            = nvl(:nome,nome),  
                                                                          status          = nvl(:status,status), 
                                                                          mesano_inicio   = :dataInicial,
@@ -50,6 +53,7 @@ namespace Repository.Classificacao
             {
                 idclassificacao = classificacao.IdClassificacaoContabil,
                 idempresa = classificacao.IdEmpresa,
+                idprojeto = classificacao.IdProjeto,
                 nome = classificacao.Nome,
                 status = classificacao.Status,
                 dataInicial = classificacao.MesAnoInicio,
@@ -65,6 +69,7 @@ namespace Repository.Classificacao
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
                                                     select id_classificacao_contabil  as IdClassificacaoContabil, 
                                                            id_empresa                 as IdEmpresa,
+                                                           id_projeto                 as IdProjeto,         
                                                            nome                       as Nome,
                                                            status                     as Status, 
                                                            mesano_inicio              as MesAnoInicio,
@@ -89,6 +94,10 @@ namespace Repository.Classificacao
             {
                 parametros += " and id_empresa = :idempresa";
             }
+            if (filtro.IdProjeto > 0)
+            {
+                parametros += " and id_projeto = :idprojeto";
+            }
             if (!string.IsNullOrEmpty(filtro.DataInicial))
             {
                 parametros += " and mesano_inicio >= to_date(:dataInicial,'DD/MM/RRRR')";
@@ -100,6 +109,7 @@ namespace Repository.Classificacao
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
                                                     select id_classificacao_contabil  as IdClassificacaoContabil, 
                                                            id_empresa                 as IdEmpresa,
+                                                           id_projeto                 as IdProjeto,
                                                            nome                       as Nome,
                                                            status                     as Status, 
                                                            mesano_inicio              as MesAnoInicio,
@@ -116,6 +126,7 @@ namespace Repository.Classificacao
             {
                 idclassificacao = filtro.IdClassificacaoContabil,
                 idempresa = filtro.IdEmpresa,
+                idprojeto = filtro.IdProjeto,
                 dataInicial = filtro.DataInicial,
                 dataFinal = filtro.DataFinal
             });

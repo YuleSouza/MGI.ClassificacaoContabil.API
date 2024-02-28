@@ -1,18 +1,21 @@
 ﻿using Infra.Data;
 using Infra.Interface;
-using Repository.Empresa;
-
-using Service.Empresa;
-using Service.Repository.Empresa;
 using Service.Interface.Empresa;
 using Service.Interface.Cenario;
+using Service.Interface.Classificacao;
+using Service.Interface.Parametrizacao;
 using Service.Cenario;
 using Service.Classificacao;
-using Service.Interface.Classificacao;
+using Service.Empresa;
+using Service.Parametrizacao;
+using Service.Repository.Empresa;
 using Service.Repository.Cenario;
-using Repository.Cenario;
 using Service.Repository.Classificacao;
+using Service.Repository.Parametrizacao;
+using Repository.Empresa;
+using Repository.Cenario;
 using Repository.Classificacao;
+using Repository.Parametrizacao;
 
 namespace API.Config
 {
@@ -27,11 +30,13 @@ namespace API.Config
             services.AddScoped<IEmpresaService, EmpresaService>();
             services.AddScoped<ICenarioService, CenarioService>();
             services.AddScoped<IClassificacaoService, ClassificacaoService>();
+            services.AddScoped<IParametrizacaoRepository, ParametrizacaoRepository>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();
             services.AddScoped<ICenarioRepository, CenarioRepository>();
             services.AddScoped<IClassificacaoRepository, ClassificacaoRepository>();
+            services.AddScoped<IParametrizacaoService, ParametrizacaoService>();
 
             return services;
         }
