@@ -19,7 +19,8 @@ namespace Repository.Parametrizacao
             _unitOfWork = unitOfWork;
             _session = session;
         }
-
+         
+        #region Parametrização Cenário
         public async Task<bool> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
             int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_cenario (id_classificacao_contabil, id_classificacao_esg, id_cenario_classif_contabil, uscriacao, dtcriacao) 
@@ -71,5 +72,118 @@ namespace Repository.Parametrizacao
                                             where 1 = 1");
             return resultado;
         }
+        #endregion
+
+        #region Parametrização Cenário
+        public async Task<bool> InserirParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_geral (id_grupo_programa, uscriacao, dtcriacao) 
+                                                                  values (:idgrupoprograma, :uscriacao, sysdate)",
+            new
+            {
+                idgrupoprograma = parametrizacao.IdGrupoPrograma,
+                uscriacao = parametrizacao.Usuario?.UsuarioCriacao
+            });
+
+            return result == 1;
+        }
+        public async Task<bool> AlterarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"update parametrizacao_esg_geral 
+                                                                     set id_grupo_programa = :idgrupoprograma,  
+                                                                         usalteracao = :usalteracao, 
+                                                                         dtalteracao = sysdate
+                                                                   where id_param_esg_geral = :idparamesggeral",
+           new
+           {
+               idparamesggeral = parametrizacao.IdParametrizacaoEsgGeral,
+               idgrupoprograma = parametrizacao.IdGrupoPrograma,
+               usalteracao = parametrizacao.Usuario?.UsuarioModificacao
+           });
+
+            return result == 1;
+        }
+        public async Task<IEnumerable<ParametrizacaoClassificacaoGeralDTO>> ConsultarParametrizacaoClassificacaoGeral()
+        {
+
+            var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoGeralDTO>($@"
+                                           select 
+                                                id_param_esg_geral              as IdParametrizacaoEsgGeral,
+                                                id_grupo_programa               as IdGrupoPrograma,
+                                                dtcriacao                       as DataCriacao,
+                                                uscriacao                       as UsuarioCriacao,
+                                                dtalteracao                     as DataModificacao,
+                                                usalteracao                     as UsuarioModificacao
+                                            from parametrizacao_esg_geral
+                                            where 1 = 1");
+            return resultado;
+        }
+        #endregion
+
+        #region Parametrização Cenário
+        public async Task<bool> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_exc (id_cenario_classif_contabil, id_empresa, id_grupo_programa, id_programa, id_projeto, id_classificacao_esg, uscriacao, dtcriacao) 
+                                                                  values (:idparametrizacaocenario, :idempresa, :idgrupoprograma, :idprograma, :idprojeto, :idclassificacaoesg, :uscriacao, sysdate)",
+            new
+            {
+                idparametrizacaocenario = parametrizacao.IdCenarioClassificacaoContabil,
+                idempresa = parametrizacao.IdEmpresa,
+                idgrupoprograma = parametrizacao.IdGrupoPrograma,
+                idprograma = parametrizacao.IdPrograma,
+                idprojeto = parametrizacao.IdProjeto,
+                idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
+                uscriacao = parametrizacao.Usuario?.UsuarioCriacao
+            });
+
+            return result == 1;
+        }
+        public async Task<bool> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"update parametrizacao_esg_exc 
+                                                                     set id_cenario_classif_contabil   = :idparametrizacaocenario,  
+                                                                         id_empresa                    = :idempresa,
+                                                                         id_grupo_programa             = :idgrupoprograma,
+                                                                         id_programa                   = :idprograma,
+                                                                         id_projeto                    = :idprojeto,
+                                                                         id_classificacao_esg          = :idclassificacaoesg,                                                               
+                                                                         usalteracao                   = :usalteracao, 
+                                                                         dtalteracao                   = sysdate
+                                                                   where id_param_esg_exc              = :idparamesgexc",
+           new
+           {
+               idparamesgexc = parametrizacao.IdParametrizacaoEsgExc,
+               idparametrizacaocenario = parametrizacao.IdCenarioClassificacaoContabil,
+               idempresa = parametrizacao.IdEmpresa,
+               idgrupoprograma = parametrizacao.IdGrupoPrograma,
+               idprograma = parametrizacao.IdPrograma,
+               idprojeto = parametrizacao.IdProjeto,
+               idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
+               usalteracao = parametrizacao.Usuario?.UsuarioModificacao
+           });
+
+            return result == 1;
+        }
+        public async Task<IEnumerable<ParametrizacaoClassificacaoEsgDTO>> ConsultarParametrizacaoClassificacaoExcecao()
+        {
+
+            var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoEsgDTO>($@"
+                                           select 
+                                                id_param_esg_exc                as IdParametrizacaoEsgExc,
+                                                id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                                                id_grupo_programa               as IdGrupoPrograma,
+                                                id_programa                     as IdPrograma,
+                                                id_projeto                      as IdProjeto,
+                                                id_classificacao_esg            as IdClassificacaoEsg,                                     
+                                                dtcriacao                       as DataCriacao,
+                                                uscriacao                       as UsuarioCriacao,
+                                                dtalteracao                     as DataModificacao,
+                                                usalteracao                     as UsuarioModificacao
+                                            from parametrizacao_esg_exc
+                                            where 1 = 1");
+            return resultado;
+        }
+        #endregion
+
     }
 }

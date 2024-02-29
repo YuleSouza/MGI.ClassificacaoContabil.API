@@ -18,6 +18,7 @@ namespace Service.Parametrizacao
             _unitOfWork = unitOfWork;
         }
 
+        #region Parametrização Cenário
         public async Task<PayloadDTO> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
             using (IUnitOfWork unitOfWork = _unitOfWork)
@@ -59,5 +60,94 @@ namespace Service.Parametrizacao
             var resultado = await _repository.ConsultarParametrizacaoCenario();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+        #endregion
+
+        #region Parametrização Classificacação ESG Geral
+        public async Task<PayloadDTO> InserirParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
+            {
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao);
+                    unitOfWork.Commit();
+                    return new PayloadDTO("Parametrização classificação esg geral inserida com successo", ok, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    return new PayloadDTO("Erro ao inserir parametrização classificação esg geral ", false, ex.Message);
+                }
+            }
+        }
+        public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
+            {
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
+                    unitOfWork.Commit();
+                    return new PayloadDTO("Parametrização da classificação esg geral alterada com successo", ok, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    return new PayloadDTO("Erro na alteração parametrização classificação esg geral ", false, ex.Message);
+                }
+            }
+        }
+        public async Task<PayloadDTO> ConsultarParametrizacaoClassificacaoGeral()
+        {
+            var resultado = await _repository.ConsultarParametrizacaoClassificacaoGeral();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
+        #endregion
+
+        #region Parametrização Classificacação ESG Exceção
+        public async Task<PayloadDTO> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
+            {
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao);
+                    unitOfWork.Commit();
+                    return new PayloadDTO("Parametrização classificação esg exceção inserido com successo", ok, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    return new PayloadDTO("Erro ao inserir parametrização classificação esg exceção ", false, ex.Message);
+                }
+            }
+        }
+        public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
+            {
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.AlterarParametrizacaoClassificacaoExcecao(parametrizacao);
+                    unitOfWork.Commit();
+                    return new PayloadDTO("Parametrização da classificação esg exceção alterada com successo", ok, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    return new PayloadDTO("Erro na alteração parametrização classificação esg exceção ", false, ex.Message);
+                }
+            }
+        }
+        public async Task<PayloadDTO> ConsultarParametrizacaoClassificacaoExcecao()
+        {
+            var resultado = await _repository.ConsultarParametrizacaoClassificacaoExcecao();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
+        #endregion
     }
 }
