@@ -1,0 +1,98 @@
+﻿using Service.DTO.Filtros;
+using Service.Interface.FiltroTela;
+
+using Microsoft.AspNetCore.Mvc;
+
+namespace API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class FiltroTelaController : ControllerBase
+    {
+        private readonly IFiltroTelaService _telaFiltrosService;
+        private readonly ILogger<FiltroTelaController> _logger;
+        public FiltroTelaController(IFiltroTelaService telaFiltrosService, ILogger<FiltroTelaController> logger)
+        {
+            _telaFiltrosService = telaFiltrosService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Empresa
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/comboempresa")]
+        public async Task<IActionResult> ComboEmpresa([FromBody] FiltroEmpresa filtro)
+        {
+            var retorno = await _telaFiltrosService.EmpresaClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Grupo Programa
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/combogrupoprograma")]
+        public async Task<IActionResult> ComboGrupoPrograma([FromBody] FiltroGrupoPrograma filtro)
+        {
+            var retorno = await _telaFiltrosService.GrupoProgramaClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Diretoria
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/combodiretoria")]
+        public async Task<IActionResult> ComboDiretoria([FromBody] FiltroDiretoria filtro)
+        {
+            var retorno = await _telaFiltrosService.DiretoriaClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Gerencia
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/combogerencia")]
+        public async Task<IActionResult> ComboGerencia([FromBody] FiltroGerencia filtro)
+        {
+            var retorno = await _telaFiltrosService.GerenciaClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Gestor
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/combogestor")]
+        public async Task<IActionResult> ComboGestor([FromBody] FiltroGestor filtro)
+        {
+            var retorno = await _telaFiltrosService.GestorClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Projeto
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/comboprojeto")]
+        public async Task<IActionResult> ComboProjeto([FromBody] FiltroProjeto filtro)
+        {
+            var retorno = await _telaFiltrosService.ProjetoClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+    }
+}

@@ -16,6 +16,10 @@ using Repository.Empresa;
 using Repository.Cenario;
 using Repository.Classificacao;
 using Repository.Parametrizacao;
+using Service.Interface.FiltroTela;
+using Service.FiltroTela;
+using Service.Repository.FiltroTela;
+using Repository.FiltroTela;
 
 namespace API.Config
 {
@@ -30,13 +34,15 @@ namespace API.Config
             services.AddScoped<IEmpresaService, EmpresaService>();
             services.AddScoped<ICenarioService, CenarioService>();
             services.AddScoped<IClassificacaoService, ClassificacaoService>();
-            services.AddScoped<IParametrizacaoRepository, ParametrizacaoRepository>();
+            services.AddScoped<IParametrizacaoService, ParametrizacaoService>();
+            services.AddScoped<IFiltroTelaService, FiltroTelaService>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();
             services.AddScoped<ICenarioRepository, CenarioRepository>();
             services.AddScoped<IClassificacaoRepository, ClassificacaoRepository>();
-            services.AddScoped<IParametrizacaoService, ParametrizacaoService>();
+            services.AddScoped<IParametrizacaoRepository, ParametrizacaoRepository>();
+            services.AddScoped<IFiltroTelaRepository, FiltroTelaRepository>();
 
             return services;
         }
