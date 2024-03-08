@@ -45,11 +45,6 @@ namespace Repository.FiltroTela
                                                                        AND a.pgmassver = 0
                                                                        AND a.pgmasscod = p.pgmasscod
                                                                        AND p.prjempcus IN :codEmpresa
-                                                                       AND a.pgmgrucod = nvl(:codGrupoPrograma, a.pgmgrucod)
-                                                                       AND nvl(p.geremp, 1) = nvl(:codEmpresaExecutora, nvl(p.geremp, 1))
-                                                                       AND nvl(p.gersig, 1) = nvl(:codDiretoria, nvl(p.gersig, 1))
-                                                                       AND nvl(p.gcocod, 1) = nvl(:codGerencial, nvl(p.gcocod, 1))
-                                                                       AND nvl(p.gsucod, 999) = nvl(:codCoordenadoria, nvl(p.gsucod, 999))
                                                                        AND ltrim(rtrim(p.prjges)) = nvl(:codGestor, ltrim(rtrim(p.prjges)))
                                                                        AND (EXISTS (SELECT 1
                                                                        FROM servdesk.geradm g
@@ -58,13 +53,8 @@ namespace Repository.FiltroTela
                                                                        AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))",
             new
             {
-                codGrupoPrograma = filtro.IdGrupoPrograma,
+                
                 codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
-                codEmpresaExecutora = filtro.IdEmpresaExecutora,
-                codDiretoria = filtro.IdDiretoria,
-                codGerencial = filtro.IdGerencia,
-                codCoordenadoria = filtro.IdCoordenadoria,
-                codGestor = filtro.IdGestor,
                 usuario = filtro.Usuario?.ToUpper()
             });
         }

@@ -65,6 +65,53 @@ namespace Service.Classificacao
             var resultado = await _repository.ConsultarClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+
+        public async Task<PayloadDTO> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
+            {
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.InserirProjetoClassificacaoContabil(projeto);
+                    unitOfWork.Commit();
+                    return new PayloadDTO("Projeto Classificação Contábil inserido com successo", ok, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    return new PayloadDTO("Erro ao inserir Projeto Classificação Contábil", false, ex.Message);
+                }
+            }
+        }
+        public async Task<PayloadDTO> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
+            {
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.AlterarProjetoClassificacaoContabil(projeto);
+                    unitOfWork.Commit();
+                    return new PayloadDTO("Projeto Classificação Contábil alterada com successo", ok, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    return new PayloadDTO("Erro na alteração Projeto Classificação Contábil", false, ex.Message);
+                }
+            }
+        }
+        public async Task<PayloadDTO> ConsultarProjetoClassificacaoContabil()
+        {
+            var resultado = await _repository.ConsultarProjetoClassificacaoContabil();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
+        public async Task<PayloadDTO> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro)
+        {
+            var resultado = await _repository.ConsultarProjetoClassificacaoContabil(filtro);
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
         #endregion
 
         #region ESG

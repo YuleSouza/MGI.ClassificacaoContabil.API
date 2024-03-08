@@ -23,13 +23,11 @@ namespace Repository.Classificacao
         #region Contabil
         public async Task<bool> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into classificacao_contabil (id_empresa, id_projeto, nome, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao) 
-                                                                  values (:idempresa, :idprojeto, :nome, :status, :dataInicial, :dataFinal, :uscriacao, sysdate)",
+            int result = await _session.Connection.ExecuteAsync(@"insert into classificacao_contabil (id_empresa, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao) 
+                                                                  values (:idempresa, :status, :dataInicial, :dataFinal, :uscriacao, sysdate)",
             new
             {
                 idempresa = classificacao.IdEmpresa,
-                idprojeto = classificacao.IdProjeto,
-                nome = classificacao.Nome,
                 status = classificacao.Status,
                 dataInicial = classificacao.MesAnoInicio,
                 dataFinal = classificacao.MesAnoFim,
@@ -41,8 +39,6 @@ namespace Repository.Classificacao
         {
             int result = await _session.Connection.ExecuteAsync(@"update classificacao_contabil 
                                                                      set id_empresa      = :idempresa,
-                                                                         id_projeto       = :idprojeto,
-                                                                         nome            = nvl(:nome,nome),  
                                                                          status          = nvl(:status,status), 
                                                                          mesano_inicio   = :dataInicial,
                                                                          mesano_fim      = :dataFinal,
@@ -53,8 +49,6 @@ namespace Repository.Classificacao
             {
                 idclassificacao = classificacao.IdClassificacaoContabil,
                 idempresa = classificacao.IdEmpresa,
-                idprojeto = classificacao.IdProjeto,
-                nome = classificacao.Nome,
                 status = classificacao.Status,
                 dataInicial = classificacao.MesAnoInicio,
                 dataFinal = classificacao.MesAnoFim,
@@ -67,18 +61,18 @@ namespace Repository.Classificacao
         {
 
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
-                                                    select id_classificacao_contabil  as IdClassificacaoContabil, 
-                                                           id_empresa                 as IdEmpresa,
-                                                           id_projeto                 as IdProjeto,         
-                                                           nome                       as Nome,
-                                                           status                     as Status, 
-                                                           mesano_inicio              as MesAnoInicio,
-                                                           mesano_fim                 as MesAnoFim,
-                                                           dtcriacao                  as DataCriacao,
-                                                           uscriacao                  as UsuarioCriacao,
-                                                           dtalteracao                as DataModificacao,
-                                                           usalteracao                as UsuarioModificacao
-                                                      from classificacao_contabil 
+                                                    select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
+                                                           cc.id_empresa                 as IdEmpresa,         
+                                                           ltrim(rtrim(a.empnomfan))     as Nome,
+                                                           cc.status                     as Status, 
+                                                           cc.mesano_inicio              as MesAnoInicio,
+                                                           cc.mesano_fim                 as MesAnoFim,
+                                                           cc.dtcriacao                  as DataCriacao,
+                                                           cc.uscriacao                  as UsuarioCriacao,
+                                                           cc.dtalteracao                as DataModificacao,
+                                                           cc.usalteracao                as UsuarioModificacao
+                                                     from classificacao_contabil cc 
+                                                     inner join corpora.empres a on cc.id_empresa = a.empcod
                                                      where 1 = 1
                                                      order by mesano_fim");
             return resultado;
@@ -107,18 +101,18 @@ namespace Repository.Classificacao
                 parametros += " and mesano_fim <= to_date(:dataFinal,'DD/MM/RRRR')";
             }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
-                                                    select id_classificacao_contabil  as IdClassificacaoContabil, 
-                                                           id_empresa                 as IdEmpresa,
-                                                           id_projeto                 as IdProjeto,
-                                                           nome                       as Nome,
-                                                           status                     as Status, 
-                                                           mesano_inicio              as MesAnoInicio,
-                                                           mesano_fim                 as MesAnoFim,
-                                                           dtcriacao                  as DataCriacao,
-                                                           uscriacao                  as UsuarioCriacao,
-                                                           dtalteracao                as DataModificacao,
-                                                           usalteracao                as UsuarioModificacao
-                                                      from classificacao_contabil 
+                                                    select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
+                                                           cc.id_empresa                 as IdEmpresa,       
+                                                           ltrim(rtrim(a.empnomfan))     as Nome,
+                                                           cc.status                     as Status, 
+                                                           cc.mesano_inicio              as MesAnoInicio,
+                                                           cc.mesano_fim                 as MesAnoFim,
+                                                           cc.dtcriacao                  as DataCriacao,
+                                                           cc.uscriacao                  as UsuarioCriacao,
+                                                           cc.dtalteracao                as DataModificacao,
+                                                           cc.usalteracao                as UsuarioModificacao
+                                                     from classificacao_contabil cc 
+                                                     inner join corpora.empres a on cc.id_empresa = a.empcod
                                                      where 1 = 1
                                                      {parametros}
                                                      order by mesano_fim
@@ -126,7 +120,112 @@ namespace Repository.Classificacao
             {
                 idclassificacao = filtro.IdClassificacaoContabil,
                 idempresa = filtro.IdEmpresa,
-                idprojeto = filtro.IdProjeto,
+                dataInicial = filtro.DataInicial,
+                dataFinal = filtro.DataFinal
+            });
+            return resultado;
+        }
+
+        public async Task<bool> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"insert into classif_contabil_prj (id_classificacao_contabil, id_projeto, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao) 
+                                                                  values (:idclassificacaocontabil, :idprojeto, :status, :dataInicial, :dataFinal, :uscriacao, sysdate)",
+            new
+            {
+                idclassificacaocontabil = projeto.IdClassificacaoContabil,
+                idprojeto = projeto.IdProjeto,
+                status = projeto.Status,
+                dataInicial = projeto.MesAnoInicio,
+                dataFinal = projeto.MesAnoFim,
+                uscriacao = projeto.Usuario?.UsuarioCriacao
+            });
+            return result == 1;
+        }
+        public async Task<bool> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"update classif_contabil_prj 
+                                                                     set id_classificacao_contabil      = :idclassificacaocontabil,
+                                                                         id_projeto                     = :idprojeto,
+                                                                         status                         = nvl(:status,status), 
+                                                                         mesano_inicio                  = :dataInicial,
+                                                                         mesano_fim                     = :dataFinal,
+                                                                         usalteracao                    = :usalteracao, 
+                                                                         dtalteracao                    = :dtalteracao
+                                                                   where id_classif_contabil_prj        = :idclassificacaoprojeto",
+            new
+            {
+                idclassificacaoprojeto = projeto.IdClassificacaoContabilProjeto,
+                idclassificacaocontabil = projeto.IdClassificacaoContabil,
+                idprojeto = projeto.IdProjeto,
+                status = projeto.Status,
+                dataInicial = projeto.MesAnoInicio,
+                dataFinal = projeto.MesAnoFim,
+                usalteracao = projeto.Usuario?.UsuarioModificacao,
+                dtalteracao = projeto.Usuario?.DataModificacao
+            });
+            return result == 1;
+        }
+        public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil()
+        {
+
+            var resultado = await _session.Connection.QueryAsync<ClassificacaoProjetoDTO>($@"
+                                                    select cp.id_classif_contabil_prj                                    as IdClassificacaoContabil, 
+                                                           cp.id_projeto                                                 as IdProjeto,  
+                                                           to_char(p.prjcod, '00000') || ' - ' || ltrim(rtrim(p.prjnom)) as Nomeprojeto,
+                                                           cp.status                                                     as Status, 
+                                                           cp.mesano_inicio                                              as MesAnoInicio,
+                                                           cp.mesano_fim                                                 as MesAnoFim,
+                                                           cp.dtcriacao                                                  as DataCriacao,
+                                                           cp.uscriacao                                                  as UsuarioCriacao,
+                                                           cp.dtalteracao                                                as DataModificacao,
+                                                           cp.usalteracao                                                as UsuarioModificacao
+                                                     from classif_contabil_prj cp 
+                                                     inner join servdesk.projeto p on p.prjcod = cp.id_projeto
+                                                     where 1 = 1 
+                                                     and p.prjsit = 'A'
+                                                     order by mesano_fim");
+            return resultado;
+        }
+        public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro)
+        {
+            string parametros = string.Empty;
+            if (filtro.IdClassificacaoContabil > 0)
+            {
+                parametros += " and cp.id_classificacao_contabil = :idclassificacao";
+            }
+            if (filtro.IdProjeto > 0)
+            {
+                parametros += " and cp.id_projeto = :idprojeto";
+            }
+            if (!string.IsNullOrEmpty(filtro.DataInicial))
+            {
+                parametros += " and cp.mesano_inicio >= to_date(:dataInicial,'DD/MM/RRRR')";
+            }
+            if (!string.IsNullOrEmpty(filtro.DataFinal))
+            {
+                parametros += " and cp.mesano_fim <= to_date(:dataFinal,'DD/MM/RRRR')";
+            }
+            var resultado = await _session.Connection.QueryAsync<ClassificacaoProjetoDTO>($@"
+                                                    select cp.id_classif_contabil_prj                                    as IdClassificacaoContabil, 
+                                                           cp.id_projeto                                                 as IdProjeto,  
+                                                           to_char(p.prjcod, '00000') || ' - ' || ltrim(rtrim(p.prjnom)) as Nomeprojeto,
+                                                           cp.status                                                     as Status, 
+                                                           cp.mesano_inicio                                              as MesAnoInicio,
+                                                           cp.mesano_fim                                                 as MesAnoFim,
+                                                           cp.dtcriacao                                                  as DataCriacao,
+                                                           cp.uscriacao                                                  as UsuarioCriacao,
+                                                           cp.dtalteracao                                                as DataModificacao,
+                                                           cp.usalteracao                                                as UsuarioModificacao
+                                                     from classif_contabil_prj cp 
+                                                     inner join servdesk.projeto p on p.prjcod = cp.id_projeto
+                                                     where 1 = 1 
+                                                     and p.prjsit = 'A'
+                                                     {parametros}
+                                                     order by mesano_fim
+                                        ", new
+            {
+                idclassificacao = filtro.IdClassificacaoContabil,
+                idempresa = filtro.IdEmpresa,
                 dataInicial = filtro.DataInicial,
                 dataFinal = filtro.DataFinal
             });

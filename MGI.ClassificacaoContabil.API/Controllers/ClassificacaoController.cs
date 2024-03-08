@@ -79,6 +79,65 @@ namespace API.Controllers
             return Ok(retorno);
         }
 
+
+        [HttpPost]
+        [Route("v1/contabil/projeto/inserir")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> InserirDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
+        {
+            var retorno = await _service.InserirProjetoClassificacaoContabil(projeto);
+            if (retorno.Sucesso)
+            {
+                return Ok(retorno);
+            }
+            else
+            {
+                _logger.LogError("Erro inserir dados do projeto classificação contábil.", retorno);
+                return BadRequest(new
+                {
+                    message = retorno.MensagemErro
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("v1/contabil/projeto/alterar")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> AlterarDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
+        {
+            var retorno = await _service.AlterarProjetoClassificacaoContabil(projeto);
+            if (retorno.Sucesso)
+            {
+                return Ok(retorno);
+            }
+            else
+            {
+                _logger.LogError("Erro alteracao dados do projeto classificação contábil.", retorno);
+                return BadRequest(new
+                {
+                    message = retorno.MensagemErro
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("v1/contabil/projeto/consultar")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadoProjetosClassificacao([FromBody] ClassificacaoContabilFiltro filtro)
+        {
+            var retorno = await _service.ConsultarProjetoClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        [HttpGet]
+        [Route("v1/contabil/projeto/consultar")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadosProjetoClassificacao()
+        {
+            var retorno = await _service.ConsultarProjetoClassificacaoContabil();
+            return Ok(retorno);
+        }
+
         #endregion
 
         #region ESG

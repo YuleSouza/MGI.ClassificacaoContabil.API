@@ -10,6 +10,11 @@ namespace Service.Repository.Classificacao
         Task<bool> AlterarClassificacaoContabil(ClassificacaoContabilDTO classificacao);
         Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil();
         Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro);
+
+        Task<bool> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto);
+        Task<bool> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto);
+        Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil();
+        Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro);
         #endregion
 
         #region ESG
