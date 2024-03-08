@@ -45,7 +45,6 @@ namespace Repository.FiltroTela
                                                                        AND a.pgmassver = 0
                                                                        AND a.pgmasscod = p.pgmasscod
                                                                        AND p.prjempcus IN :codEmpresa
-                                                                       AND ltrim(rtrim(p.prjges)) = nvl(:codGestor, ltrim(rtrim(p.prjges)))
                                                                        AND (EXISTS (SELECT 1
                                                                        FROM servdesk.geradm g
                                                                        WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
