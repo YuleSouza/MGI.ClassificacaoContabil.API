@@ -206,7 +206,8 @@ namespace Repository.Classificacao
                 parametros += " and cp.mesano_fim <= to_date(:dataFinal,'DD/MM/RRRR')";
             }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoProjetoDTO>($@"
-                                                    select cp.id_classif_contabil_prj                                    as IdClassificacaoContabil, 
+                                                    select cp.id_classif_contabil_prj                                    as IdClassificacaoContabilProjeto, 
+                                                           cp.id_classificacao_contabil                                  as IdClassificacaoContabil,
                                                            cp.id_projeto                                                 as IdProjeto,  
                                                            to_char(p.prjcod, '00000') || ' - ' || ltrim(rtrim(p.prjnom)) as Nomeprojeto,
                                                            cp.status                                                     as Status, 
