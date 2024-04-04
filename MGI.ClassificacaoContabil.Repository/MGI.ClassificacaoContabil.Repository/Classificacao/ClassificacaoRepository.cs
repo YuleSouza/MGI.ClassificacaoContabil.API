@@ -1,11 +1,11 @@
 ﻿using Dapper;
-
 using Infra.Data;
 using Infra.Interface;
-
-using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
+using Service.DTO.Classificacao;
 using Service.Repository.Classificacao;
+using Dapper.Oracle.BulkSql;
+using System.Data;
 
 namespace Repository.Classificacao
 {
@@ -19,7 +19,6 @@ namespace Repository.Classificacao
             _unitOfWork = unitOfWork;
             _session = session;
         }
-
         #region Contabil
         public async Task<bool> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
@@ -141,6 +140,32 @@ namespace Repository.Classificacao
             });
             return result == 1;
         }
+        public async Task<bool> InserirProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos)
+        {
+            if (projetos.Count > 0)
+            {
+                IList<BulkMapping<ClassificacaoProjetoDTO>> bulkMappings = new List<BulkMapping<ClassificacaoProjetoDTO>>();
+                var prop = new BulkMapping<ClassificacaoProjetoDTO>("id_classificacao_contabil", p => p.IdClassificacaoContabil, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("id_projeto", p => p.IdProjeto, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("status", p => p.Status, Dapper.Oracle.OracleMappingType.Char);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("mesano_inicio", p => p.MesAnoInicio, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("mesano_fim", p => p.MesAnoFim, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("uscriacao", p => p.Usuario?.UsuarioCriacao, Dapper.Oracle.OracleMappingType.Varchar2);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("dtcriacao", p => p.Usuario?.DataCriacao, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                var bulk = await BulkOperation.SqlBulkAsync(_session.Connection, @"insert into classif_contabil_prj (id_classificacao_contabil, id_projeto, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao)  
+                                                                                 values (:id_classificacao_contabil, :id_projeto, :status, :mesano_inicio, :mesano_fim, :uscriacao, sysdate)", projetos.AsEnumerable(), bulkMappings.AsEnumerable());
+            }
+            return true;
+        }
+
+
         public async Task<bool> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
             int result = await _session.Connection.ExecuteAsync(@"update classif_contabil_prj 
@@ -165,11 +190,48 @@ namespace Repository.Classificacao
             });
             return result == 1;
         }
+        public async Task<bool> AlterarProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos)
+        {
+            if (projetos.Count > 0)
+            {
+                IList<BulkMapping<ClassificacaoProjetoDTO>> bulkMappings = new List<BulkMapping<ClassificacaoProjetoDTO>>();
+                var prop = new BulkMapping<ClassificacaoProjetoDTO>("id_classificacao_contabil", p => p.IdClassificacaoContabil, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("id_classif_contabil_prj", p => p.IdClassificacaoContabilProjeto, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("id_projeto", p => p.IdProjeto, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("status", p => p.Status, Dapper.Oracle.OracleMappingType.Char);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("mesano_inicio", p => p.MesAnoInicio, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("mesano_fim", p => p.MesAnoFim, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("usalteracao", p => p.Usuario?.UsuarioModificacao, Dapper.Oracle.OracleMappingType.Varchar2);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("dtalteracao", p => p.Usuario?.DataModificacao, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                var bulk = await BulkOperation.SqlBulkAsync(_session.Connection, @"update classif_contabil_prj 
+                                                                                     set id_classificacao_contabil      = nvl(:id_classificacao_contabil, id_classificacao_contabil),
+                                                                                         id_projeto                     = nvl(:id_projeto, id_projeto),
+                                                                                         status                         = nvl(:status, status), 
+                                                                                         mesano_inicio                  = nvl(:mesano_inicio, mesano_inicio),
+                                                                                         mesano_fim                     = nvl(:mesano_fim, mesano_fim),
+                                                                                         usalteracao                    = :usalteracao, 
+                                                                                         dtalteracao                    = :dtalteracao
+                                                                                   where id_classif_contabil_prj        = :id_classif_contabil_prj
+                                                                                 ", projetos.AsEnumerable(), bulkMappings.AsEnumerable(), CommandType.Text);
+            }
+            return true;
+        }
+
+
         public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil()
         {
 
             var resultado = await _session.Connection.QueryAsync<ClassificacaoProjetoDTO>($@"
-                                                    select cp.id_classif_contabil_prj                                    as IdClassificacaoContabil, 
+                                                    select cp.id_classif_contabil_prj                                    as IdClassificacaoContabilProjeto, 
+                                                           cp.id_classificacao_contabil                                  as IdClassificacaoContabil,
                                                            cp.id_projeto                                                 as IdProjeto,  
                                                            to_char(p.prjcod, '00000') || ' - ' || ltrim(rtrim(p.prjnom)) as Nomeprojeto,
                                                            cp.status                                                     as Status, 
@@ -318,5 +380,5 @@ namespace Repository.Classificacao
             return resultado;
         }
         #endregion
-    }
+    } 
 }
