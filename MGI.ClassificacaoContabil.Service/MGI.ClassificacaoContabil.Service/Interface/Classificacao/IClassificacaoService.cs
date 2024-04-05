@@ -12,14 +12,8 @@ namespace Service.Interface.Classificacao
         Task<PayloadDTO> ConsultarClassificacaoContabil();
         Task<PayloadDTO> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro);
 
-
         Task<PayloadDTO> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto);
-        Task<PayloadDTO> InserirProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos);
-
-
         Task<PayloadDTO> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto);
-
-        Task<PayloadDTO> AlterarProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos);
 
         Task<PayloadDTO> ConsultarProjetoClassificacaoContabil();
         Task<PayloadDTO> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro);

@@ -48,7 +48,6 @@ namespace Service.Classificacao
                 try
                 {
                     unitOfWork.BeginTransaction();
-
                     if (classificacao?.Projetos.Count() > 0)
                     { 
                         var projetos = _repository.ConsultarProjetoClassificacaoContabil(new ClassificacaoContabilFiltro { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
@@ -62,26 +61,26 @@ namespace Service.Classificacao
                                 var projetosInativos = projetos.Result.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
                                 projetosInativos.ToList().ForEach(P => P.Status = "I");
 
-                                await AlterarProjetosClassificacaoContabil(projetosInativos.ToList());
+                                await _repository.AlterarProjetosClassificacaoContabil(projetosInativos.ToList());
                             }
                             else if (projetosExistente.Count() == classificacao.Projetos.Count())
                             {
-                                await AlterarProjetosClassificacaoContabil(classificacao.Projetos.ToList());
+                                await _repository.AlterarProjetosClassificacaoContabil(classificacao.Projetos.ToList());
                             }
                             else
                             {
                                 var projetosNovos = classificacao.Projetos.Where(a => !projetos.Result.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
 
-                                InserirProjetosClassificacaoContabil(projetosNovos.ToList());
+                                await _repository.InserirProjetosClassificacaoContabil(projetosNovos.ToList());
                             }
                         }
                         else
                         {
-                            InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
+                            await _repository.InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
                         }
                     }
-                    
 
+                   
                     bool ok = await _repository.AlterarClassificacaoContabil(classificacao);
                     unitOfWork.Commit();
                     return new PayloadDTO("Classificação Contábil alterada com successo", ok, string.Empty);
@@ -146,42 +145,6 @@ namespace Service.Classificacao
                 {
                     unitOfWork.Rollback();
                     return new PayloadDTO("Erro na alteração Projeto Classificação Contábil", false, ex.Message);
-                }
-            }
-        }
-        public async Task<PayloadDTO> InserirProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos)
-        {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.InserirProjetosClassificacaoContabil(projetos);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Projetos Classificação Contábil inseridos com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir Projetos Classificação Contábil", false, ex.Message);
-                }
-            }
-        }
-        public async Task<PayloadDTO> AlterarProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos)
-        {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.AlterarProjetosClassificacaoContabil(projetos);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Projetos Classificação Contábil alterados com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração Projetos Classificação Contábil", false, ex.Message);
                 }
             }
         }
