@@ -61,7 +61,7 @@ namespace Service.Classificacao
                                 var projetosInativos = projetos.Result.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
                                 projetosInativos.ToList().ForEach(P => P.Status = "I");
 
-                                await _repository.AlterarProjetosClassificacaoContabil(projetosInativos.ToList());
+                                await _repository.DeletarProjetosClassificacaoContabil(projetosInativos.ToList());
                             }
                             else if (projetosExistente.Count() == classificacao.Projetos.Count())
                             {

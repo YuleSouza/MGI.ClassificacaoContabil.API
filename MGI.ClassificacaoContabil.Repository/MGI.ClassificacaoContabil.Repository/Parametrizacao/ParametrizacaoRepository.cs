@@ -23,13 +23,14 @@ namespace Repository.Parametrizacao
         #region Parametrização Cenário
         public async Task<bool> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_cenario (id_classificacao_contabil, id_classificacao_esg, id_cenario_classif_contabil, uscriacao, dtcriacao) 
-                                                                  values (:idclassificacaocontabil, :idclassificacaoesg, :idcenarioclassificacao, :uscriacao, sysdate)",
+            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_cenario (id_classificacao_contabil, id_classificacao_esg, id_cenario_classif_contabil, status, uscriacao, dtcriacao) 
+                                                                  values (:idclassificacaocontabil, :idclassificacaoesg, :idcenarioclassificacao, :status, :uscriacao, sysdate)",
             new
             {
                 idclassificacaocontabil = parametrizacao.IdClassificacaoContabil,
                 idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
                 idcenarioclassificacao = parametrizacao.IdCenarioClassificacaoContabil,
+                status = parametrizacao.Status,
                 uscriacao = parametrizacao.Usuario?.UsuarioCriacao
             });
 
@@ -41,6 +42,7 @@ namespace Repository.Parametrizacao
                                                                      set id_classificacao_contabil = :idclassificacaocontabil,  
                                                                          id_classificacao_esg = :idclassificacaoesg, 
                                                                          id_cenario_classif_contabil = :idcenarioclassificacao,
+                                                                         status  = :status,
                                                                          usalteracao = :usalteracao, 
                                                                          dtalteracao = sysdate
                                                                    where id_parametrizacao_cenario = :idparametrizacaocenario",
@@ -50,6 +52,7 @@ namespace Repository.Parametrizacao
                idclassificacaocontabil = parametrizacao.IdClassificacaoContabil,
                idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
                idcenarioclassificacao = parametrizacao.IdCenarioClassificacaoContabil,
+               status = parametrizacao.Status,
                usalteracao = parametrizacao.Usuario?.UsuarioModificacao
            });
 

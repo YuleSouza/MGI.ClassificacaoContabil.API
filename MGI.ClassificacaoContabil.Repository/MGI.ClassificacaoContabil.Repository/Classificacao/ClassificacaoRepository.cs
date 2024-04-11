@@ -225,6 +225,19 @@ namespace Repository.Classificacao
             return true;
         }
 
+        public async Task<bool> DeletarProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos)
+        {
+            if (projetos.Count > 0)
+            {
+                IList<BulkMapping<ClassificacaoProjetoDTO>> bulkMappings = new List<BulkMapping<ClassificacaoProjetoDTO>>();
+                var prop = new BulkMapping<ClassificacaoProjetoDTO>("id_classif_contabil_prj", p => p.IdClassificacaoContabilProjeto, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                var bulk = await BulkOperation.SqlBulkAsync(_session.Connection, @"delete classif_contabil_prj 
+                                                                                   where id_classif_contabil_prj = :id_classif_contabil_prj
+                                                                                 ", projetos.AsEnumerable(), bulkMappings.AsEnumerable(), CommandType.Text);
+            }
+            return true;
+        }
 
         public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil()
         {

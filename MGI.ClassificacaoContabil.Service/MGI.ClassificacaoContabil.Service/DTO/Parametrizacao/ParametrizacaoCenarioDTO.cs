@@ -6,6 +6,7 @@
         public int IdClassificacaoContabil { get; set; }
         public int IdClassificacaoEsg { get; set; }
         public int IdCenarioClassificacaoContabil { get; set; }
+        public string? Status { get; set; }
         public UsuarioDTO? Usuario { get; set; }
     }
 }
