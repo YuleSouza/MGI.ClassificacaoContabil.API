@@ -2,10 +2,12 @@
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
+using Service.DTO.Cenario;
 using Service.DTO.Classificacao;
 using Service.Repository.PainelClassificacao;
 
 using Dapper;
+using Service.DTO.Parametrizacao;
 
 namespace Repository.PainelClassificacao
 {
@@ -171,6 +173,19 @@ namespace Repository.PainelClassificacao
                         codPrograma = (filtro.IdPrograma ?? "").Select(s => Convert.ToInt32(s)),
                     });
         }
+        public async Task<IEnumerable<ParametrizacaoCenarioPainelDTO>> FiltroPainelCenario(FiltroPainelCenario filtro)
+        {
+            return await _session.Connection.QueryAsync<ParametrizacaoCenarioPainelDTO>(
+                    $@"SELECT
+                            pc.id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                            cc.nome                            as Nome
+                       FROM servdesk.cenario_classif_contabil cc
+                       JOIN servdesk.parametrizacao_cenario  pc on cc.id_cenario_classif_contabil = pc.id_cenario_classif_contabil
+                       WHERE cc.id_cenario_classif_contabil = :codCenarioClassif", new
+                    {
+                        codCenarioClassif = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
+                    });
+        }
         public async Task<IEnumerable<ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             return await _session.Connection.QueryAsync<ClassificacaoContabilDTO>(
@@ -188,7 +203,7 @@ namespace Repository.PainelClassificacao
                       WHERE status = 'A'
                       AND id_empresa IN :codEmpresa", new
                     {
-                        codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
+                        codEmpresa = (filtro.IdEmpresa ?? "").Select(s => Convert.ToInt32(s))
                     });
         }
         public async Task<IEnumerable<ClassificacaoEsgDTO>>FiltroPainelClassificacaoESG(FiltroPainelClassificacaoEsg filtro)
@@ -206,8 +221,7 @@ namespace Repository.PainelClassificacao
                                                                                 AND id_classificacao_esg = :codClassificacaoEsg",
             new
             {
-
-                codClassificacaoEsg = Convert.ToInt32(filtro.IdClassificacaoEsg)
+                codClassificacaoEsg = (filtro.IdClassificacaoEsg ?? "").Select(s => Convert.ToInt32(s))
             });
         }
 

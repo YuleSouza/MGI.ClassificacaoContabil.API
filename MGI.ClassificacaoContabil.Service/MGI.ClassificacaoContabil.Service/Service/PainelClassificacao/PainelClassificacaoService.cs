@@ -53,6 +53,11 @@ namespace Service.PainelClassificacao
             var resultado = await _PainelClassificacaoRepository.FiltroPainelPrograma(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+        public async Task<PayloadDTO> FiltroPainelCenario(FiltroPainelCenario filtro)
+        {
+            var resultado = await _PainelClassificacaoRepository.FiltroPainelCenario(filtro);
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
         public async Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             var resultado = await _PainelClassificacaoRepository.FiltroPainelClassificacaoContabil(filtro);

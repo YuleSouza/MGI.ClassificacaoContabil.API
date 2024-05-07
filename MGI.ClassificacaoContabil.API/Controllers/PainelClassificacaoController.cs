@@ -117,6 +117,19 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         /// <param name="filtro"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("v1/combocenario")]
+        public async Task<IActionResult> ComboCenario([FromBody] FiltroPainelCenario filtro)
+        {
+            var retorno = await _service.FiltroPainelCenario(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Projeto
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
         [Route("v1/combocontabil")]
         public async Task<IActionResult> ComboClassificacaoContabil([FromBody] FiltroPainelClassificacaoContabil filtro)
         {

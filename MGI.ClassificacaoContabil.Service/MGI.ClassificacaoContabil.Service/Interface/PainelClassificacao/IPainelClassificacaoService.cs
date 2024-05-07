@@ -12,7 +12,8 @@ namespace Service.Interface.PainelClassificacao
         Task<PayloadDTO> FiltroPainelGerencia(FiltroPainelGerencia filtro);
         Task<PayloadDTO> FiltroPainelGestor(FiltroPainelGestor filtro);
         Task<PayloadDTO> FiltroPainelGrupoPrograma(FiltroPainelGrupoPrograma filtro);
-        Task<PayloadDTO> FiltroPainelPrograma(FiltroPainelPrograma filtro);
+        Task<PayloadDTO> FiltroPainelPrograma(FiltroPainelPrograma filtro); 
+        Task<PayloadDTO> FiltroPainelCenario(FiltroPainelCenario filtro);
         Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         Task<PayloadDTO> FiltroPainelClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         #endregion
