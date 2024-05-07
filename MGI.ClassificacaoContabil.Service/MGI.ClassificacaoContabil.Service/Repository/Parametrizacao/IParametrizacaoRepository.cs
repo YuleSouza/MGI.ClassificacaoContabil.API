@@ -1,6 +1,4 @@
 ﻿using Service.DTO.Parametrizacao;
-using Service.DTO.Filtros;
-using DTO.Payload;
 
 namespace Service.Repository.Parametrizacao
 {

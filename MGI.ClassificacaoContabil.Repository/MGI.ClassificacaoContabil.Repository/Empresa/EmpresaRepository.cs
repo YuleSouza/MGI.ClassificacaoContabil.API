@@ -1,7 +1,8 @@
-﻿using Dapper;
-using Infra.Data;
+﻿using Infra.Data;
 using Service.DTO.Empresa;
 using Service.Repository.Empresa;
+
+using Dapper;
 
 namespace Repository.Empresa
 {

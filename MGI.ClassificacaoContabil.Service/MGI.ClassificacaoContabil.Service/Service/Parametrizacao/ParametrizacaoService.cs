@@ -1,9 +1,8 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
+using Service.DTO.Parametrizacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;
-using Service.DTO.Parametrizacao;
-using Service.DTO.Filtros;
 
 namespace Service.Parametrizacao
 {

@@ -4,9 +4,6 @@ using Service.DTO.Filtros;
 using Service.DTO.Classificacao;
 using Service.Interface.Classificacao;
 using Service.Repository.Classificacao;
-using System.Collections.Generic;
-
-using System.Linq;
 
 namespace Service.Classificacao
 {
@@ -50,7 +47,7 @@ namespace Service.Classificacao
                     unitOfWork.BeginTransaction();
                     if (classificacao?.Projetos.Count() > 0)
                     { 
-                        var projetos = _repository.ConsultarProjetoClassificacaoContabil(new ClassificacaoContabilFiltro { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
+                        var projetos = _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
                  
                         if (projetos.Result.Count() > 0)
                         {
@@ -97,7 +94,7 @@ namespace Service.Classificacao
             var resultado = await _repository.ConsultarClassificacaoContabil();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro)
+        public async Task<PayloadDTO> ConsultarClassificacaoContabil(FiltroClassificacaoContabil filtro)
         {
             var resultado = await _repository.ConsultarClassificacaoContabil(filtro);
 
@@ -153,7 +150,7 @@ namespace Service.Classificacao
             var resultado = await _repository.ConsultarProjetoClassificacaoContabil();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro)
+        public async Task<PayloadDTO> ConsultarProjetoClassificacaoContabil(FiltroClassificacaoContabil filtro)
         {
             var resultado = await _repository.ConsultarProjetoClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);

@@ -1,10 +1,9 @@
 ﻿using DTO.Payload;
-using Service.Interface.Cenario;
 using Service.DTO.Cenario;
 using Service.DTO.Filtros;
+using Service.Interface.Cenario;
 
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace API.Controllers
 {
@@ -20,7 +19,6 @@ namespace API.Controllers
             _service = service;
             _logger = logger;
         }
-
 
         [HttpPost]
         [Route("v1/inserir")]
@@ -62,7 +60,6 @@ namespace API.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("v1/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
@@ -71,7 +68,6 @@ namespace API.Controllers
             var retorno = await _service.ConsultarCenario(filtro);
             return Ok(retorno);
         }
-
 
         [HttpGet]
         [Route("v1/consultar")]

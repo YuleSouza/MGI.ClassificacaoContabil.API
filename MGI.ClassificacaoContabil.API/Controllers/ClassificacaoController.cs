@@ -1,9 +1,9 @@
-﻿using Service.Interface.Classificacao;
-using Service.DTO.Classificacao;
+﻿using DTO.Payload;
 using Service.DTO.Filtros;
+using Service.DTO.Classificacao;
+using Service.Interface.Classificacao;
 
 using Microsoft.AspNetCore.Mvc;
-using DTO.Payload;
 
 namespace API.Controllers
 {
@@ -64,7 +64,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("v1/contabil/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] ClassificacaoContabilFiltro filtro)
+        public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
             var retorno = await _service.ConsultarClassificacaoContabil(filtro);
             return Ok(retorno);
@@ -123,7 +123,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("v1/contabil/projeto/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ConsultarDadoProjetosClassificacao([FromBody] ClassificacaoContabilFiltro filtro)
+        public async Task<IActionResult> ConsultarDadoProjetosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
             var retorno = await _service.ConsultarProjetoClassificacaoContabil(filtro);
             return Ok(retorno);

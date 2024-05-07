@@ -1,11 +1,9 @@
-﻿using Dapper;
-
-using Infra.Data;
+﻿using Infra.Data;
 using Infra.Interface;
-
-using Service.DTO.Filtros;
 using Service.DTO.Parametrizacao;
 using Service.Repository.Parametrizacao;
+
+using Dapper;
 
 namespace Repository.Parametrizacao
 {
@@ -19,8 +17,8 @@ namespace Repository.Parametrizacao
             _unitOfWork = unitOfWork;
             _session = session;
         }
-         
-        #region Parametrização Cenário
+
+        #region [Parametrização Cenario]
         public async Task<bool> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
             int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_cenario (id_classificacao_contabil, id_classificacao_esg, id_cenario_classif_contabil, status, uscriacao, dtcriacao) 
@@ -77,14 +75,15 @@ namespace Repository.Parametrizacao
         }
         #endregion
 
-        #region Parametrização Cenário
+        #region [Classificacao Geral]
         public async Task<bool> InserirParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_geral (id_grupo_programa, uscriacao, dtcriacao) 
-                                                                  values (:idgrupoprograma, :uscriacao, sysdate)",
+            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_geral (id_classificacao_esg, id_grupo_programa, uscriacao, dtcriacao) 
+                                                                  values (:idclassificacaoesg, :idgrupoprograma, :uscriacao, sysdate)",
             new
             {
                 idgrupoprograma = parametrizacao.IdGrupoPrograma,
+                idclassificacaoesg = parametrizacao.IdParametrizacaoEsgGeral,
                 uscriacao = parametrizacao.Usuario?.UsuarioCriacao
             });
 
@@ -123,7 +122,7 @@ namespace Repository.Parametrizacao
         }
         #endregion
 
-        #region Parametrização Cenário
+        #region [Classificacao ESG]
         public async Task<bool> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
             int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_exc (id_cenario_classif_contabil, id_empresa, id_grupo_programa, id_programa, id_projeto, id_classificacao_esg, uscriacao, dtcriacao) 
@@ -187,6 +186,5 @@ namespace Repository.Parametrizacao
             return resultado;
         }
         #endregion
-
     }
 }

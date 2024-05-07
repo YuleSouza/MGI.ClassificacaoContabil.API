@@ -1,5 +1,5 @@
-﻿using Service.DTO.Classificacao;
-using Service.DTO.Filtros;
+﻿using Service.DTO.Filtros;
+using Service.DTO.Classificacao;
 
 namespace Service.Repository.Classificacao
 {
@@ -9,7 +9,7 @@ namespace Service.Repository.Classificacao
         Task<bool> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao);
         Task<bool> AlterarClassificacaoContabil(ClassificacaoContabilDTO classificacao);
         Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil();
-        Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro);
+        Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(FiltroClassificacaoContabil filtro);
 
         Task<bool> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto);
         Task<bool> InserirProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos);
@@ -20,7 +20,7 @@ namespace Service.Repository.Classificacao
         Task<bool> DeletarProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos);
 
         Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil();
-        Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro);
+        Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(FiltroClassificacaoContabil filtro);
         #endregion
 
         #region ESG

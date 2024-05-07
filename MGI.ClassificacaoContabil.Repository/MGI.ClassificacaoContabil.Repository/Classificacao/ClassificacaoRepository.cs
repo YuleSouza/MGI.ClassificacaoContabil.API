@@ -3,9 +3,11 @@ using Infra.Data;
 using Infra.Interface;
 using Service.DTO.Filtros;
 using Service.DTO.Classificacao;
+
+using System.Data;
 using Service.Repository.Classificacao;
 using Dapper.Oracle.BulkSql;
-using System.Data;
+
 
 namespace Repository.Classificacao
 {
@@ -76,7 +78,7 @@ namespace Repository.Classificacao
                                                      order by mesano_fim");
             return resultado;
         }
-        public async Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(ClassificacaoContabilFiltro filtro)
+        public async Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(FiltroClassificacaoContabil filtro)
         {
             string parametros = string.Empty;
             if (filtro.IdClassificacaoContabil > 0)
@@ -261,7 +263,7 @@ namespace Repository.Classificacao
                                                      order by mesano_fim");
             return resultado;
         }
-        public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(ClassificacaoContabilFiltro filtro)
+        public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(FiltroClassificacaoContabil filtro)
         {
             string parametros = string.Empty;
             if (filtro.IdClassificacaoContabil > 0)

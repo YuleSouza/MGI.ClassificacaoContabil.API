@@ -1,5 +1,5 @@
-﻿using Service.DTO.Cenario;
-using Service.DTO.Filtros;
+﻿using Service.DTO.Filtros;
+using Service.DTO.Cenario;
 
 namespace Service.Repository.Cenario
 {

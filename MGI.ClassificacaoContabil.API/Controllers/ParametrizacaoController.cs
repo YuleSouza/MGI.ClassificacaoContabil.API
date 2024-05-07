@@ -1,7 +1,6 @@
 ﻿using DTO.Payload;
-using Service.Interface.Parametrizacao;
 using Service.DTO.Parametrizacao;
-using Service.DTO.Filtros;
+using Service.Interface.Parametrizacao;
 
 using Microsoft.AspNetCore.Mvc;
 

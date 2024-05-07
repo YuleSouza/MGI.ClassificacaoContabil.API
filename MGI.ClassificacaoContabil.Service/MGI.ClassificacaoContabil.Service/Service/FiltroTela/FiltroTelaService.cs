@@ -1,8 +1,8 @@
-﻿using Infra.Interface;
-using DTO.Payload;
-using Service.Repository.FiltroTela;
+﻿using DTO.Payload;
 using Service.DTO.Filtros;
+using Service.Repository.FiltroTela;
 using Service.Interface.FiltroTela;
+using Infra.Interface;
 
 namespace Service.FiltroTela
 {
@@ -45,6 +45,11 @@ namespace Service.FiltroTela
         public async Task<PayloadDTO> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro)
         {
             var resultado = await _FiltroTelaRepository.GrupoProgramaClassificacaoContabil(filtro);
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
+        public async Task<PayloadDTO> ProgramaClassificacaoContabil(FiltroPrograma filtro)
+        {
+            var resultado = await _FiltroTelaRepository.ProgramaClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
     }

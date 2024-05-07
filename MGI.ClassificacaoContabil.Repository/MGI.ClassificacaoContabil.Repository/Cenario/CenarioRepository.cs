@@ -1,8 +1,9 @@
 ﻿using Infra.Data;
 using Infra.Interface;
-using Service.DTO.Cenario;
 using Service.DTO.Filtros;
+using Service.DTO.Cenario;
 using Service.Repository.Cenario;
+
 using Dapper;
 
 namespace Repository.Cenario

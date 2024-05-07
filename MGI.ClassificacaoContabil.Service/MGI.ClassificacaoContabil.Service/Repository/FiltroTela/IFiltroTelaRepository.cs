@@ -1,5 +1,5 @@
-﻿using Service.DTO.Empresa;
-using Service.DTO.Filtros;
+﻿using Service.DTO.Filtros;
+using Service.DTO.Empresa;
 using Service.DTO.Projeto;
 
 namespace Service.Repository.FiltroTela
@@ -12,5 +12,6 @@ namespace Service.Repository.FiltroTela
         Task<IEnumerable<GerenciaDTO>> GerenciaClassificacaoContabil(FiltroGerencia filtro);
         Task<IEnumerable<GestorDTO>> GestorClassificacaoContabil(FiltroGestor filtro);
         Task<IEnumerable<GrupoProgramaDTO>> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro);
+        Task<IEnumerable<ProgramaDTO>> ProgramaClassificacaoContabil(FiltroPrograma filtro);
     }
 }

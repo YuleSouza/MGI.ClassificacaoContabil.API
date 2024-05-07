@@ -1,4 +1,4 @@
-﻿namespace DTO.Filtros
+﻿namespace Service.DTO.Filtros
 {
     public class ParametrizacaoCenarioFiltro
     {

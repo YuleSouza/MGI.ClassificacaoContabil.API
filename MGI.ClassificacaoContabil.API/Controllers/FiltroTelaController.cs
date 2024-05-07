@@ -44,6 +44,19 @@ namespace API.Controllers
         }
 
         /// <summary>
+        /// Retorna dados para combo Grupo Programa
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/comboprograma")]
+        public async Task<IActionResult> ComboPrograma([FromBody] FiltroPrograma filtro)
+        {
+            var retorno = await _telaFiltrosService.ProgramaClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
         /// Retorna dados para combo Diretoria
         /// </summary>
         /// <param name="filtro"></param>

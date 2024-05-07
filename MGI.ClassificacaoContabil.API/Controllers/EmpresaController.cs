@@ -3,7 +3,6 @@ using Service.Interface.Empresa;
 
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace API.Controllers
 {
     [ApiController]
