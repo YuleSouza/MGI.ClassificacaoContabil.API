@@ -3,6 +3,7 @@ using Infra.Data;
 using Service.DTO.Empresa;
 using Service.DTO.Projeto;
 using Service.DTO.Filtros;
+using Service.DTO.Classificacao;
 using Service.Repository.FiltroTela;
 
 namespace Repository.FiltroTela
@@ -164,6 +165,28 @@ namespace Repository.FiltroTela
                         codGrupoPrograma = (filtro.IdGrupoPrograma ?? "").Select(s => Convert.ToInt32(s)),
                         codPrograma = (filtro.IdPrograma ?? "").Select(s => Convert.ToInt32(s)),
                     });
+        }
+        public async Task<IEnumerable<ClassificacaoContabilFiltroDTO>> ClassificacaoContabil()
+        {
+            var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilFiltroDTO>($@"
+                                                    select cc.id_classificacao_contabil  as IdClassificacaoContabil,    
+                                                           ltrim(rtrim(a.empnomfan))     as Nome
+                                                     from classificacao_contabil cc 
+                                                     inner join corpora.empres a on cc.id_empresa = a.empcod
+                                                     where 1 = 1
+                                                     order by mesano_fim");
+
+            return resultado;
+        }
+        public async Task<IEnumerable<ClassificacaoEsgFiltroDTO>> ClassificacaoEsg()
+        {
+            var resultado = await _session.Connection.QueryAsync<ClassificacaoEsgFiltroDTO>($@"
+                                           select 
+                                                id_classificacao_esg  as IdClassificacaoEsg,
+                                                nome                  as Nome
+                                            from classificacao_esg
+                                            where 1 = 1");
+            return resultado;
         }
     }
 }

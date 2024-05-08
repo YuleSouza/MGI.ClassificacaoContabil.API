@@ -93,14 +93,6 @@ namespace Repository.Classificacao
             {
                 parametros += " and id_projeto = :idprojeto";
             }
-            if (!string.IsNullOrEmpty(filtro.DataInicial))
-            {
-                parametros += " and mesano_inicio >= to_date(:dataInicial,'DD/MM/RRRR')";
-            }
-            if (!string.IsNullOrEmpty(filtro.DataFinal))
-            {
-                parametros += " and mesano_fim <= to_date(:dataFinal,'DD/MM/RRRR')";
-            }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
                                                     select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
                                                            cc.id_empresa                 as IdEmpresa,       
@@ -120,9 +112,7 @@ namespace Repository.Classificacao
                                         ", new
             {
                 idclassificacao = filtro.IdClassificacaoContabil,
-                idempresa = filtro.IdEmpresa,
-                dataInicial = filtro.DataInicial,
-                dataFinal = filtro.DataFinal
+                idempresa = filtro.IdEmpresa
             });
             return resultado;
         }
@@ -274,14 +264,6 @@ namespace Repository.Classificacao
             {
                 parametros += " and cp.id_projeto = :idprojeto";
             }
-            if (!string.IsNullOrEmpty(filtro.DataInicial))
-            {
-                parametros += " and cp.mesano_inicio >= to_date(:dataInicial,'DD/MM/RRRR')";
-            }
-            if (!string.IsNullOrEmpty(filtro.DataFinal))
-            {
-                parametros += " and cp.mesano_fim <= to_date(:dataFinal,'DD/MM/RRRR')";
-            }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoProjetoDTO>($@"
                                                     select cp.id_classif_contabil_prj                                    as IdClassificacaoContabilProjeto, 
                                                            cp.id_classificacao_contabil                                  as IdClassificacaoContabil,
@@ -303,9 +285,7 @@ namespace Repository.Classificacao
                                         ", new
             {
                 idclassificacao = filtro.IdClassificacaoContabil,
-                idempresa = filtro.IdEmpresa,
-                dataInicial = filtro.DataInicial,
-                dataFinal = filtro.DataFinal
+                idempresa = filtro.IdEmpresa
             });
             return resultado;
         }

@@ -52,5 +52,15 @@ namespace Service.FiltroTela
             var resultado = await _FiltroTelaRepository.ProgramaClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+        public async Task<PayloadDTO> ClassificacaoContabil()
+        {
+            var resultado = await _FiltroTelaRepository.ClassificacaoContabil();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
+        public async Task<PayloadDTO> ClassificacaoEsg()
+        {
+            var resultado = await _FiltroTelaRepository.ClassificacaoEsg();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
     }
 }

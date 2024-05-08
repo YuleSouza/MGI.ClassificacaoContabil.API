@@ -107,5 +107,31 @@ namespace API.Controllers
             var retorno = await _telaFiltrosService.ProjetoClassificacaoContabil(filtro);
             return Ok(retorno);
         }
+
+        /// <summary>
+        /// Retorna dados para combo Classificacao Contabil
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/comboclassificacaocontabil")]
+        public async Task<IActionResult> ComboClassificacaoContabil()
+        {
+            var retorno = await _telaFiltrosService.ClassificacaoContabil();
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Classificacao ESG
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/comboclassificacaoesg")]
+        public async Task<IActionResult> ComboClassificacaoEsg()
+        {
+            var retorno = await _telaFiltrosService.ClassificacaoEsg();
+            return Ok(retorno);
+        }
     }
 }
