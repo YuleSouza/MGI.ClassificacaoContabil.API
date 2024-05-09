@@ -92,13 +92,15 @@ namespace Repository.Parametrizacao
         public async Task<bool> AlterarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             int result = await _session.Connection.ExecuteAsync(@"update parametrizacao_esg_geral 
-                                                                     set id_grupo_programa = :idgrupoprograma,  
+                                                                     set id_classificacao_esg = :idclassificacaoesg,
+                                                                         id_grupo_programa = :idgrupoprograma,  
                                                                          usalteracao = :usalteracao, 
                                                                          dtalteracao = sysdate
                                                                    where id_param_esg_geral = :idparamesggeral",
            new
            {
                idparamesggeral = parametrizacao.IdParametrizacaoEsgGeral,
+               idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
                idgrupoprograma = parametrizacao.IdGrupoPrograma,
                usalteracao = parametrizacao.Usuario?.UsuarioModificacao
            });
