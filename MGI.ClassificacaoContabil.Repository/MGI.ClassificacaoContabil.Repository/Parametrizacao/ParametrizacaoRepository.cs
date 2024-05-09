@@ -110,14 +110,20 @@ namespace Repository.Parametrizacao
 
             var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoGeralDTO>($@"
                                            select 
-                                                id_param_esg_geral              as IdParametrizacaoEsgGeral,
-                                                id_grupo_programa               as IdGrupoPrograma,
-                                                dtcriacao                       as DataCriacao,
-                                                uscriacao                       as UsuarioCriacao,
-                                                dtalteracao                     as DataModificacao,
-                                                usalteracao                     as UsuarioModificacao
-                                            from parametrizacao_esg_geral
-                                            where 1 = 1");
+                                                pg.id_param_esg_geral          as IdParametrizacaoEsgGeral,
+                                                pg.id_classificacao_esg        as IdClassificacaoEsg,
+                                                ces.nome                       as NomeClassificacaoEsg,
+                                                pg.id_grupo_programa           as IdGrupoPrograma,
+                                                gp.pgmgrunom                   as NomeGrupoPrograma,
+                                                pg.dtcriacao                      as DataCriacao,
+                                                pg.uscriacao                      as UsuarioCriacao,
+                                                pg.dtalteracao                    as DataModificacao,
+                                                pg.usalteracao                    as UsuarioModificacao
+                                            from parametrizacao_esg_geral pg
+                                            join servdesk.pgmgru gp on pg.id_grupo_programa = gp.pgmgrucod
+                                            join servdesk.classificacao_esg ces on pg.id_classificacao_esg = ces.id_classificacao_esg
+                                            where 1 = 1
+                                            and gp.pgmgrusit = 'A'");
             return resultado;
         }
         #endregion
