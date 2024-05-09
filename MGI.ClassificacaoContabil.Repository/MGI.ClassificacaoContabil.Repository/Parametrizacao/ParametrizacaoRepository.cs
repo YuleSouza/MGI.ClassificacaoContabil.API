@@ -83,7 +83,7 @@ namespace Repository.Parametrizacao
             new
             {
                 idgrupoprograma = parametrizacao.IdGrupoPrograma,
-                idclassificacaoesg = parametrizacao.IdParametrizacaoEsgGeral,
+                idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
                 uscriacao = parametrizacao.Usuario?.UsuarioCriacao
             });
 
