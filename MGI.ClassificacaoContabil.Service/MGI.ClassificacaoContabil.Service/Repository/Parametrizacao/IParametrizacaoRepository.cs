@@ -19,7 +19,7 @@ namespace Service.Repository.Parametrizacao
         #region Parametrização Classificacação ESG Exceção
         Task<bool> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao);
         Task<bool> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao);
-        Task<IEnumerable<ParametrizacaoClassificacaoEsgDTO>> ConsultarParametrizacaoClassificacaoExcecao();
+        Task<IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO>> ConsultarParametrizacaoClassificacaoExcecao();
         #endregion
     }
 }

@@ -133,5 +133,18 @@ namespace API.Controllers
             var retorno = await _telaFiltrosService.ClassificacaoEsg();
             return Ok(retorno);
         }
+
+        /// <summary>
+        /// Retorna dados para combo Classificacao ESG
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("v1/combocenario")]
+        public async Task<IActionResult> ComboCenario()
+        {
+            var retorno = await _telaFiltrosService.Cenario();
+            return Ok(retorno);
+        }
     }
 }

@@ -62,5 +62,10 @@ namespace Service.FiltroTela
             var resultado = await _FiltroTelaRepository.ClassificacaoEsg();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+        public async Task<PayloadDTO> Cenario()
+        {
+            var resultado = await _FiltroTelaRepository.Cenario();
+            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+        }
     }
 }

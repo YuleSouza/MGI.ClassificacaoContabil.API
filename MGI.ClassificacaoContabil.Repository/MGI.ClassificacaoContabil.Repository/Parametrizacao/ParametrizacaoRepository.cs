@@ -174,22 +174,35 @@ namespace Repository.Parametrizacao
 
             return result == 1;
         }
-        public async Task<IEnumerable<ParametrizacaoClassificacaoEsgDTO>> ConsultarParametrizacaoClassificacaoExcecao()
+        public async Task<IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO>> ConsultarParametrizacaoClassificacaoExcecao()
         {
-
-            var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoEsgDTO>($@"
-                                           select 
-                                                id_param_esg_exc                as IdParametrizacaoEsgExc,
-                                                id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
-                                                id_grupo_programa               as IdGrupoPrograma,
-                                                id_programa                     as IdPrograma,
-                                                id_projeto                      as IdProjeto,
-                                                id_classificacao_esg            as IdClassificacaoEsg,                                     
-                                                dtcriacao                       as DataCriacao,
-                                                uscriacao                       as UsuarioCriacao,
-                                                dtalteracao                     as DataModificacao,
-                                                usalteracao                     as UsuarioModificacao
-                                            from parametrizacao_esg_exc
+            var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoEsgFiltroDTO>($@"
+                                            select distinct
+                                                 pe.id_param_esg_exc                as IdParametrizacaoEsgExc,
+                                                 pe.id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                                                 c.nome                             as NomeCenario, 
+                                                 pe.id_empresa                      as IdEmpresa,
+                                                 ltrim(rtrim(e.empnomfan))          as NomeEmpresa,         
+                                                 pe.id_grupo_programa               as IdGrupoPrograma,
+                                                 gp.pgmgrunom                       as NomeGrupoPrograma,  
+                                                 pe.id_programa                     as IdPrograma,
+                                                 p.pgmnom                           as NomePrograma,
+                                                 pe.id_projeto                      as IdProjeto,
+                                                 to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prj.prjnom)) nomeprojeto,
+                                                 pe.id_classificacao_esg            as IdClassificacaoEsg,    
+                                                 ces.nome                           as NomeClassificacaoEsg,
+                                                 pe.dtcriacao                       as DataCriacao,
+                                                 pe.uscriacao                       as UsuarioCriacao,
+                                                 pe.dtalteracao                     as DataModificacao,
+                                                 pe.usalteracao                     as UsuarioModificacao
+                                            from parametrizacao_esg_exc pe
+                                            join corpora.empres e on pe.id_empresa = e.empcod            
+                                            join servdesk.pgmgru gp on pe.id_grupo_programa = gp.pgmgrucod
+                                            join servdesk.pgmass pgp on pgp.pgmgrucod = gp.pgmgrucod 
+                                            join servdesk.pgmpro p on p.pgmcod = pe.id_programa
+                                            join servdesk.cenario_classif_contabil c on pe.id_cenario_classif_contabil = c.id_cenario_classif_contabil     
+                                            join servdesk.classificacao_esg ces on pe.id_classificacao_esg = ces.id_classificacao_esg
+                                            join servdesk.projeto prj on pe.id_programa = prj.prjcod
                                             where 1 = 1");
             return resultado;
         }

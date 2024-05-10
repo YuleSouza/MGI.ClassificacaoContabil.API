@@ -14,5 +14,6 @@ namespace Service.Interface.FiltroTela
         Task<PayloadDTO> ProgramaClassificacaoContabil(FiltroPrograma filtro);
         Task<PayloadDTO> ClassificacaoContabil(); 
         Task<PayloadDTO> ClassificacaoEsg();
+        Task<PayloadDTO> Cenario();
     }
 }

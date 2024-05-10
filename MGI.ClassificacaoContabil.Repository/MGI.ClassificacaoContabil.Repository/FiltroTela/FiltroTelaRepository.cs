@@ -5,6 +5,7 @@ using Service.DTO.Projeto;
 using Service.DTO.Filtros;
 using Service.DTO.Classificacao;
 using Service.Repository.FiltroTela;
+using Service.DTO.Cenario;
 
 namespace Repository.FiltroTela
 {
@@ -146,24 +147,16 @@ namespace Repository.FiltroTela
         public async Task<IEnumerable<ProgramaDTO>> ProgramaClassificacaoContabil(FiltroPrograma filtro)
         {
             return await _session.Connection.QueryAsync<ProgramaDTO>(
-                    $@" SELECT prg.pgmcod codPrograma, ltrim(rtrim(pgmnom)) Nome
-                              FROM servdesk.pgmpro prg
-                             WHERE pgmver = 0
-                               AND prg.pgmsit = 'A'
-                               AND EXISTS
-                             (SELECT 1
-                                      FROM projeto p, pgmass a
-                                     WHERE
-                                        p.prjempcus IN :codEmpresa
-                                       AND a.pgmassver = 0
-                                       AND a.pgmasscod = p.pgmasscod
-                                       AND a.pgmcod = prg.pgmcod)
-                                       AND a.pgmgrucod = : codGrupoPrograma OR prg.pgmcod = :codPrograma)
-                             ORDER BY 2, 1", new
+                    $@"select 
+                              prg.pgmcod codPrograma, 
+                              ltrim(rtrim(pgmnom)) Nome
+                        from servdesk.pgmpro prg
+                        join servdesk.pgmass pgp on pgp.pgmcod = prg.pgmcod
+                        join servdesk.pgmgru gp on  gp.pgmgrucod = pgp.pgmgrucod
+                        where pgp.pgmgrucod = :codGrupoPrograma
+                        order by 2, 1", new
                     {
-                        codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
-                        codGrupoPrograma = (filtro.IdGrupoPrograma ?? "").Select(s => Convert.ToInt32(s)),
-                        codPrograma = (filtro.IdPrograma ?? "").Select(s => Convert.ToInt32(s)),
+                        codGrupoPrograma = Convert.ToInt32(filtro.IdGrupoPrograma)
                     });
         }
         public async Task<IEnumerable<ClassificacaoContabilFiltroDTO>> ClassificacaoContabil()
@@ -185,6 +178,21 @@ namespace Repository.FiltroTela
                                                 id_classificacao_esg  as IdClassificacaoEsg,
                                                 nome                  as Nome
                                             from classificacao_esg
+                                            where 1 = 1");
+            return resultado;
+        }
+        public async Task<IEnumerable<CenarioDTO>> Cenario()
+        {
+            var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
+                                           select 
+                                                id_cenario_classif_contabil  as IdCenario,
+                                                nome                as Nome,
+                                                status              as Status,
+                                                dtcriacao           as DataCriacao,
+                                                uscriacao           as UsuarioCriacao,
+                                                dtalteracao         as DataModificacao,
+                                                usalteracao         as UsuarioModificacao
+                                            from cenario_classif_contabil
                                             where 1 = 1");
             return resultado;
         }
