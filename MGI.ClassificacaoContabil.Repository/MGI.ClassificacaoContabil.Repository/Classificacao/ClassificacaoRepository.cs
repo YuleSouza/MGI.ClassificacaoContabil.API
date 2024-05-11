@@ -96,7 +96,7 @@ namespace Repository.Classificacao
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
                                                     select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
                                                            cc.id_empresa                 as IdEmpresa,       
-                                                           ltrim(rtrim(a.empnomfan))     as Nome,
+                                                           ltrim(rtrim(a.empnomfan))     as NomeEmpresa,
                                                            cc.status                     as Status, 
                                                            cc.mesano_inicio              as MesAnoInicio,
                                                            cc.mesano_fim                 as MesAnoFim,

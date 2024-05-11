@@ -102,11 +102,10 @@ namespace Repository.FiltroTela
             return await _session.Connection.QueryAsync<GestorDTO>(
                     $@"SELECT DISTINCT ltrim(rtrim(u.usunom)) NomeGestor,
                                           ltrim(rtrim(u.usulog)) Gestor
-                              FROM corpora.usuari u
+                             FROM corpora.usuari u
                              WHERE EXISTS (SELECT 1
-                                      FROM projeto p, justificativa_ciclo j, pgmass a
-                                     WHERE p.prjcod = j.prjcod
-                                       AND p.prjges = u.usulog
+                                      FROM projeto p, pgmass a
+                                     WHERE p.prjges = u.usulog
                                        AND a.pgmassver = 0
                                        AND a.pgmasscod = p.pgmasscod
                                        AND a.pgmgrucod = nvl(NULL, a.pgmgrucod)
