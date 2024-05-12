@@ -107,27 +107,29 @@ namespace Repository.PainelClassificacao
             return await _session.Connection.QueryAsync<GestorDTO>(
                     $@"SELECT DISTINCT ltrim(rtrim(u.usunom)) NomeGestor,
                                           ltrim(rtrim(u.usulog)) Gestor
-                              FROM corpora.usuari u
+                             FROM corpora.usuari u
                              WHERE EXISTS (SELECT 1
-                                      FROM projeto p, servdesk.classif_contabil_prj cp, pgmass a
-                                     WHERE p.prjcod = cp.id_projeto
-                                       AND p.prjges = u.usulog
-                                       AND a.pgmassver = 0
-                                       AND a.pgmasscod = p.pgmasscod
-                                       AND a.pgmgrucod = nvl(NULL, a.pgmgrucod)
-                                       AND p.prjempcus IN :codEmpresa
-                                       AND p.geremp = nvl(:codEmpresaExecutora, p.geremp)
-                                       AND p.gersig = nvl(:codDiretoria, p.gersig)
-                                       AND p.gcocod = nvl(:codGerencial, p.gcocod)
-                                       AND p.gsucod = nvl(:codCoordenadoria, p.gsucod)
+                                           FROM corpora.empres e
+                                           INNER JOIN projeto p on (e.empcod = p.prjempcus and p.prjsit = 'A')
+                                           INNER JOIN pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                           INNER JOIN pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+                                           INNER JOIN pgmass m on (m.pgmasscod = p.pgmasscod and m.pgmassver = gru.pgmgruver and m.pgmgrucod = gru.pgmgrucod and m.pgmassver = 0)
+                                           INNER JOIN pgmass m2 on (m2.pgmcod = pro.pgmcod and m2.pgmassver = 0)
+                                           WHERE p.prjges = u.usulog
+                                           AND m.pgmassver = 0
+                                           AND m.pgmasscod = p.pgmasscod
+                                           AND m.pgmgrucod = nvl(NULL, m.pgmgrucod)
+                                           AND p.prjempcus IN :codEmpresa
+                                           AND gru.pgmgrucod  = nvl(:codGrupoPrograma,  gru.pgmgrucod)  
+                                           AND pro.pgmcod   = nvl(:codPrograma,  pro.pgmcod)  
+                                           AND p.prjcod = nvl(:codProjeto,  p.prjcod) 
                                     )
                              ORDER BY 1, 2", new
                     {
                         codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
-                        codEmpresaExecutora = filtro.IdEmpresaExecutora,
-                        codDiretoria = filtro.IdDiretoria,
-                        codGerencial = filtro.IdGerencia,
-                        codCoordenadoria = filtro.IdCoordenadoria
+                        codGrupoPrograma = filtro.CodGrupoPrograma,
+                        codPrograma = filtro.IdPrograma,
+                        codProjeto = filtro.IdProjeto
                     });
         }
         public async Task<IEnumerable<GrupoProgramaDTO>>FiltroPainelGrupoPrograma(FiltroPainelGrupoPrograma filtro)
