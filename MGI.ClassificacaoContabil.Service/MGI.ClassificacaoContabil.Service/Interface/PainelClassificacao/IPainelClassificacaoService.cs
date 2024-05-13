@@ -19,7 +19,7 @@ namespace Service.Interface.PainelClassificacao
         #endregion
 
         #region [Contabil]
-
+        Task<IEnumerable<DTO.PainelClassificacao.ClassificacaoContabilDTO>> ConsultarClassificacaoContabil();
         #endregion
 
         #region [ESG]

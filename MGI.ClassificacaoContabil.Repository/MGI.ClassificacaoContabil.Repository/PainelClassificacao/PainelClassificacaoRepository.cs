@@ -8,6 +8,7 @@ using Service.Repository.PainelClassificacao;
 
 using Dapper;
 using Service.DTO.Parametrizacao;
+using Service.DTO.PainelClassificacao;
 
 namespace Repository.PainelClassificacao
 {
@@ -188,9 +189,9 @@ namespace Repository.PainelClassificacao
                         codCenarioClassif = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
                     });
         }
-        public async Task<IEnumerable<ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IEnumerable<Service.DTO.Classificacao.ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
-            return await _session.Connection.QueryAsync<ClassificacaoContabilDTO>(
+            return await _session.Connection.QueryAsync<Service.DTO.Classificacao.ClassificacaoContabilDTO>(
                     $@"SELECT 
                             id_classificacao_contabil AS IdClassificacaoContabil,
                             id_empresa                AS IdEmpresa,
@@ -227,9 +228,16 @@ namespace Repository.PainelClassificacao
             });
         }
 
+
+
         #endregion
 
         #region [Contabil]
+
+        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil()
+        {
+            return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"select * from lanc_classif_contabil_2");
+        }
 
         #endregion
     }

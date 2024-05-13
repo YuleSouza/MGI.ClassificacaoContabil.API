@@ -150,6 +150,13 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(retorno);
         }
 
+        [HttpPost("v1/consultar")]
+        public async Task<IActionResult> Consultar()
+        {
+            var retorno = await _service.ConsultarClassificacaoContabil();
+            return Ok(retorno);
+        }
+
         #endregion
     }
 }

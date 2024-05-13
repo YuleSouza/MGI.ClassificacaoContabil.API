@@ -1,9 +1,9 @@
-﻿using Service.DTO.Filtros;
+﻿using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
-using Service.DTO.Projeto;
-using Service.DTO.Cenario;
-using Service.DTO.Classificacao;
+using Service.DTO.Filtros;
+using Service.DTO.PainelClassificacao;
 using Service.DTO.Parametrizacao;
+using Service.DTO.Projeto;
 
 namespace Service.Repository.PainelClassificacao
 {
@@ -18,8 +18,11 @@ namespace Service.Repository.PainelClassificacao
         Task<IEnumerable<DiretoriaDTO>>FiltroPainelDiretoria(FiltroPainelDiretoria filtro);
         Task<IEnumerable<GerenciaDTO>>FiltroPainelGerencia(FiltroPainelGerencia filtro);
         Task<IEnumerable<ParametrizacaoCenarioPainelDTO>> FiltroPainelCenario(FiltroPainelCenario filtro);
-        Task<IEnumerable<ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
+        Task<IEnumerable<Service.DTO.Classificacao.ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<ClassificacaoEsgDTO>>FiltroPainelClassificacaoESG(FiltroPainelClassificacaoEsg filtro);
+        #endregion
+        #region [ Consulta ]
+        Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil();
         #endregion
     }
 }
