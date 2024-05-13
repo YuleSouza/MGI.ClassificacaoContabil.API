@@ -14,12 +14,16 @@ namespace Service.PainelClassificacao
     public class PainelClassificacaoService : IPainelClassificacaoService
     {
         private readonly IPainelClassificacaoRepository _PainelClassificacaoRepository;
+        private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
 
         private IUnitOfWork _unitOfWork;
         public PainelClassificacaoService(IPainelClassificacaoRepository PainelClassificacaoRepository, IUnitOfWork unitOfWork)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
             _unitOfWork = unitOfWork;
+            tiposLancamento.Add(1, "Provisão de Manutenção");
+            tiposLancamento.Add(2, "Intangível");
+            tiposLancamento.Add(3, "Imobilizado");
         }
 
         #region [Filtros]
@@ -97,8 +101,9 @@ namespace Service.PainelClassificacao
                                       {
                                           OrcadoAcumulado = grp.Sum(p => p.ValorProjeto),
                                           RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).Sum(p => p.ValorRealizadoSap),
-                                          IdTipoClassificacao = grp.Key.IdTipoClassificacao                                          
-                                      },
+                                          IdTipoClassificacao = grp.Key.IdTipoClassificacao,
+                                          NomeTipoClassificacao = tiposLancamento.Where(p => p.Key == grp.Key.IdTipoClassificacao).FirstOrDefault().Value
+        },
                                       GrupoPrograma = from gru in lancamentos
                                                       where gru.IdEmpresa == grp.Key.IdEmpresa
                                                       group gru by new { gru.IdEmpresa, gru.IdGrupoPrograma, gru.GrupoDePrograma, gru.IdTipoClassificacao } into grpGru

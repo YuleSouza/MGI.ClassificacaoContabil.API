@@ -29,5 +29,6 @@
         }
 
         public string DescricaoLancSap { get; set; }
+        public object NomeTipoClassificacao { get; internal set; }
     }
 }
