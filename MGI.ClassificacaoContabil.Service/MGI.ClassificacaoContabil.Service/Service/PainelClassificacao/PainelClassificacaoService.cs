@@ -82,13 +82,14 @@ namespace Service.PainelClassificacao
 
         #region [Consuta da Tela]
 
-        public async Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil()
+        public async Task<IList<EmpresaDTO>> ConsultarClassificacaoContabil()
         {
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil();
             ClassificacaoContabilDTO classificacaoContabil = new ClassificacaoContabilDTO();
             classificacaoContabil.Empresas = new List<EmpresaDTO>();
             var retorno = from a in lancamentos
-                          group a by new { a.IdEmpresa, a.NomeEmpresa, a.IdTipoClassificacao } into grp
+                          orderby a.IdTipoClassificacao
+                          group a by new { a.IdEmpresa, a.NomeEmpresa } into grp
                           select new ClassificacaoContabilDTO()
                           {
                               Empresas = new List<EmpresaDTO>()
@@ -96,14 +97,33 @@ namespace Service.PainelClassificacao
                                   new EmpresaDTO()
                                   {
                                       IdEmpresa = grp.Key.IdEmpresa,
-                                      Nome = grp.Key.NomeEmpresa,                                      
-                                      Lancamento = new LancamentoContabilDTO()
+                                      Nome = grp.Key.NomeEmpresa,
+                                      #region [ Lancamentos ]
+                                      LancamentoProvisao = new LancamentoContabilDTO()
                                       {
-                                          OrcadoAcumulado = grp.Sum(p => p.ValorProjeto),
-                                          RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).Sum(p => p.ValorRealizadoSap),
-                                          IdTipoClassificacao = grp.Key.IdTipoClassificacao,
-                                          NomeTipoClassificacao = tiposLancamento.Where(p => p.Key == grp.Key.IdTipoClassificacao).FirstOrDefault().Value
-        },
+                                          OrcadoAcumulado = grp.Where(p => p.IdTipoClassificacao == 1).Sum(p => p.ValorProjeto),
+                                          RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdTipoClassificacao == 1).Sum(p => p.ValorRealizadoSap),
+                                          IdTipoClassificacao = 1,
+                                          NomeTipoClassificacao = "Provisão de Manutenção"
+                                      },
+                                      LancamentoIntangivel = new LancamentoContabilDTO() {
+                                          OrcadoAcumulado = grp.Where(p => p.IdTipoClassificacao == 2).Sum(p => p.ValorProjeto),
+                                          RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdTipoClassificacao == 2).Sum(p => p.ValorRealizadoSap),
+                                          IdTipoClassificacao = 2,
+                                          NomeTipoClassificacao = "Intangível"
+                                      },
+                                      LancamentoImobilizado = new LancamentoContabilDTO() {
+                                          OrcadoAcumulado = grp.Where(p => p.IdTipoClassificacao == 3).Sum(p => p.ValorProjeto),
+                                          RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdTipoClassificacao == 3).Sum(p => p.ValorRealizadoSap),
+                                          IdTipoClassificacao = 3,
+                                          NomeTipoClassificacao = "Imobilizado"
+                                      },
+                                      TotalLancamento = new LancamentoContabilTotalDTO()
+                                      {
+                                          TotalOrcado = grp.Sum(p => p.ValorProjeto),
+                                          TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).Sum(p => p.ValorRealizadoSap)
+                                      },
+                                      #endregion  
                                       GrupoPrograma = from gru in lancamentos
                                                       where gru.IdEmpresa == grp.Key.IdEmpresa
                                                       group gru by new { gru.IdEmpresa, gru.IdGrupoPrograma, gru.GrupoDePrograma, gru.IdTipoClassificacao } into grpGru
@@ -111,11 +131,28 @@ namespace Service.PainelClassificacao
                                                       {
                                                           CodGrupoPrograma = grpGru.Key.IdGrupoPrograma,
                                                           Nome = grpGru.Key.GrupoDePrograma,
-                                                          Lancamento = new LancamentoContabilDTO()
+                                                          LancamentoProvisao = new LancamentoContabilDTO()
                                                           {
-                                                              IdTipoClassificacao = grpGru.Key.IdTipoClassificacao,
-                                                              OrcadoAcumulado = grpGru.Sum(p => p.ValorProjeto),
-                                                              RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma && p.IdTipoClassificacao == grpGru.Key.IdTipoClassificacao).Sum(p => p.ValorRealizadoSap)
+                                                              IdTipoClassificacao = 1,
+                                                              OrcadoAcumulado = grpGru.Where(p => p.IdTipoClassificacao == 1 && p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorProjeto),
+                                                              RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma && p.IdTipoClassificacao == 1).Sum(p => p.ValorRealizadoSap)
+                                                          },
+                                                          LancamentoIntangivel = new LancamentoContabilDTO()
+                                                          {
+                                                              IdTipoClassificacao = 2,
+                                                              OrcadoAcumulado = grpGru.Where(p => p.IdTipoClassificacao == 2 && p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorProjeto),
+                                                              RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma && p.IdTipoClassificacao == 2).Sum(p => p.ValorRealizadoSap)
+                                                          },
+                                                          LancamentoImobilizado = new LancamentoContabilDTO()
+                                                          {
+                                                              IdTipoClassificacao = 3,
+                                                              OrcadoAcumulado = grpGru.Where(p => p.IdTipoClassificacao == 3 && p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorProjeto),
+                                                              RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma && p.IdTipoClassificacao == 3).Sum(p => p.ValorRealizadoSap)
+                                                          },
+                                                          TotalLancamento = new LancamentoContabilTotalDTO()
+                                                          {
+                                                              TotalOrcado = grp.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma) .Sum(p => p.ValorProjeto),
+                                                              TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorRealizadoSap)
                                                           },
                                                           Programas = from gruPro in lancamentos
                                                                      where gruPro.IdEmpresa == grp.Key.IdEmpresa
@@ -126,15 +163,51 @@ namespace Service.PainelClassificacao
                                                                      {
                                                                          CodPrograma = grpGruPro.Key.IdPrograma,
                                                                          Nome = grpGruPro.Key.Programa,
-                                                                         Lancamentos = new LancamentoContabilDTO()
+                                                                         LancamentoProvisao = new LancamentoContabilDTO()
                                                                          {
-                                                                             IdTipoClassificacao = grpGruPro.Key.IdTipoClassificacao,
-                                                                             OrcadoAcumulado = grpGruPro.Sum(p => p.ValorProjeto),
-                                                                             RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa 
-                                                                                                                    && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma 
+                                                                             IdTipoClassificacao = 1,
+                                                                             OrcadoAcumulado = grpGruPro.Where(p => p.IdTipoClassificacao == 1
+                                                                                                                && p.IdEmpresa == grpGruPro.Key.IdEmpresa
+                                                                                                                && p.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
+                                                                                                                && p.IdPrograma == grpGruPro.Key.IdPrograma).Sum(p => p.ValorProjeto),
+                                                                             RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa
+                                                                                                                    && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
                                                                                                                     && p.IdPrograma == grpGruPro.Key.IdPrograma
-                                                                                                                    && p.IdTipoClassificacao == grpGruPro.Key.IdTipoClassificacao).Sum(p => p.ValorRealizadoSap)
+                                                                                                                    && p.IdTipoClassificacao == 1).Sum(p => p.ValorRealizadoSap)
                                                                          },
+                                                                         LancamentoIntangivel = new LancamentoContabilDTO()
+                                                                         {
+                                                                             IdTipoClassificacao = 2,
+                                                                             OrcadoAcumulado = grpGruPro.Where(p => p.IdTipoClassificacao == 2
+                                                                                                                && p.IdEmpresa == grpGruPro.Key.IdEmpresa
+                                                                                                                && p.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
+                                                                                                                && p.IdPrograma == grpGruPro.Key.IdPrograma).Sum(p => p.ValorProjeto),
+                                                                             RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa
+                                                                                                                    && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
+                                                                                                                    && p.IdPrograma == grpGruPro.Key.IdPrograma
+                                                                                                                    && p.IdTipoClassificacao == 2).Sum(p => p.ValorRealizadoSap)
+                                                                         },
+                                                                         LancamentoImobilizado = new LancamentoContabilDTO()
+                                                                         {
+                                                                             IdTipoClassificacao = 3,
+                                                                             OrcadoAcumulado = grpGruPro.Where(p => p.IdTipoClassificacao == 3
+                                                                                                                && p.IdEmpresa == grpGruPro.Key.IdEmpresa
+                                                                                                                && p.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
+                                                                                                                && p.IdPrograma == grpGruPro.Key.IdPrograma).Sum(p => p.ValorProjeto),
+                                                                             RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpGru.Key.IdEmpresa
+                                                                                                                    && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
+                                                                                                                    && p.IdPrograma == grpGruPro.Key.IdPrograma
+                                                                                                                    && p.IdTipoClassificacao == 3).Sum(p => p.ValorRealizadoSap)
+                                                                         },
+                                                                         TotalLancamento = new LancamentoContabilTotalDTO()
+                                                                          {
+                                                                              TotalOrcado = grp.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
+                                                                                                        && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
+                                                                                                        && p.IdPrograma == grpGruPro.Key.IdPrograma) .Sum(p => p.ValorProjeto),
+                                                                              TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
+                                                                                                        && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
+                                                                                                        && p.IdPrograma == grpGruPro.Key.IdPrograma).Sum(p => p.ValorRealizadoSap)
+                                                                          },
                                                                          Projetos = from prj in lancamentos
                                                                                     where prj.IdEmpresa == grpGruPro.Key.IdEmpresa
                                                                                        && prj.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
@@ -145,26 +218,76 @@ namespace Service.PainelClassificacao
                                                                                     {
                                                                                         CodProjeto = grpPrj.Key.IdProjeto,
                                                                                         NomeProjeto = grpPrj.Key.NomeProjeto,
-                                                                                        LancamentosSAP = from lancSap in lancamentos
-                                                                                                         where lancSap.IdProjeto == grpPrj.Key.IdProjeto
-                                                                                                           && lancSap.IdEmpresa == grpPrj.Key.IdEmpresa
-                                                                                                           && lancSap.IdPrograma == grpPrj.Key.IdPrograma
-                                                                                                           && lancSap.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
-                                                                                                           && lancSap.IdTipoClassificacao == grpPrj.Key.IdTipoClassificacao
-                                                                                                        select new LancamentoSAP()
-                                                                                                        {
-                                                                                                            IdTipoClassificacao = grpPrj.Key.IdTipoClassificacao,
-                                                                                                            DescricaoLancamento = lancSap.DescricaoLancSap,
-                                                                                                            OrcadoAcumulado = lancSap.ValorProjeto,
-                                                                                                            RealizadoAcumulado = lancSap.ValorRealizadoSap                                                                                                            
-                                                                                                        }
+                                                                                        LancamentoSAPProvisao = (from lancSap in lancamentos
+                                                                                                                 where lancSap.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                   && lancSap.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                   && lancSap.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                   && lancSap.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                   && lancSap.IdTipoClassificacao == 1
+                                                                                                                select new LancamentoSAP()
+                                                                                                                {
+                                                                                                                    IdTipoClassificacao = 1,                                                                                                                    
+                                                                                                                    OrcadoAcumulado = lancSap.ValorProjeto,
+                                                                                                                    RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                                                        && p.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                                                        && p.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                                                        && p.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                                                        && p.IdTipoClassificacao == 1).Sum(p => p.ValorRealizadoSap)
+                                                                                                                }),
+                                                                                        LancamentoSAPIntangivel = (from lancSap in lancamentos
+                                                                                                                 where lancSap.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                   && lancSap.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                   && lancSap.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                   && lancSap.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                   && lancSap.IdTipoClassificacao == 2
+                                                                                                                select new LancamentoSAP()
+                                                                                                                {
+                                                                                                                    IdTipoClassificacao = 2,                                                                                                                    
+                                                                                                                    OrcadoAcumulado = lancSap.ValorProjeto,
+                                                                                                                    RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                                                        && p.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                                                        && p.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                                                        && p.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                                                        && p.IdTipoClassificacao == 2).Sum(p => p.ValorRealizadoSap)
+                                                                                                                }),
+                                                                                        LancamentoSAPImobilizado = (from lancSap in lancamentos
+                                                                                                                 where lancSap.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                   && lancSap.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                   && lancSap.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                   && lancSap.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                   && lancSap.IdTipoClassificacao == 3
+                                                                                                                select new LancamentoSAP()
+                                                                                                                {
+                                                                                                                    IdTipoClassificacao = 3,                                                                                                                    
+                                                                                                                    OrcadoAcumulado = lancSap.ValorProjeto,
+                                                                                                                    RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                                                        && p.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                                                        && p.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                                                        && p.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                                                        && p.IdTipoClassificacao == 3).Sum(p => p.ValorRealizadoSap)
+                                                                                                                }),
+                                                                                        TotalLancamentoSAP = (from lancSap in lancamentos
+                                                                                                                group lancSap by new { lancSap.IdEmpresa, lancSap.IdGrupoPrograma, lancSap.IdPrograma, lancSap.IdProjeto } into grpTotal
+                                                                                                                 where grpTotal.Key.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                                   && grpTotal.Key.IdPrograma == grpPrj.Key.IdPrograma
+                                                                                                                   && grpTotal.Key.IdGrupoPrograma == grpPrj.Key.IdGrupoPrograma
+                                                                                                                   &&  grpTotal.Key.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                                select new LancamentoContabilTotalDTO()
+                                                                                                                {
+                                                                                                                    TotalOrcado = grpTotal.Sum(p => p.ValorProjeto),
+                                                                                                                    TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpTotal.Key.IdEmpresa
+                                                                                                                                                    && p.IdGrupoPrograma == grpTotal.Key.IdGrupoPrograma
+                                                                                                                                                    && p.IdPrograma == grpTotal.Key.IdPrograma
+                                                                                                                                                    && p.IdProjeto == grpTotal.Key.IdProjeto)
+                                                                                                                                                    .Sum(p => p.ValorRealizadoSap)
+                                                                                                                }),
                                                                                     }
                                                                      }
                                                       }
                                   }
                               }
                           };
-            return retorno;
+            return retorno.SelectMany(p => p.Empresas).ToList();
         }
 
 
