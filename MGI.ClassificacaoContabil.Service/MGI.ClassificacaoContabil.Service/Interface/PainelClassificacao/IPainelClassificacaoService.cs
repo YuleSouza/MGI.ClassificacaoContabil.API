@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 
 namespace Service.Interface.PainelClassificacao
@@ -19,7 +20,7 @@ namespace Service.Interface.PainelClassificacao
         #endregion
 
         #region [Contabil]
-        Task<IEnumerable<DTO.PainelClassificacao.ClassificacaoContabilDTO>> ConsultarClassificacaoContabil();
+        Task<IList<EmpresaDTO>> ConsultarClassificacaoContabil();
         #endregion
 
         #region [ESG]
