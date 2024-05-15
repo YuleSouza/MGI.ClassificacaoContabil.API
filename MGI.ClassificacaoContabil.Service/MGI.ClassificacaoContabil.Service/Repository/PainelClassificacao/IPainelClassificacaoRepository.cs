@@ -21,6 +21,7 @@ namespace Service.Repository.PainelClassificacao
         Task<IEnumerable<Service.DTO.Classificacao.ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<ClassificacaoEsgDTO>>FiltroPainelClassificacaoESG(FiltroPainelClassificacaoEsg filtro);
         #endregion
+
         #region [ Consulta ]
         Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil();
         #endregion
