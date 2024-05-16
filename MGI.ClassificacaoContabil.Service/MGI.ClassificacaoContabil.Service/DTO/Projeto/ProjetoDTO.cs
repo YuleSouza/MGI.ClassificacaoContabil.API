@@ -6,9 +6,9 @@ namespace Service.DTO.Projeto
     {
         public int CodProjeto { get; set; }
         public string? NomeProjeto { get; set; }
-        public IEnumerable<LancamentoSAP>? LancamentoSAPIntangivel { get; set; }
-        public IEnumerable<LancamentoSAP>? LancamentoSAPImobilizado { get; set; }
-        public IEnumerable<LancamentoSAP>? LancamentoSAPProvisao { get; set; }
-        public IEnumerable<LancamentoContabilTotalDTO>? TotalLancamentoSAP { get; set; }
+        public LancamentoSAP? LancamentoSAPIntangivel { get; set; }
+        public LancamentoSAP? LancamentoSAPImobilizado { get; set; }
+        public LancamentoSAP? LancamentoSAPProvisao { get; set; }
+        public LancamentoContabilTotalDTO? TotalLancamentoSAP { get; set; }
     }
 }
