@@ -2,7 +2,7 @@
 {
     public class ParametrizacaoCenarioPainelDTO
     {
-        public int IdCenarioClassificacaoContabil { get; set; }
+        public int IdCenario { get; set; }
         public string? Nome { get; set; }
     }
 }

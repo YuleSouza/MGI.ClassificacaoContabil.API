@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 
@@ -25,7 +26,7 @@ namespace Service.Interface.PainelClassificacao
 
         #region [ESG]
 
-
+        Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg();
         #endregion
     }
 }

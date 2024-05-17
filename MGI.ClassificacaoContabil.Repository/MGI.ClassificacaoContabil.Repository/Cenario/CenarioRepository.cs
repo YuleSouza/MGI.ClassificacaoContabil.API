@@ -38,7 +38,7 @@ namespace Repository.Cenario
                                                                          status = nvl(:status,status), 
                                                                          usalteracao = :usalteracao, 
                                                                          dtalteracao = sysdate
-                                                                   where id_cenario_classif_contabil = :idcenario",
+                                                                   where id_cenario = :idcenario",
             new
             {
                 idcenario = cenario.IdCenario,
@@ -54,7 +54,7 @@ namespace Repository.Cenario
             
             var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
                                            select 
-                                                id_cenario_classif_contabil  as IdCenario,
+                                                id_cenario          as IdCenario,
                                                 nome                as Nome,
                                                 status              as Status,
                                                 dtcriacao           as DataCriacao,
@@ -70,7 +70,7 @@ namespace Repository.Cenario
             var parametros = string.Empty;
             if (filtro.IdCenario > 0)
             {
-                parametros += $" and id_cenario_classif_contabil = :idcenario";
+                parametros += $" and id_cenario = :idcenario";
             }
             if (!string.IsNullOrEmpty(filtro.Nome))
             {
@@ -83,7 +83,7 @@ namespace Repository.Cenario
 
             var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
                                            select 
-                                                id_cenario_classif_contabil  as IdCenario,
+                                                id_cenario          as IdCenario,
                                                 nome                as Nome,
                                                 status              as Status,
                                                 dtcriacao           as DataCriacao,

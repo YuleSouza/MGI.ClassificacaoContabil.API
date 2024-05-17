@@ -1,13 +1,17 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
+using Service.DTO.Cenario;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 using Service.DTO.PainelClassificacao;
+using Service.DTO.Parametrizacao;
 using Service.DTO.Projeto;
+using Service.Interface.Cenario;
 using Service.Interface.PainelClassificacao;
+using Service.Interface.Parametrizacao;
 using Service.Repository.PainelClassificacao;
-using System.Linq;
 
 namespace Service.PainelClassificacao
 {
@@ -15,12 +19,23 @@ namespace Service.PainelClassificacao
     {
         private readonly IPainelClassificacaoRepository _PainelClassificacaoRepository;
         private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
+        private readonly ICenarioService _cenarioService;
+        private readonly IParametrizacaoService _parametrizacaoService;
+        private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
+        private IEnumerable<ParametrizacaoClassificacaoGeralDTO> _parametrizacaoGrupoDTOs;
+        public IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
 
         private IUnitOfWork _unitOfWork;
-        public PainelClassificacaoService(IPainelClassificacaoRepository PainelClassificacaoRepository, IUnitOfWork unitOfWork)
+        public PainelClassificacaoService(
+            IPainelClassificacaoRepository PainelClassificacaoRepository, 
+            IUnitOfWork unitOfWork, 
+            ICenarioService cenarioService,
+            IParametrizacaoService parametrizacaoService)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
             _unitOfWork = unitOfWork;
+            _cenarioService = cenarioService;
+            _parametrizacaoService = parametrizacaoService;
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
             tiposLancamento.Add(3, "Imobilizado");
@@ -278,7 +293,94 @@ namespace Service.PainelClassificacao
                           };
             return retorno.SelectMany(p => p.Empresas).ToList();
         }
+        public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg()
+        {
+            int idCenario = 1;
+            int idGrupoPrograma = 1;
+            var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg();
+            await PopularParametrizacoes();
+            foreach (var item in lancamentos)
+            {
+                item.IdClassificacaoESG = RetornarClassificacaoEsg(item.IdTipoClassificacao, idCenario, item.IdGrupoPrograma, item.IdEmpresa);
+            }
+            var cenarios = await _cenarioService.ConsultarCenario();
+            if (cenarios.ObjetoRetorno != null)
+            {
+                IEnumerable<CenarioDTO> cenarioDTO = (IEnumerable<CenarioDTO>)cenarios.ObjetoRetorno;
+                CabecalhoEsg cabecalhoEsg = new CabecalhoEsg();
+                cabecalhoEsg.Cenarios = new List<CenarioDTO>();
+                foreach (var item in cenarioDTO)
+                {
+                    cabecalhoEsg.Cenarios.Add(item);
+                }
+                
+                var retorno = new PainelClassificacaoEsg()
+                              {
+                                 Cabecalho = cabecalhoEsg,
+                                 Empresas = from a in lancamentos
+                                            group a by new { a.IdEmpresa, a.IdClassificacaoESG, a.NomeEmpresa } into grp
+                                            select new EmpresaDTO()
+                                            {
+                                                IdEmpresa = grp.Key.IdEmpresa,
+                                                Nome = grp.Key.NomeEmpresa,
+                                                LancamentoESG = from b in lancamentos
+                                                                where b.IdEmpresa == grp.Key.IdEmpresa
+                                                                group b by new { b.IdEmpresa, b.NomeEmpresa, b.IdClassificacaoESG } into grpLanc
+                                                                select new LancamentoESG()
+                                                                {
+                                                                    Id = grpLanc.Key.IdClassificacaoESG,
+                                                                    OrcadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoESG == grpLanc.Key.IdClassificacaoESG).Sum(p => p.ValorProjeto),
+                                                                }
+                                            }
+                              };
+                return retorno;
+            }
+            return null;
+        }
+        private async Task PopularParametrizacoes()
+        {
+            var parametrizacoes = await _parametrizacaoService.ConsultarParametrizacaoCenario();
+            if (parametrizacoes.ObjetoRetorno != null)
+            {
+                _parametrizacaoCenarioDTOs = parametrizacoes.ObjetoRetorno;
+            }
+            var parametrizacoesGeral = await _parametrizacaoService.ConsultarParametrizacaoClassificacaoGeral();
+            if (parametrizacoesGeral.ObjetoRetorno != null)
+            {
+                _parametrizacaoGrupoDTOs = parametrizacoesGeral.ObjetoRetorno;
+            }
+            var parametrizacoesExcecao = await _parametrizacaoService.ConsultarParametrizacaoClassificacaoExcecao();
+            if (parametrizacoesExcecao.ObjetoRetorno != null)
+            {
+                _parametrizacaoExecoes = parametrizacoesExcecao.ObjetoRetorno;
+            }
+        }
+        private int RetornarClassificacaoEsg(int idTipoClassificacaoContabil, int idCenario, int idGrupoPrograma, int idEmpresa)
+        {
+            int idEsg = 22;
+            if (_parametrizacaoCenarioDTOs.Any())
+            {
+                var paramCenario = _parametrizacaoCenarioDTOs.Where(p => p.IdParametrizacaoCenario == idCenario);
+                if (paramCenario.Any())
+                {
+                    idEsg = paramCenario.FirstOrDefault().IdClassificacaoEsg;
+                }
+                var paramGeral = _parametrizacaoGrupoDTOs.Where(p => p.IdGrupoPrograma == idGrupoPrograma);
+                if (paramGeral.Any())
+                {
+                    idEsg = paramGeral.FirstOrDefault().IdClassificacaoEsg;
+                }
+                //var paramExcecao = _parametrizacaoExecoes.Where(p => p.IdEmpresa == idEmpresa 
+                //                                                    && p.IdCenarioClassificacaoContabil == idTipoClassificacaoContabil
+                //                                                    && p.IdGrupoPrograma == idGrupoPrograma);
+                //if (paramExcecao.Any())
+                //{
 
+                //}
+                return idEsg;
+            }
+            return idEsg;
+        }
 
         #endregion
 

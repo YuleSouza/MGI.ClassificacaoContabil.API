@@ -1,4 +1,5 @@
-﻿using Service.DTO.Classificacao;
+﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
+using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 using Service.DTO.PainelClassificacao;
@@ -23,6 +24,7 @@ namespace Service.Repository.PainelClassificacao
         #endregion
         #region [ Consulta ]
         Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil();
+        Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg();
         #endregion
     }
 }

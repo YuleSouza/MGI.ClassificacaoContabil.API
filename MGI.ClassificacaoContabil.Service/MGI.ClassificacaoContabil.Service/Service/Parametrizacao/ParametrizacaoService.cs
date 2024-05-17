@@ -54,10 +54,10 @@ namespace Service.Parametrizacao
                 }
             }
         }
-        public async Task<PayloadDTO> ConsultarParametrizacaoCenario()
+        public async Task<PayloadGeneric<IEnumerable<ParametrizacaoCenarioDTO>>> ConsultarParametrizacaoCenario()
         {
             var resultado = await _repository.ConsultarParametrizacaoCenario();
-            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+            return new PayloadGeneric<IEnumerable<ParametrizacaoCenarioDTO>>(string.Empty, true, string.Empty, resultado);
         }
         #endregion
 
@@ -98,10 +98,10 @@ namespace Service.Parametrizacao
                 }
             }
         }
-        public async Task<PayloadDTO> ConsultarParametrizacaoClassificacaoGeral()
+        public async Task<PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>> ConsultarParametrizacaoClassificacaoGeral()
         {
             var resultado = await _repository.ConsultarParametrizacaoClassificacaoGeral();
-            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+            return new PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>(string.Empty, true, string.Empty, resultado);
         }
         #endregion
 
@@ -142,10 +142,10 @@ namespace Service.Parametrizacao
                 }
             }
         }
-        public async Task<PayloadDTO> ConsultarParametrizacaoClassificacaoExcecao()
+        public async Task<PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO>>> ConsultarParametrizacaoClassificacaoExcecao()
         {
             var resultado = await _repository.ConsultarParametrizacaoClassificacaoExcecao();
-            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
+            return new PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO>>(string.Empty, true, string.Empty, resultado);
         }
         #endregion
     }

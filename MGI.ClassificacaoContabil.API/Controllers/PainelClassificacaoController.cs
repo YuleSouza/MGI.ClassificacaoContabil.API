@@ -157,6 +157,13 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(retorno);
         }
 
+        [HttpPost("v1/consultar/esg")]
+        public async Task<IActionResult> ConsultarEsg() 
+        {
+            var retorno = await _service.ConsultarClassificacaoEsg();
+            return Ok(retorno);
+        }
+
         #endregion
     }
 }

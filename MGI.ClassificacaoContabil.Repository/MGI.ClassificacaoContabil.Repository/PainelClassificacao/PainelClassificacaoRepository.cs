@@ -9,6 +9,7 @@ using Service.Repository.PainelClassificacao;
 using Dapper;
 using Service.DTO.Parametrizacao;
 using Service.DTO.PainelClassificacao;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 
 namespace Repository.PainelClassificacao
 {
@@ -180,10 +181,10 @@ namespace Repository.PainelClassificacao
         {
             return await _session.Connection.QueryAsync<ParametrizacaoCenarioPainelDTO>(
                     $@"SELECT
-                            pc.id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                            pc.id_cenario                      as IdCenario,
                             cc.nome                            as Nome
                        FROM servdesk.cenario_classif_contabil cc
-                       JOIN servdesk.parametrizacao_cenario  pc on cc.id_cenario_classif_contabil = pc.id_cenario_classif_contabil
+                       JOIN servdesk.parametrizacao_cenario  pc on cc.id_cenario = pc.id_cenario
                        WHERE cc.id_cenario_classif_contabil = :codCenarioClassif", new
                     {
                         codCenarioClassif = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
@@ -237,6 +238,11 @@ namespace Repository.PainelClassificacao
         public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil()
         {
             return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"select * from lanc_classif_contabil_2");
+        }
+
+        public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
+        {
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg");
         }
 
         #endregion

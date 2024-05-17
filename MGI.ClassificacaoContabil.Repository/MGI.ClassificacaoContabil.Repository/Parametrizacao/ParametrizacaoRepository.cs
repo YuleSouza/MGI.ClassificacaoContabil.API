@@ -1,9 +1,8 @@
-﻿using Infra.Data;
+﻿using Dapper;
+using Infra.Data;
 using Infra.Interface;
 using Service.DTO.Parametrizacao;
 using Service.Repository.Parametrizacao;
-
-using Dapper;
 
 namespace Repository.Parametrizacao
 {
@@ -21,13 +20,13 @@ namespace Repository.Parametrizacao
         #region [Parametrização Cenario]
         public async Task<bool> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_cenario (id_classificacao_contabil, id_classificacao_esg, id_cenario_classif_contabil, status, uscriacao, dtcriacao) 
+            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_cenario (id_classificacao_contabil, id_classificacao_esg, id_cenario, status, uscriacao, dtcriacao) 
                                                                   values (:idclassificacaocontabil, :idclassificacaoesg, :idcenarioclassificacao, :status, :uscriacao, sysdate)",
             new
             {
                 idclassificacaocontabil = parametrizacao.IdClassificacaoContabil,
                 idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
-                idcenarioclassificacao = parametrizacao.IdCenarioClassificacaoContabil,
+                idcenarioclassificacao = parametrizacao.IdCenario,
                 status = parametrizacao.Status,
                 uscriacao = parametrizacao.Usuario?.UsuarioCriacao
             });
@@ -39,7 +38,7 @@ namespace Repository.Parametrizacao
             int result = await _session.Connection.ExecuteAsync(@"update parametrizacao_cenario 
                                                                      set id_classificacao_contabil = :idclassificacaocontabil,  
                                                                          id_classificacao_esg = :idclassificacaoesg, 
-                                                                         id_cenario_classif_contabil = :idcenarioclassificacao,
+                                                                         id_cenario = :idcenarioclassificacao,
                                                                          status  = :status,
                                                                          usalteracao = :usalteracao, 
                                                                          dtalteracao = sysdate
@@ -49,7 +48,7 @@ namespace Repository.Parametrizacao
                idparametrizacaocenario = parametrizacao.IdParametrizacaoCenario,
                idclassificacaocontabil = parametrizacao.IdClassificacaoContabil,
                idclassificacaoesg = parametrizacao.IdClassificacaoEsg,
-               idcenarioclassificacao = parametrizacao.IdCenarioClassificacaoContabil,
+               idcenarioclassificacao = parametrizacao.IdCenario,
                status = parametrizacao.Status,
                usalteracao = parametrizacao.Usuario?.UsuarioModificacao
            });
@@ -64,7 +63,7 @@ namespace Repository.Parametrizacao
                                                 id_parametrizacao_cenario       as IdParametrizacaoCenario,
                                                 id_classificacao_contabil       as IdClassificacaoContabil,
                                                 id_classificacao_esg            as IdClassificacaoEsg,
-                                                id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                                                id_cenario                      as IdCenario,
                                                 dtcriacao                       as DataCriacao,
                                                 uscriacao                       as UsuarioCriacao,
                                                 dtalteracao                     as DataModificacao,
@@ -133,11 +132,11 @@ namespace Repository.Parametrizacao
         #region [Classificacao ESG]
         public async Task<bool> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_exc (id_cenario_classif_contabil, id_empresa, id_grupo_programa, id_programa, id_projeto, id_classificacao_esg, uscriacao, dtcriacao) 
+            int result = await _session.Connection.ExecuteAsync(@"insert into parametrizacao_esg_exc (id_cenario, id_empresa, id_grupo_programa, id_programa, id_projeto, id_classificacao_esg, uscriacao, dtcriacao) 
                                                                   values (:idparametrizacaocenario, :idempresa, :idgrupoprograma, :idprograma, :idprojeto, :idclassificacaoesg, :uscriacao, sysdate)",
             new
             {
-                idparametrizacaocenario = parametrizacao.IdCenarioClassificacaoContabil,
+                idparametrizacaocenario = parametrizacao.IdCenario,
                 idempresa = parametrizacao.IdEmpresa,
                 idgrupoprograma = parametrizacao.IdGrupoPrograma,
                 idprograma = parametrizacao.IdPrograma,
@@ -151,7 +150,7 @@ namespace Repository.Parametrizacao
         public async Task<bool> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
             int result = await _session.Connection.ExecuteAsync(@"update parametrizacao_esg_exc 
-                                                                     set id_cenario_classif_contabil   = :idparametrizacaocenario,  
+                                                                     set id_cenario                    = :idparametrizacaocenario,  
                                                                          id_empresa                    = :idempresa,
                                                                          id_grupo_programa             = :idgrupoprograma,
                                                                          id_programa                   = :idprograma,
@@ -163,7 +162,7 @@ namespace Repository.Parametrizacao
            new
            {
                idparamesgexc = parametrizacao.IdParametrizacaoEsgExc,
-               idparametrizacaocenario = parametrizacao.IdCenarioClassificacaoContabil,
+               idparametrizacaocenario = parametrizacao.IdCenario,
                idempresa = parametrizacao.IdEmpresa,
                idgrupoprograma = parametrizacao.IdGrupoPrograma,
                idprograma = parametrizacao.IdPrograma,
@@ -179,7 +178,7 @@ namespace Repository.Parametrizacao
             var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoEsgFiltroDTO>($@"
                                             select distinct
                                                  pe.id_param_esg_exc                as IdParametrizacaoEsgExc,
-                                                 pe.id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                                                 pe.id_cenario                      as IdCenario,
                                                  c.nome                             as NomeCenario, 
                                                  pe.id_empresa                      as IdEmpresa,
                                                  ltrim(rtrim(e.empnomfan))          as NomeEmpresa,         
@@ -200,12 +199,13 @@ namespace Repository.Parametrizacao
                                             join servdesk.pgmgru gp on pe.id_grupo_programa = gp.pgmgrucod
                                             join servdesk.pgmass pgp on pgp.pgmgrucod = gp.pgmgrucod 
                                             join servdesk.pgmpro p on p.pgmcod = pe.id_programa
-                                            join servdesk.cenario_classif_contabil c on pe.id_cenario_classif_contabil = c.id_cenario_classif_contabil     
+                                            join servdesk.cenario_classif_contabil c on pe.id_cenario = c.id_cenario
                                             join servdesk.classificacao_esg ces on pe.id_classificacao_esg = ces.id_classificacao_esg
                                             join servdesk.projeto prj on pe.id_programa = prj.prjcod
                                             where 1 = 1");
             return resultado;
         }
+        
         #endregion
     }
 }
