@@ -158,9 +158,9 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost("v1/consultar/esg")]
-        public async Task<IActionResult> ConsultarEsg() 
+        public async Task<IActionResult> ConsultarEsg(FiltroPainelClassificacaoEsg filtro) 
         {
-            var retorno = await _service.ConsultarClassificacaoEsg();
+            var retorno = await _service.ConsultarClassificacaoEsg(filtro);
             return Ok(retorno);
         }
 

@@ -3,12 +3,13 @@ using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Cenario;
+using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 using Service.DTO.PainelClassificacao;
 using Service.DTO.Parametrizacao;
 using Service.DTO.Projeto;
-using Service.Interface.Cenario;
+using Service.Interface.Classificacao;
 using Service.Interface.PainelClassificacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.PainelClassificacao;
@@ -19,22 +20,24 @@ namespace Service.PainelClassificacao
     {
         private readonly IPainelClassificacaoRepository _PainelClassificacaoRepository;
         private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
-        private readonly ICenarioService _cenarioService;
+        private IClassificacaoService _classificacaoEsgService;
         private readonly IParametrizacaoService _parametrizacaoService;
         private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
         private IEnumerable<ParametrizacaoClassificacaoGeralDTO> _parametrizacaoGrupoDTOs;
         public IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
+        public const int VALOR_ACUMULADO = 0;
+        public const int VALOR_ANUAL = 1;
 
         private IUnitOfWork _unitOfWork;
         public PainelClassificacaoService(
             IPainelClassificacaoRepository PainelClassificacaoRepository, 
-            IUnitOfWork unitOfWork, 
-            ICenarioService cenarioService,
+            IUnitOfWork unitOfWork,
+            IClassificacaoService classificacaoEsgService,
             IParametrizacaoService parametrizacaoService)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
             _unitOfWork = unitOfWork;
-            _cenarioService = cenarioService;
+            _classificacaoEsgService = classificacaoEsgService;
             _parametrizacaoService = parametrizacaoService;
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
@@ -100,12 +103,12 @@ namespace Service.PainelClassificacao
         public async Task<IList<EmpresaDTO>> ConsultarClassificacaoContabil()
         {
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil();
-            ClassificacaoContabilDTO classificacaoContabil = new ClassificacaoContabilDTO();
+            PainelClassificacaoContabilDTO classificacaoContabil = new PainelClassificacaoContabilDTO();
             classificacaoContabil.Empresas = new List<EmpresaDTO>();
             var retorno = from a in lancamentos
                           orderby a.IdTipoClassificacao
                           group a by new { a.IdEmpresa, a.NomeEmpresa } into grp
-                          select new ClassificacaoContabilDTO()
+                          select new PainelClassificacaoContabilDTO()
                           {
                               Empresas = new List<EmpresaDTO>()
                               {
@@ -293,25 +296,24 @@ namespace Service.PainelClassificacao
                           };
             return retorno.SelectMany(p => p.Empresas).ToList();
         }
-        public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg()
+        public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
-            int idCenario = 1;
-            int idGrupoPrograma = 1;
-            var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg();
+            int idCenario = filtro.IdCenario;
+            int idGrupoPrograma = filtro.IdGrupoPrograma.HasValue ? filtro.IdGrupoPrograma.Value : 0;
+            var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
             await PopularParametrizacoes();
             foreach (var item in lancamentos)
             {
                 item.IdClassificacaoESG = RetornarClassificacaoEsg(item.IdTipoClassificacao, idCenario, item.IdGrupoPrograma, item.IdEmpresa);
             }
-            var cenarios = await _cenarioService.ConsultarCenario();
-            if (cenarios.ObjetoRetorno != null)
+            var classificacoesEsg = await _classificacaoEsgService.ConsultarClassificacaoEsg();
+            if (classificacoesEsg.ObjetoRetorno != null)
             {
-                IEnumerable<CenarioDTO> cenarioDTO = (IEnumerable<CenarioDTO>)cenarios.ObjetoRetorno;
+                IEnumerable<ClassificacaoEsgDTO> classificacaoEsgDTO = (IEnumerable<ClassificacaoEsgDTO>)classificacoesEsg.ObjetoRetorno;
                 CabecalhoEsg cabecalhoEsg = new CabecalhoEsg();
-                cabecalhoEsg.Cenarios = new List<CenarioDTO>();
-                foreach (var item in cenarioDTO)
+                foreach (var item in classificacaoEsgDTO)
                 {
-                    cabecalhoEsg.Cenarios.Add(item);
+                    cabecalhoEsg.ClassificacoesEsg.Add(item);
                 }
                 
                 var retorno = new PainelClassificacaoEsg()
@@ -319,17 +321,41 @@ namespace Service.PainelClassificacao
                                  Cabecalho = cabecalhoEsg,
                                  Empresas = from a in lancamentos
                                             group a by new { a.IdEmpresa, a.IdClassificacaoESG, a.NomeEmpresa } into grp
-                                            select new EmpresaDTO()
+                                            select new EmpresaEsgDTO()
                                             {
                                                 IdEmpresa = grp.Key.IdEmpresa,
                                                 Nome = grp.Key.NomeEmpresa,
+                                                Total = new LancamentoTotalESG()
+                                                {
+                                                    TotalOrcado = filtro.TipoAcumuladoOuAnual == VALOR_ACUMULADO ? lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).Sum(p => p.ValorProjeto)
+                                                                                                 : lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).Sum(p => p.ValorAnualProjeto),
+                                                    TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).Sum(p => p.ValorRealizadoSap)
+                                                },
                                                 LancamentoESG = from b in lancamentos
                                                                 where b.IdEmpresa == grp.Key.IdEmpresa
                                                                 group b by new { b.IdEmpresa, b.NomeEmpresa, b.IdClassificacaoESG } into grpLanc
                                                                 select new LancamentoESG()
                                                                 {
-                                                                    Id = grpLanc.Key.IdClassificacaoESG,
-                                                                    OrcadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoESG == grpLanc.Key.IdClassificacaoESG).Sum(p => p.ValorProjeto),
+                                                                    IdClassificacaoEsg = grpLanc.Key.IdClassificacaoESG,
+                                                                    OrcadoAcumulado = filtro.TipoAcumuladoOuAnual == VALOR_ACUMULADO ? lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoESG == grpLanc.Key.IdClassificacaoESG).Sum(p => p.ValorProjeto)
+                                                                                        : lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoESG == grpLanc.Key.IdClassificacaoESG).Sum(p => p.ValorAnualProjeto),
+                                                                    RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoESG == grpLanc.Key.IdClassificacaoESG).Sum(p => p.ValorRealizadoSap)
+                                                                },
+                                                GrupoPrograma = from c in lancamentos
+                                                                where c.IdEmpresa == grp.Key.IdEmpresa
+                                                                group c by new { c.IdEmpresa, c.IdGrupoPrograma, c.GrupoDePrograma } into grpGru
+                                                                select new GrupoProgramaEsgDTO()
+                                                                {
+                                                                    IdGrupoPrograma = grpGru.Key.IdGrupoPrograma,
+                                                                    Nome = grpGru.Key.GrupoDePrograma,
+                                                                    LancamentoESG = from l in lancamentos
+                                                                                    where l.IdEmpresa == grpGru.Key.IdEmpresa
+                                                                                    && l.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
+                                                                                    group l by new { l.IdEmpresa, l.IdClassificacaoESG, l.IdGrupoPrograma } into grpLancGru
+                                                                                    select new LancamentoESG()
+                                                                                    {
+                                                                                        IdClassificacaoEsg = grpLancGru.Key.IdClassificacaoESG
+                                                                                    }
                                                                 }
                                             }
                               };
@@ -357,7 +383,7 @@ namespace Service.PainelClassificacao
         }
         private int RetornarClassificacaoEsg(int idTipoClassificacaoContabil, int idCenario, int idGrupoPrograma, int idEmpresa)
         {
-            int idEsg = 22;
+            int idEsg = 0;
             if (_parametrizacaoCenarioDTOs.Any())
             {
                 var paramCenario = _parametrizacaoCenarioDTOs.Where(p => p.IdParametrizacaoCenario == idCenario);

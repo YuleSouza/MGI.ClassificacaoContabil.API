@@ -225,7 +225,7 @@ namespace Repository.PainelClassificacao
                                                                                 AND id_classificacao_esg = :codClassificacaoEsg",
             new
             {
-                codClassificacaoEsg = (filtro.IdClassificacaoEsg ?? "").Select(s => Convert.ToInt32(s))
+                codClassificacaoEsg = filtro.IdClassificacaoEsg
             });
         }
 
@@ -240,9 +240,11 @@ namespace Repository.PainelClassificacao
             return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"select * from lanc_classif_contabil_2");
         }
 
-        public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
+        public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
-            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg");
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg where idEmpresa = :idEmpresa", new {
+                idEmpresa = filtro.IdEmpresa
+            });
         }
 
         #endregion

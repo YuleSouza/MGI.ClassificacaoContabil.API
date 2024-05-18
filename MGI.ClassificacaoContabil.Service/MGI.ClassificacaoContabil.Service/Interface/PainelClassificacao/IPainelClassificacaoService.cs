@@ -26,7 +26,7 @@ namespace Service.Interface.PainelClassificacao
 
         #region [ESG]
 
-        Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg();
+        Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         #endregion
     }
 }

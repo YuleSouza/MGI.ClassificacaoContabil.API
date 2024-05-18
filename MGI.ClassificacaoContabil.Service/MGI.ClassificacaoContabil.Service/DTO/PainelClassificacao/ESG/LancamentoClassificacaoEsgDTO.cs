@@ -11,12 +11,19 @@
         public int IdProjeto { get; set; }
         public string NomeProjeto { get; set; }
         public decimal ValorProjeto { get; set; }
+        public decimal ValorAnualProjeto { get; set; }
         public decimal TotalOrcado { get; set; }
         public decimal TotalOrcadoGrupo { get; set; }
         public decimal TotalOrcadoPrograma { get; set; }
+        public decimal TotalOrcadoAnual { get; set; }
+        public decimal TotalOrcadoGrupoAnual { get; set; }
+        public decimal TotalOrcadoProgramaAnual { get; set; }
         public string MesOrcamento { get; set; }
         public int IdTipoClassificacao { get; set; }
         public decimal ValorRealizadoSap { get; set; }
         public int IdClassificacaoESG { get; set; }
+        public string IdGestor {  get; set; }
+        public string NomeGestor { get; set; }
+        public DateTime DtLancamentoSap { get; set; }
     }
 }

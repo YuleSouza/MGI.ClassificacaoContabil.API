@@ -2,7 +2,7 @@
 {
     public class LancamentoESG
     {
-        public int Id { get; set; }
+        public int IdClassificacaoEsg { get; set; }
         public string Nome { get; set; }
         public decimal OrcadoAcumulado { get; set; }
         public decimal RealizadoAcumulado { get; set; }
@@ -26,6 +26,18 @@
             set
             {
                 PercentualVariacao = value;
+            }
+        }
+
+        public bool Indicador
+        {
+            get
+            {
+                return OrcadoAcumulado > RealizadoAcumulado;
+            }
+            set
+            {
+                Indicador = value;
             }
         }
     }
