@@ -14,5 +14,6 @@
         public int? IdGrupoPrograma { get; set; }
         public int? IdPrograma { get; set; }
         public int? IdGestor { get; set; }
+        public int? IdProjeto { get; set; }
     }
 }

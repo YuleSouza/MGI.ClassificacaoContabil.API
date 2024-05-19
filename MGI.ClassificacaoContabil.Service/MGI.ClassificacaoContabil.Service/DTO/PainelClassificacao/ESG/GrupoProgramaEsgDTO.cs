@@ -10,6 +10,6 @@ namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
         public string? Nome { get; set; }
         public IEnumerable<LancamentoESG> LancamentoESG { get; set; }
         public LancamentoTotalESG Total { get; set; }
-        public IEnumerable<ProgramaDTO>? Programas { get; set; }
+        public IEnumerable<ProgramaEsgDTO>? Programas { get; set; }
     }
 }

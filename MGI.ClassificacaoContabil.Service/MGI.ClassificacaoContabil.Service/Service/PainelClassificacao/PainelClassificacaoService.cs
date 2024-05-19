@@ -299,7 +299,6 @@ namespace Service.PainelClassificacao
         public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
             int idCenario = filtro.IdCenario;
-            int idGrupoPrograma = filtro.IdGrupoPrograma.HasValue ? filtro.IdGrupoPrograma.Value : 0;
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
             await PopularParametrizacoes();
             foreach (var item in lancamentos)
@@ -364,7 +363,38 @@ namespace Service.PainelClassificacao
                                                                                         RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa 
                                                                                                                                 && p.IdClassificacaoESG == grpLancGru.Key.IdClassificacaoESG
                                                                                                                                 && p.IdGrupoPrograma == grpLancGru.Key.IdGrupoPrograma).Sum(p => p.ValorRealizadoSap)
-                                                                                    }
+                                                                                    },
+                                                                    Programas = from p in lancamentos
+                                                                                where p.IdEmpresa == grp.Key.IdEmpresa
+                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
+                                                                                group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.Programa, p.IdClassificacaoESG } into grpPro
+                                                                                select new ProgramaEsgDTO()
+                                                                                {
+                                                                                    IdPrograma = grpPro.Key.IdPrograma,
+                                                                                    Nome = grpPro.Key.Programa,
+                                                                                    LancamentoESG = from l in lancamentos
+                                                                                                    where l.IdEmpresa == grpPro.Key.IdEmpresa
+                                                                                                    && l.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
+                                                                                                    && l.IdPrograma == grpPro.Key.IdPrograma
+                                                                                                    group l by new { l.IdEmpresa, l.IdClassificacaoESG, l.IdGrupoPrograma, l.IdPrograma } into grpLancGruPro
+                                                                                                    select new LancamentoESG()
+                                                                                                    {
+                                                                                                        IdClassificacaoEsg = grpLancGruPro.Key.IdPrograma,
+                                                                                                        OrcadoAcumulado = filtro.TipoAcumuladoOuAnual == VALOR_ACUMULADO ? lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
+                                                                                                                                                                                && p.IdClassificacaoESG == grpLancGruPro.Key.IdClassificacaoESG
+                                                                                                                                                                                && p.IdGrupoPrograma == grpLancGruPro.Key.IdGrupoPrograma
+                                                                                                                                                                                && p.IdPrograma == grpLancGruPro.Key.IdPrograma).Sum(p => p.ValorProjeto)
+                                                                                                                                                            : lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
+                                                                                                                                                                                && p.IdClassificacaoESG == grpLancGruPro.Key.IdClassificacaoESG
+                                                                                                                                                                                && p.IdGrupoPrograma == grpLancGruPro.Key.IdGrupoPrograma
+                                                                                                                                                                                && p.IdPrograma == grpLancGruPro.Key.IdPrograma).Sum(p => p.ValorAnualProjeto),
+                                                                                                        RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
+                                                                                                                                                && p.IdClassificacaoESG == grpLancGruPro.Key.IdClassificacaoESG
+                                                                                                                                                && p.IdGrupoPrograma == grpLancGruPro.Key.IdGrupoPrograma
+                                                                                                                                                && p.IdPrograma == grpLancGruPro.Key.IdPrograma).Sum(p => p.ValorRealizadoSap)
+                                                                                                    }
+                                                                                }
+                                                                    
                                                                 }
                                             }
                               };
