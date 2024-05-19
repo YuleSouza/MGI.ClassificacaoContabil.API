@@ -21,7 +21,7 @@ namespace Service.Interface.PainelClassificacao
         #endregion
 
         #region [Contabil]
-        Task<IList<EmpresaDTO>> ConsultarClassificacaoContabil();
+        Task<IList<EmpresaDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         #endregion
 
         #region [ESG]

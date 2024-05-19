@@ -151,9 +151,9 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost("v1/consultar")]
-        public async Task<IActionResult> Consultar()
+        public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
         {
-            var retorno = await _service.ConsultarClassificacaoContabil();
+            var retorno = await _service.ConsultarClassificacaoContabil(filtro);
             return Ok(retorno);
         }
 
