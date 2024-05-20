@@ -164,6 +164,18 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(retorno);
         }
 
+        [HttpGet("v1/relatorio/esg")]
+        public async Task<IActionResult> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
+        {
+            var relatorio = await _service.GerarRelatorioContabilEsg(filtro);
+            if (relatorio == null)
+            {
+                return BadRequest();
+            }
+            string filename = "relatorio.csv";
+            return File(relatorio,"text/csv",filename);
+        }
+
         #endregion
     }
 }

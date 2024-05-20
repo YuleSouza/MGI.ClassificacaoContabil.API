@@ -301,6 +301,31 @@ namespace Repository.PainelClassificacao
                 });
         }
 
+        public Task<IEnumerable<ClassificacaoContabilItemDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        {
+            StringBuilder parametros = new StringBuilder();
+            parametros.AppendLine(" and 1 = 1");
+            #region [ filtros ]
+            if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGrupoPrograma = :idGrupoPrograma ");
+            }
+            if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idPrograma = :idPrograma ");
+            }
+            if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
+            {
+                parametros.AppendLine(" and a.idProjeto = :idProjeto");
+            }
+            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGestor = :idGestor");
+            }
+            #endregion
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

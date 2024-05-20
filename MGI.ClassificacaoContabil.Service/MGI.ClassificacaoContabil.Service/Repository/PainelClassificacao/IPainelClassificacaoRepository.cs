@@ -24,6 +24,8 @@ namespace Service.Repository.PainelClassificacao
         #endregion
         #region [ Consulta ]
         Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
+
+        Task<IEnumerable<ClassificacaoContabilItemDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         #endregion
     }

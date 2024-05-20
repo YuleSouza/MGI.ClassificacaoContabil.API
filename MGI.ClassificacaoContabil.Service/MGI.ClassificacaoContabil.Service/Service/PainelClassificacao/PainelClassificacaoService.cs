@@ -1,8 +1,9 @@
-﻿using DTO.Payload;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using DTO.Payload;
 using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
-using Service.DTO.Cenario;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
@@ -13,6 +14,9 @@ using Service.Interface.Classificacao;
 using Service.Interface.PainelClassificacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.PainelClassificacao;
+using System.Formats.Asn1;
+using System.Globalization;
+using System.Text;
 
 namespace Service.PainelClassificacao
 {
@@ -494,6 +498,39 @@ namespace Service.PainelClassificacao
             }
             return idEsg;
         }
+        public Task<byte[]> GerarRelatorioContabilg(FiltroPainelClassificacaoContabil filtro)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<byte[]> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
+        {
+            var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
+            return GerarExcel(lancamentos);
+        }
+        public byte[] GerarExcel<T>(IEnumerable<T> data)
+        {
+            using var memoryStream = new MemoryStream();
+            using var writer = new StreamWriter(memoryStream, new UTF8Encoding(false));
+            var config = new CsvConfiguration(CultureInfo.CurrentCulture) { Delimiter = ";", Encoding = Encoding.UTF8 };
+            using var csv = new CsvWriter(writer, config);
+
+            if (data != null && data.Any())
+            {
+                csv.WriteRecords(data);
+            }
+            else
+            {
+                data = data.Append(Activator.CreateInstance<T>());
+                csv.WriteRecords(data);
+            }
+
+            writer.Flush();
+
+            memoryStream.Position = 0;
+
+            return memoryStream.ToArray();
+        }
+
 
         #endregion
 
