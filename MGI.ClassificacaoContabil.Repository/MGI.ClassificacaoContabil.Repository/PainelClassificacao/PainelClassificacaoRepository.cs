@@ -9,6 +9,8 @@ using Service.Repository.PainelClassificacao;
 using Dapper;
 using Service.DTO.Parametrizacao;
 using Service.DTO.PainelClassificacao;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
+using System.Text;
 
 namespace Repository.PainelClassificacao
 {
@@ -180,10 +182,10 @@ namespace Repository.PainelClassificacao
         {
             return await _session.Connection.QueryAsync<ParametrizacaoCenarioPainelDTO>(
                     $@"SELECT
-                            pc.id_cenario_classif_contabil     as IdCenarioClassificacaoContabil,
+                            pc.id_cenario                      as IdCenario,
                             cc.nome                            as Nome
                        FROM servdesk.cenario_classif_contabil cc
-                       JOIN servdesk.parametrizacao_cenario  pc on cc.id_cenario_classif_contabil = pc.id_cenario_classif_contabil
+                       JOIN servdesk.parametrizacao_cenario  pc on cc.id_cenario = pc.id_cenario
                        WHERE cc.id_cenario_classif_contabil = :codCenarioClassif", new
                     {
                         codCenarioClassif = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
@@ -206,7 +208,7 @@ namespace Repository.PainelClassificacao
                       WHERE status = 'A'
                       AND id_empresa IN :codEmpresa", new
                     {
-                        codEmpresa = (filtro.IdEmpresa ?? "").Select(s => Convert.ToInt32(s))
+                        codEmpresa = filtro.IdEmpresa
                     });
         }
         public async Task<IEnumerable<ClassificacaoEsgDTO>>FiltroPainelClassificacaoESG(FiltroPainelClassificacaoEsg filtro)
@@ -224,7 +226,7 @@ namespace Repository.PainelClassificacao
                                                                                 AND id_classificacao_esg = :codClassificacaoEsg",
             new
             {
-                codClassificacaoEsg = (filtro.IdClassificacaoEsg ?? "").Select(s => Convert.ToInt32(s))
+                codClassificacaoEsg = filtro.IdClassificacaoEsg
             });
         }
 
@@ -234,9 +236,94 @@ namespace Repository.PainelClassificacao
 
         #region [Contabil]
 
-        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil()
+        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
-            return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"select * from lanc_classif_contabil_2");
+            StringBuilder parametros = new StringBuilder();
+            parametros.AppendLine(" and 1 = 1");
+            #region [ filtros ]
+            if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGrupoPrograma = :idGrupoPrograma ");
+            }
+            if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idPrograma = :idPrograma ");
+            }
+            if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
+            {
+                parametros.AppendLine(" and a.idProjeto = :idProjeto");
+            }
+            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGestor = :idGestor");
+            }
+            #endregion
+            return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"select * from v_lanc_classif_esg where idEmpresa = :idEmpresa {parametros.ToString()}",
+                new
+                {
+                    idEmpresa = filtro.IdEmpresa,
+                    idGrupoPrograma = filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
+                    idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
+                    idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
+                    idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                });
+        }
+
+        public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
+        {
+            StringBuilder parametros = new StringBuilder();
+            parametros.AppendLine(" and 1 = 1");
+            #region [ filtros ]
+            if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGrupoPrograma = :idGrupoPrograma ");
+            }
+            if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idPrograma = :idPrograma ");
+            }
+            if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
+            {
+                parametros.AppendLine(" and a.idProjeto = :idProjeto");
+            }
+            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGestor = :idGestor");
+            }
+            #endregion
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
+                new {
+                    idEmpresa = filtro.IdEmpresa,
+                    idGrupoPrograma = filtro.IdGrupoPrograma.HasValue  && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
+                    idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
+                    idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
+                    idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                });
+        }
+
+        public Task<IEnumerable<ClassificacaoContabilItemDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        {
+            StringBuilder parametros = new StringBuilder();
+            parametros.AppendLine(" and 1 = 1");
+            #region [ filtros ]
+            if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGrupoPrograma = :idGrupoPrograma ");
+            }
+            if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
+            {
+                parametros.AppendLine(" and a.idPrograma = :idPrograma ");
+            }
+            if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
+            {
+                parametros.AppendLine(" and a.idProjeto = :idProjeto");
+            }
+            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            {
+                parametros.AppendLine(" and a.idGestor = :idGestor");
+            }
+            #endregion
+            throw new NotImplementedException();
         }
 
         #endregion

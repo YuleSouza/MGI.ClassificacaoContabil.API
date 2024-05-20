@@ -151,10 +151,29 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost("v1/consultar")]
-        public async Task<IActionResult> Consultar()
+        public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
         {
-            var retorno = await _service.ConsultarClassificacaoContabil();
+            var retorno = await _service.ConsultarClassificacaoContabil(filtro);
             return Ok(retorno);
+        }
+
+        [HttpPost("v1/consultar/esg")]
+        public async Task<IActionResult> ConsultarEsg(FiltroPainelClassificacaoEsg filtro) 
+        {
+            var retorno = await _service.ConsultarClassificacaoEsg(filtro);
+            return Ok(retorno);
+        }
+
+        [HttpGet("v1/relatorio/esg")]
+        public async Task<IActionResult> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
+        {
+            var relatorio = await _service.GerarRelatorioContabilEsg(filtro);
+            if (relatorio == null)
+            {
+                return BadRequest();
+            }
+            string filename = "relatorio.csv";
+            return File(relatorio,"text/csv",filename);
         }
 
         #endregion

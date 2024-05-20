@@ -3,7 +3,7 @@
     public class ParametrizacaoClassificacaoEsgFiltroDTO
     {
         public int IdParametrizacaoEsgExc { get; set; }
-        public int IdCenarioClassificacaoContabil { get; set; }
+        public int IdCenario { get; set; }
         public string? NomeCenario { get; set; }
         public int IdEmpresa { get; set; }
         public string? NomeEmpresa { get; set; }

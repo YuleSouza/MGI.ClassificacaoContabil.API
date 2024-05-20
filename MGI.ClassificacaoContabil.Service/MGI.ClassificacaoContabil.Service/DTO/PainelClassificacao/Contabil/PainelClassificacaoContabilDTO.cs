@@ -3,7 +3,7 @@ using Service.DTO.Empresa;
 
 namespace Service.DTO.PainelClassificacao
 {
-    public class ClassificacaoContabilDTO
+    public class PainelClassificacaoContabilDTO
     {
         public IList<EmpresaDTO> Empresas { get; set; }       
     }

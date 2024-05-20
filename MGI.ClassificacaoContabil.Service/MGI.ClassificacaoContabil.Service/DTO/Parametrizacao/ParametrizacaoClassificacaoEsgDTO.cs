@@ -3,7 +3,7 @@
     public class ParametrizacaoClassificacaoEsgDTO
     {
         public int IdParametrizacaoEsgExc { get; set; }
-        public int IdCenarioClassificacaoContabil { get; set; }
+        public int IdCenario { get; set; }
         public int IdEmpresa { get; set; }
         public int IdGrupoPrograma { get; set; }
         public int IdPrograma { get; set; }

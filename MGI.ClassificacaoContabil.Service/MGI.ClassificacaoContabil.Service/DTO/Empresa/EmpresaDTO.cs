@@ -1,4 +1,5 @@
 ﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 
 namespace Service.DTO.Empresa
 {
@@ -10,7 +11,7 @@ namespace Service.DTO.Empresa
         public LancamentoContabilDTO LancamentoImobilizado { get; set; }
         public LancamentoContabilDTO LancamentoProvisao { get; set; }
         public LancamentoContabilTotalDTO TotalLancamento { get; set; }
-
         public IEnumerable<GrupoProgramaDTO> GrupoPrograma { get; set; }
+        public IEnumerable<LancamentoESG> LancamentoESG { get; set; }
     }
 }
