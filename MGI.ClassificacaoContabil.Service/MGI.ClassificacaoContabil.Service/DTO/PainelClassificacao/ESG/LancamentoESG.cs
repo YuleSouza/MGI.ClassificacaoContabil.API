@@ -3,7 +3,6 @@
     public class LancamentoESG
     {
         public int IdClassificacaoEsg { get; set; }
-        public string Nome { get; set; }
         public decimal OrcadoAcumulado { get; set; }
         public decimal RealizadoAcumulado { get; set; }
         public decimal Variacao

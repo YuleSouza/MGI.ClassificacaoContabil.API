@@ -324,7 +324,6 @@ namespace Repository.Classificacao
         }
         public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
         {
-
             var resultado = await _session.Connection.QueryAsync<ClassificacaoEsgDTO>($@"
                                            select 
                                                 id_classificacao_esg  as IdClassificacaoEsg,
@@ -335,7 +334,8 @@ namespace Repository.Classificacao
                                                 dtalteracao         as DataModificacao,
                                                 usalteracao         as UsuarioModificacao
                                             from classificacao_esg
-                                            where 1 = 1");
+                                            where 1 = 1
+                                              and status = 'A'");
             return resultado;
         }
         public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg(ClassificacaoEsgFiltro filtro)

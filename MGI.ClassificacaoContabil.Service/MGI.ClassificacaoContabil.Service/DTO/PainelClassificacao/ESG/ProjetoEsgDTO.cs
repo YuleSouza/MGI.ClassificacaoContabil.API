@@ -4,7 +4,7 @@
     {
         public int IdProjeto { get; set; }
         public string? NomeProjeto { get; set; }
-        public IEnumerable<LancamentoESG> Lancamentos { get; set; }
+        public LancamentoESG LancamentoESG { get; set; }
         public LancamentoTotalESG Total { get; set; }
     }
 }
