@@ -264,6 +264,10 @@ namespace Repository.Classificacao
             {
                 parametros += " and cp.id_projeto = :idprojeto";
             }
+            if (filtro.Ano.HasValue && filtro.Ano > 0)
+            {
+                parametros += " and :ano between extract(year from cp.mesano_inicio)  and extract(year from cp.mesano_fim)";
+            }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoProjetoDTO>($@"
                                                     select cp.id_classif_contabil_prj                                    as IdClassificacaoContabilProjeto, 
                                                            cp.id_classificacao_contabil                                  as IdClassificacaoContabil,
@@ -285,7 +289,9 @@ namespace Repository.Classificacao
                                         ", new
             {
                 idclassificacao = filtro.IdClassificacaoContabil,
-                idempresa = filtro.IdEmpresa
+                idempresa = filtro.IdEmpresa,
+                idprojeto = filtro.IdProjeto,
+                ano = filtro.Ano,
             });
             return resultado;
         }

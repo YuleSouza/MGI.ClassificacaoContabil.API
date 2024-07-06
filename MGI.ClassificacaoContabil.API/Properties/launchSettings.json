@@ -16,16 +16,16 @@
       "applicationUrl": "http://localhost:5541",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "Homlog": {
-        "commandName": "Project",
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "applicationUrl": "http://localhost:5541",
-        "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Homolog"
-        }
+      }
+    },
+    "Homolog": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5541",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Homolog"
       }
     }
   }

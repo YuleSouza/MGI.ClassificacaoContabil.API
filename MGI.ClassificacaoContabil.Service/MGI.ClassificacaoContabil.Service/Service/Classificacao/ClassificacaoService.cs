@@ -155,6 +155,12 @@ namespace Service.Classificacao
             var resultado = await _repository.ConsultarProjetoClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+
+        public async Task<bool> VerificarRegraExcessaoContabil(FiltroClassificacaoContabil filtro)
+        {
+            var resultado = await _repository.ConsultarProjetoClassificacaoContabil(filtro);
+            return resultado.Any();
+        }
         #endregion
 
         #region ESG
@@ -204,6 +210,8 @@ namespace Service.Classificacao
             var resultado = await _repository.ConsultarClassificacaoEsg(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+
+
         #endregion
     }
 }

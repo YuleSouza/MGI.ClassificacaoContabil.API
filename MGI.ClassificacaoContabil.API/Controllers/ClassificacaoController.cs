@@ -138,6 +138,18 @@ namespace API.Controllers
             return Ok(retorno);
         }
 
+        [HttpGet("v1/contabil/projeto/regra-excessao/{idprojeto}/ano/{ano}")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadosProjetoClassificacao([FromRoute] int idprojeto, int ano)
+        {
+            var retorno = await _service.VerificarRegraExcessaoContabil(new FiltroClassificacaoContabil()
+            {
+                Ano = ano,
+                IdProjeto = idprojeto,
+            });
+            return Ok(retorno);
+        }
+
         #endregion
 
         #region ESG
