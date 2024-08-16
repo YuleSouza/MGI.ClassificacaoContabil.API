@@ -7,9 +7,9 @@
         public int IdClassificacaoEsg { get; set; }
         public int IdCenario { get; set; }
         public string? Status { get; set; }
-        public string NomeCenario {  get; set; }
-        public string NomeClassifEsg { get; set; }
-        public string NomeEmpresa { get; set; }
+        public string? NomeCenario {  get; set; }
+        public string? NomeClassifEsg { get; set; }
+        public string? NomeEmpresa { get; set; }
         public UsuarioDTO? Usuario { get; set; }
     }
 }
