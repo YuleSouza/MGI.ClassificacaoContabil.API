@@ -67,8 +67,15 @@ namespace Repository.Parametrizacao
                                                 dtcriacao                       as DataCriacao,
                                                 uscriacao                       as UsuarioCriacao,
                                                 dtalteracao                     as DataModificacao,
-                                                usalteracao                     as UsuarioModificacao
+                                                usalteracao                     as UsuarioModificacao,
+                                                c.nome                          as NomeCenario,
+                                                e.nome                          as NomeClassifEsg,
+                                                s.empnomfan                     as NomeEmpresa
                                             from parametrizacao_cenario
+                                                    inner join cenario_classif_contabil c on p.id_cenario = c.id_cenario
+                                                    inner join classificacao_esg e on (p.id_classificacao_esg = e.id_classificacao_esg)
+                                                    inner join classificacao_contabil t on (p.id_classificacao_contabil = t.id_classificacao_contabil)
+                                                    inner join corpora.empres s on (t.id_empresa = s.empcod)
                                             where 1 = 1");
             return resultado;
         }
