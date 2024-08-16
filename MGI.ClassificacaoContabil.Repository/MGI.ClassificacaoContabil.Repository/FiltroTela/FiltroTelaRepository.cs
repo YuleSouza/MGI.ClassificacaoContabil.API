@@ -129,19 +129,23 @@ namespace Repository.FiltroTela
         }
         public async Task<IEnumerable<GrupoProgramaDTO>> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro)
         {
-            return await _session.Connection.QueryAsync<GrupoProgramaDTO>(
-                    $@"SELECT pgmgrucod codGrupoPrograma, ltrim(rtrim(pgmgrunom)) Nome
-                              FROM servdesk.pgmgru g
-                             WHERE pgmgruver = 0
-                               AND g.pgmgrusit = 'A'
-                               AND EXISTS
-                             (SELECT 1
+            string parametroEmpresa = string.Empty;
+            if (!string.IsNullOrEmpty(filtro.IdEmpresa))
+            {
+                parametroEmpresa = @" AND EXISTS (SELECT 1
                                       FROM projeto p, pgmass a
                                      WHERE p.prjempcus IN :codEmpresa
                                        AND a.pgmassver = 0
                                        AND a.pgmasscod = p.pgmasscod
-                                       AND a.pgmgrucod = g.pgmgrucod)
-                             ORDER BY 2, 1", new
+                                       AND a.pgmgrucod = g.pgmgrucod)";
+            }
+            return await _session.Connection.QueryAsync<GrupoProgramaDTO>(
+                    $@"SELECT pgmgrucod codGrupoPrograma, ltrim(rtrim(pgmgrunom)) Nome
+                         FROM servdesk.pgmgru g
+                        WHERE pgmgruver = 0
+                          AND g.pgmgrusit = 'A'
+                              {parametroEmpresa}
+                        ORDER BY 2, 1", new
                     {
                         codEmpresa = !string.IsNullOrEmpty(filtro.IdEmpresa) ? (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray() : null,
                     });
