@@ -60,14 +60,14 @@ namespace Repository.Parametrizacao
 
             var resultado = await _session.Connection.QueryAsync<ParametrizacaoCenarioDTO>($@"
                                            select 
-                                                id_parametrizacao_cenario       as IdParametrizacaoCenario,
-                                                id_classificacao_contabil       as IdClassificacaoContabil,
-                                                id_classificacao_esg            as IdClassificacaoEsg,
-                                                id_cenario                      as IdCenario,
-                                                dtcriacao                       as DataCriacao,
-                                                uscriacao                       as UsuarioCriacao,
-                                                dtalteracao                     as DataModificacao,
-                                                usalteracao                     as UsuarioModificacao,
+                                                p.id_parametrizacao_cenario       as IdParametrizacaoCenario,
+                                                p.id_classificacao_contabil       as IdClassificacaoContabil,
+                                                p.id_classificacao_esg            as IdClassificacaoEsg,
+                                                p.id_cenario                      as IdCenario,
+                                                p.dtcriacao                       as DataCriacao,
+                                                p.uscriacao                       as UsuarioCriacao,
+                                                p.dtalteracao                     as DataModificacao,
+                                                p.usalteracao                     as UsuarioModificacao,
                                                 c.nome                          as NomeCenario,
                                                 e.nome                          as NomeClassifEsg,
                                                 s.empnomfan                     as NomeEmpresa
