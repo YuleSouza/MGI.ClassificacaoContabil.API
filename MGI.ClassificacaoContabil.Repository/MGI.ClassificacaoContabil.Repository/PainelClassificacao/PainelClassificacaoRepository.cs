@@ -186,9 +186,9 @@ namespace Repository.PainelClassificacao
                             cc.nome                            as Nome
                        FROM servdesk.cenario_classif_contabil cc
                        JOIN servdesk.parametrizacao_cenario  pc on cc.id_cenario = pc.id_cenario
-                       WHERE cc.id_cenario_classif_contabil = :codCenarioClassif", new
+                       WHERE cc.id_cenario = :id_cenario", new
                     {
-                        codCenarioClassif = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
+                        id_cenario = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
                     });
         }
         public async Task<IEnumerable<Service.DTO.Classificacao.ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)

@@ -187,7 +187,7 @@ namespace Repository.FiltroTela
         {
             var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
                                            select 
-                                                id_cenario_classif_contabil  as IdCenario,
+                                                id_cenario          as IdCenario,
                                                 nome                as Nome,
                                                 status              as Status,
                                                 dtcriacao           as DataCriacao,
