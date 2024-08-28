@@ -13,5 +13,6 @@ namespace Service.DTO.Empresa
         public LancamentoContabilTotalDTO TotalLancamento { get; set; }
         public IEnumerable<GrupoProgramaDTO> GrupoPrograma { get; set; }
         public IEnumerable<LancamentoESG> LancamentoESG { get; set; }
+        public LancamentoContabilDTO LancamentoSoftware { get; internal set; }
     }
 }
