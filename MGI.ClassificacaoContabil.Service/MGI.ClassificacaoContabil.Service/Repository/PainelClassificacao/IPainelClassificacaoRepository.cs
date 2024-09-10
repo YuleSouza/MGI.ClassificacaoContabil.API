@@ -1,4 +1,5 @@
-﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
+﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
@@ -25,9 +26,11 @@ namespace Service.Repository.PainelClassificacao
 
         #region [ Consulta ]
         Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
-
         Task<IEnumerable<ClassificacaoContabilItemDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
+        Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroPainelClassificacaoContabil filtro);
+        Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroPainelClassificacaoContabil filtro);
+        
         #endregion
     }
 }

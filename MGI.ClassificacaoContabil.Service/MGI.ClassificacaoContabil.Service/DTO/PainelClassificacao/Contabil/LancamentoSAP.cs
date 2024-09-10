@@ -6,6 +6,7 @@
         public int IdTipoClassificacao { get; set; }
         public decimal OrcadoAcumulado { get; set; }
         public decimal RealizadoAcumulado { get; set; }
+        public int IdProjeto { get; set; }
         public decimal Variacao
         {
             get

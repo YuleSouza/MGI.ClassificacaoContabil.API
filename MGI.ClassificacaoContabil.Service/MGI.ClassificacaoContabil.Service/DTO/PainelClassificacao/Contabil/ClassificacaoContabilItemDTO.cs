@@ -12,14 +12,17 @@ namespace Service.DTO.PainelClassificacao
         public int IdPrograma { get; set; }
         public string Programa { get; set; }
         public int IdProjeto { get; set; }
+        public int FseSeq {  get; set; }
         public string NomeProjeto { get; set; }
-        public decimal ValorProjeto { get; set; }
-        public decimal TotalOrcado { get; set; }
-        public decimal TotalOrcadoGrupo { get; set; }
-        public decimal TotalOrcadoPrograma { get; set; }
-        public string MesOrcamento { get; set; }
-        public int IdTipoClassificacao { get; set; }
-        public decimal ValorRealizadoSap {  get; set; }
-        public string DescricaoLancSap { get; set; }
+        public decimal ValorOrcado { get; set; }
+        public decimal ValorTendencia { get; set; }
+        public decimal ValorRealizado { get; set; }
+        public decimal ValorCiclo { get; set; }
+        public decimal ValorReplan { get; set; }
+        public string TipoLancamento { get; set; }
+        public DateTime DtLancamentoProjeto { get; set; }
+        public string IdGestor { get; set; }
+        public string NomeClassifContabil { get; set; }
+        public int IdClassifContabil { get; set; }
     }
 }
