@@ -357,7 +357,7 @@ namespace Repository.PainelClassificacao
         public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
-            parametros.AppendLine(" and lcc. between :dataInicio and :dataFim");
+            parametros.AppendLine(" and lcc.dt_lancamento_sap between :dataInicio and :dataFim");
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
                 parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
@@ -409,6 +409,7 @@ namespace Repository.PainelClassificacao
                                                     and orc.prjorctip in ('O','J','R','2','1')
                                                     and orc.prjorcfse > 0)
                         left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
+                  where 1 = 1 {parametros.ToString()}
             ", new
             {
                 dataInicio = filtro.DataInicio,
