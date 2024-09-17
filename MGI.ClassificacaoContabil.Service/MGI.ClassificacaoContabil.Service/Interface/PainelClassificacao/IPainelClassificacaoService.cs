@@ -1,7 +1,7 @@
 ﻿using DTO.Payload;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
-using Service.DTO.Empresa;
 using Service.DTO.Filtros;
+using Service.DTO.PainelClassificacao;
 
 namespace Service.Interface.PainelClassificacao
 {
@@ -21,7 +21,7 @@ namespace Service.Interface.PainelClassificacao
         #endregion
 
         #region [Contabil]
-        Task<IList<EmpresaDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
+        Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         Task<byte[]> GerarRelatorioContabilg(FiltroPainelClassificacaoContabil filtro);
         #endregion
 

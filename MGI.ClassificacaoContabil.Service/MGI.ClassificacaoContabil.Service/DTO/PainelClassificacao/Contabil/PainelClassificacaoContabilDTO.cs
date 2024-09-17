@@ -6,5 +6,6 @@ namespace Service.DTO.PainelClassificacao
     public class PainelClassificacaoContabilDTO
     {
         public IList<EmpresaDTO> Empresas { get; set; }       
+        public IList<TotalizadorContabil> Totalizador { get; set; }
     }
 }
