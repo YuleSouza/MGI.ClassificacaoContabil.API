@@ -10,5 +10,6 @@
         public LancamentoContabilDTO Lancamentos {  get; set; }
         public LancamentoContabilTotalDTO TotalLancamento { get; set; }
         public IEnumerable<LancamentoSAP> LancamentoSAP { get; set; }
+        public string Pep { get; set; }
     }
 }

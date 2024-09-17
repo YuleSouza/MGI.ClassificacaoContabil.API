@@ -274,6 +274,7 @@ namespace Repository.PainelClassificacao
                                       , cl.cconom as NomeClassifContabil
                                       , cl.ccocod as IdClassifContabil
                                       , orc.prjorcfse as FseSeq
+                                      , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
@@ -333,6 +334,7 @@ namespace Repository.PainelClassificacao
                                        , p.prjges as IdGestor
                                        , nvl(fse.prjfsenom,'') as NomeFase
                                        , nvl(fse.prjfseseq,0) as FseSeq
+                                      , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)

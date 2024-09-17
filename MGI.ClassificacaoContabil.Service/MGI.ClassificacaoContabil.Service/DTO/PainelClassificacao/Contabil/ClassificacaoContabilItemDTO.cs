@@ -24,5 +24,6 @@ namespace Service.DTO.PainelClassificacao
         public string IdGestor { get; set; }
         public string NomeClassifContabil { get; set; }
         public int IdClassifContabil { get; set; }
+        public string Pep {  get; set; }
     }
 }

@@ -312,12 +312,13 @@ namespace Service.PainelClassificacao
                                                                                         },                                                                                        
                                                                                         Fase = from fse in lancamentosFase
                                                                                                          join p in grpPrj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
-                                                                                                         group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase } into grpFse
+                                                                                                         group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
                                                                                                          select new FaseContabilDTO
                                                                                                          {
                                                                                                              IdEmpresa = grpFse.Key.IdEmpresa,
                                                                                                              FseSeq = grpFse.Key.FseSeq,
                                                                                                              NomeFase = grpFse.Key.NomeFase,
+                                                                                                             Pep = grpFse.Key.Pep,
                                                                                                              Lancamentos = new LancamentoContabilDTO()
                                                                                                              {
                                                                                                                     OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
@@ -328,14 +329,14 @@ namespace Service.PainelClassificacao
                                                                                                                     IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                                                                                             },                                                                                                            
-                                                                                                            LancamentoSAP = from l in lancamentosSap
-                                                                                                                            join p in grpFse on new { } equals new { } into qPrjSap
-                                                                                                                            group l by new { l.DescricaoLancSap, l.IdTipoClassificacao, l.IdProjeto } into grpSap
-                                                                                                                            select new LancamentoSAP()
-                                                                                                                            {
-                                                                                                                                OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
-                                                                                                                                RealizadoAcumulado = grpSap.Sum(p => p.RealizadoAcumulado)
-                                                                                                                            }
+                                                                                                            //LancamentoSAP = from l in lancamentosSap
+                                                                                                            //                join p in grpFse on new { } equals new { } into qPrjSap
+                                                                                                            //                group l by new { l.DescricaoLancSap, l.IdTipoClassificacao, l.IdProjeto } into grpSap
+                                                                                                            //                select new LancamentoSAP()
+                                                                                                            //                {
+                                                                                                            //                    OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
+                                                                                                            //                    RealizadoAcumulado = grpSap.Sum(p => p.RealizadoAcumulado)
+                                                                                                            //                }
                                                                                                          }
                                                                                     }
                                                                      }
