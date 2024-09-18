@@ -7,8 +7,8 @@ namespace Service.DTO.Empresa
     {
         public int CodPrograma { get; set; }
         public string? Nome { get; set; }
+        public int IdClassifContabil { get; set; }
         public LancamentoContabilDTO? Lancamentos { get; set; }
-        public LancamentoContabilTotalDTO? TotalLancamento { get; set; }
         public IEnumerable<ProjetoDTO>? Projetos { get; set; }
     }
 }

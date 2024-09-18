@@ -411,7 +411,8 @@ namespace Repository.PainelClassificacao
                                                     and orc.prjorcano = extract(year from lcc.dt_lancamento_sap) 
                                                     and orc.prjorctip in ('O','J','R','2','1')
                                                     and orc.prjorcfse > 0)
-                        left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
+                        inner join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
+                        inner join clacon cl on (fse.ccocod = cl.ccocod)
                   where 1 = 1 {parametros.ToString()}
             ", new
             {

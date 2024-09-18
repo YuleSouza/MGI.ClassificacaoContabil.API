@@ -250,6 +250,7 @@ namespace Service.PainelClassificacao
                                                       {
                                                           IdGrupoPrograma = grpGru.Key.IdGrupoPrograma,
                                                           Nome = grpGru.Key.GrupoDePrograma,
+                                                          IdClassifContabil = grpGru.Key.IdClassifContabil,
                                                           Lancamentos = new LancamentoContabilDTO()
                                                           {
                                                                 OrcadoAcumulado = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
@@ -269,6 +270,7 @@ namespace Service.PainelClassificacao
                                                                      {
                                                                          CodPrograma = grpGruPro.Key.IdPrograma,
                                                                          Nome = grpGruPro.Key.Programa,
+                                                                         IdClassifContabil = grp.Key.IdClassifContabil,
                                                                          Lancamentos = new LancamentoContabilDTO()
                                                                          {
                                                                                 OrcadoAcumulado = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
@@ -276,21 +278,8 @@ namespace Service.PainelClassificacao
                                                                                 ValorCiclo = grp.AsQueryable().Where(predicateCiclo).Sum(p => p.ValorCiclo),
                                                                                 ValorTendencia = grp.Where(predicateTendencia).Sum(p => p.ValorTendencia),
                                                                                 ValorReplan = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
-                                                                                IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil
-                                                                         },
-                                                                         TotalLancamento = new LancamentoContabilTotalDTO()
-                                                                          {
-                                                                              TotalOrcado = grp.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                        && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
-                                                                                                        && p.IdPrograma == grpGruPro.Key.IdPrograma) .Sum(p => p.ValorOrcado),
-                                                                              TotalReplan = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && grp.Key.IdClassifContabil > 0
-                                                                                                        && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
-                                                                                                        && p.IdPrograma == grpGruPro.Key.IdPrograma).Sum(p => p.ValorReplan),
-                                                                              TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                        && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
-                                                                                                        && p.IdPrograma == grpGruPro.Key.IdPrograma).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
-                                                                          },
+                                                                         },                                                                         
                                                                          Projetos = from prj in lancamentos
                                                                                     where prj.IdEmpresa == grpGruPro.Key.IdEmpresa
                                                                                        && prj.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
@@ -301,6 +290,7 @@ namespace Service.PainelClassificacao
                                                                                     {
                                                                                         CodProjeto = grpPrj.Key.IdProjeto,
                                                                                         NomeProjeto = grpPrj.Key.NomeProjeto,
+                                                                                        IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                         Lancamentos = new LancamentoContabilDTO()
                                                                                         {
                                                                                                 OrcadoAcumulado = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
@@ -308,7 +298,6 @@ namespace Service.PainelClassificacao
                                                                                                 ValorCiclo = grp.AsQueryable().Where(predicateCiclo).Sum(p => p.ValorCiclo),
                                                                                                 ValorTendencia = grp.Where(predicateTendencia).Sum(p => p.ValorTendencia),
                                                                                                 ValorReplan = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
-                                                                                                IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                                                                         },
                                                                                         Fase = from fse in lancamentosFase
@@ -320,24 +309,16 @@ namespace Service.PainelClassificacao
                                                                                                              FseSeq = grpFse.Key.FseSeq,
                                                                                                              NomeFase = grpFse.Key.NomeFase,
                                                                                                              Pep = grpFse.Key.Pep,
+                                                                                                             IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                                              Lancamentos = new LancamentoContabilDTO()
                                                                                                              {
                                                                                                                     OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
                                                                                                                     RealizadoAcumulado = grpFse.AsQueryable().Where(predicateFaseRealizado).Sum(p => p.ValorRealizado),
                                                                                                                     ValorCiclo = grpFse.AsQueryable().Where(predicateFaseCiclo).Sum(p => p.ValorCiclo),
                                                                                                                     ValorTendencia = grpFse.Where(predicateFaseTendencia).Sum(p => p.ValorTendencia),
-                                                                                                                    ValorReplan = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorReplan),
-                                                                                                                    IdClassifContabil = grp.Key.IdClassifContabil,
+                                                                                                                    ValorReplan = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorReplan),                                                                                                                    
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil
-                                                                                                            },                                                                                                            
-                                                                                                            //LancamentoSAP = from l in lancamentosSap
-                                                                                                            //                join p in grpFse on new { } equals new { } into qPrjSap
-                                                                                                            //                group l by new { l.DescricaoLancSap, l.IdTipoClassificacao, l.IdProjeto } into grpSap
-                                                                                                            //                select new LancamentoSAP()
-                                                                                                            //                {
-                                                                                                            //                    OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
-                                                                                                            //                    RealizadoAcumulado = grpSap.Sum(p => p.RealizadoAcumulado)
-                                                                                                            //                }
+                                                                                                            },
                                                                                                          }
                                                                                     }
                                                                      }

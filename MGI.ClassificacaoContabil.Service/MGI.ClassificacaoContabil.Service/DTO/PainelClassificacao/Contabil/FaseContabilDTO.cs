@@ -7,9 +7,10 @@
         public DateTime DtLancamentoProjeto { get; set; }
         public string NomeFase { get; set; }
         public int FseSeq { get; set; }
+        public string Pep { get; set; }
+        public int IdClassifContabil { get; set; }
         public LancamentoContabilDTO Lancamentos {  get; set; }
         public LancamentoContabilTotalDTO TotalLancamento { get; set; }
         public IEnumerable<LancamentoSAP> LancamentoSAP { get; set; }
-        public string Pep { get; set; }
     }
 }
