@@ -1,4 +1,5 @@
 ﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
+using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 
 namespace Service.DTO.PainelClassificacao
@@ -7,5 +8,6 @@ namespace Service.DTO.PainelClassificacao
     {
         public IList<EmpresaDTO> Empresas { get; set; }       
         public IList<TotalizadorContabil> Totalizador { get; set; }
+        public IList<ClassificacaoContabilMgpDTO> Cabecalho { get; set; }
     }
 }

@@ -216,6 +216,7 @@ namespace Service.PainelClassificacao
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
             var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(filtro);
             var lancamentosSap = await _PainelClassificacaoRepository.ConsultarLancamentoSap(filtro);
+            var classificacoesMgp = await _classificacaoEsgService.ConsultarClassificacaoContabilMGP();
 
             PainelClassificacaoContabilDTO classificacaoContabil = new PainelClassificacaoContabilDTO();
             classificacaoContabil.Empresas = new List<EmpresaDTO>();
@@ -309,7 +310,7 @@ namespace Service.PainelClassificacao
                                                                                                 ValorReplan = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
                                                                                                 IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil
-                                                                                        },                                                                                        
+                                                                                        },
                                                                                         Fase = from fse in lancamentosFase
                                                                                                          join p in grpPrj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
                                                                                                          group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
@@ -343,8 +344,10 @@ namespace Service.PainelClassificacao
                                                       }
                                   }
                               },
-                              Totalizador = new List<TotalizadorContabil>()
+                              Totalizador = new List<TotalizadorContabil>(),
+                              Cabecalho = new List<ClassificacaoContabilMgpDTO>()
                           };
+
             var totais = from a in lancamentos
                          group a by new { a.IdEmpresa} into grp
                          select new PainelClassificacaoContabilDTO()
@@ -441,6 +444,7 @@ namespace Service.PainelClassificacao
 
                                             }).ToList()
                          };
+
             var totalizador = retorno.SelectMany(p => p.Totalizador).ToList();
             totalizador.AddRange(totais.SelectMany(p => p.Totalizador));
             var empresa = retorno.SelectMany(p => p.Empresas).AsQueryable(); 
@@ -448,17 +452,12 @@ namespace Service.PainelClassificacao
             return new PainelClassificacaoContabilDTO()
             {
                 Empresas = empresa.ToList(),
-                Totalizador = totalizador
+                Totalizador = totalizador,
+                Cabecalho = classificacoesMgp.ToList()
             };
         }
         public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
-            /*
-             TO-DO
-                retirar os totais -- OK
-                retirar a lista do cabeçalho e retornar somente um objeto 
-                rever regra de busca das regras
-             */
             int idCenario = filtro.IdCenario;
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
             await PopularParametrizacoes();

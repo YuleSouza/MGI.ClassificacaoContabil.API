@@ -211,6 +211,11 @@ namespace Service.Classificacao
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
 
+        public async Task<IEnumerable<ClassificacaoContabilMgpDTO>> ConsultarClassificacaoContabilMGP()
+        {
+            return await _repository.ConsultarClassificacaoContabilMGP();
+        }
+
 
         #endregion
     }

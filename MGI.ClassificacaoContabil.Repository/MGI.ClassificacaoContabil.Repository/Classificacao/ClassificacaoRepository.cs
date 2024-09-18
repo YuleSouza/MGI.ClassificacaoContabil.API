@@ -380,6 +380,11 @@ namespace Repository.Classificacao
             });
             return resultado;
         }
+
+        public async Task<IEnumerable<ClassificacaoContabilMgpDTO>> ConsultarClassificacaoContabilMGP()
+        {
+            return await _session.Connection.QueryAsync<ClassificacaoContabilMgpDTO>("select ccocod as Id, clacon.cconom as Nome from clacon ");
+        }
         #endregion
     } 
 }

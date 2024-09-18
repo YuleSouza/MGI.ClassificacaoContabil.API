@@ -21,6 +21,7 @@ namespace Service.Repository.Classificacao
 
         Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil();
         Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(FiltroClassificacaoContabil filtro);
+        Task<IEnumerable<ClassificacaoContabilMgpDTO>> ConsultarClassificacaoContabilMGP();
         #endregion
 
         #region ESG

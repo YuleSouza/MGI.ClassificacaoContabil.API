@@ -18,6 +18,7 @@ namespace Service.Interface.Classificacao
         Task<PayloadDTO> ConsultarProjetoClassificacaoContabil();
         Task<PayloadDTO> ConsultarProjetoClassificacaoContabil(FiltroClassificacaoContabil filtro);
         Task<bool> VerificarRegraExcessaoContabil(FiltroClassificacaoContabil filtro);
+        Task<IEnumerable<ClassificacaoContabilMgpDTO>> ConsultarClassificacaoContabilMGP();
         #endregion
 
         #region ESG

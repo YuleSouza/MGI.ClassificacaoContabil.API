@@ -70,6 +70,15 @@ namespace API.Controllers
             return Ok(retorno);
         }
 
+        [HttpPost]
+        [Route("v1/contabil/consultar/mgp")]
+        [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarDadosClassificacaoMgp()
+        {
+            var retorno = await _service.ConsultarClassificacaoContabilMGP();
+            return Ok(retorno);
+        }
+
         [HttpGet]
         [Route("v1/contabil/consultar")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
