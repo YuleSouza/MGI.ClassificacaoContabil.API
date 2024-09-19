@@ -37,5 +37,6 @@
         /// </summary>
         public char BaseOrcamento { get; set; }
         public int ClassificacaoContabil {  get; set; }
+        public string Pep { get; set; }
     }
 }

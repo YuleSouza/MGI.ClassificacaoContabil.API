@@ -29,7 +29,7 @@ namespace Service.Repository.PainelClassificacao
         Task<IEnumerable<ClassificacaoContabilItemDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroPainelClassificacaoContabil filtro);
-        Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroPainelClassificacaoContabil filtro);
+        Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro);
         
         #endregion
     }

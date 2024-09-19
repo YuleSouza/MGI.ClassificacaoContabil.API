@@ -357,72 +357,44 @@ namespace Repository.PainelClassificacao
 
         }
 
-        public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroPainelClassificacaoContabil filtro)
-        {
-            StringBuilder parametros = new StringBuilder();
-            parametros.AppendLine(" and lcc.dt_lancamento_sap between :dataInicio and :dataFim");
-            if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
-            {
-                parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
-            }
-            if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
-            {
-                parametros.AppendLine(" and pro.pgmcod = :idPrograma ");
-            }
-            if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
-            {
-                parametros.AppendLine(" and p.prjcod = :idProjeto");
-            }
-            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
-            {
-                parametros.AppendLine(" and p.prjges = :idGestor");
-            }
-            if (filtro.IdEmpresa >= 0)
-            {
-                parametros.AppendLine(" and e.empcod = :idEmpresa");
-            }
+        public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro)
+        {   
             return await _session.Connection.QueryAsync<LancamentoSAP>(@$"
                 select e.empcod as IdEmpresa
-                       , gru.pgmgrucod as IdGrupoPrograma
-                       , pro.pgmcod as IdPrograma
-                       , p.prjcod as IdProjeto 
-                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado 
-                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
-                       , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
-                       , lcc.id_tipo_classif as IdTipoClassificacao
-                       , lcc.valor as RealizadoAcumulado
-                       , p.prjges as IdGestor
-                       , lcc.dt_lancamento_sap as DtLancamentoSap
-                       , lcc.pep as Pep
-                       , lcc.nomenclatura as Nomenclatura
-                   from lanc_classif_contabil lcc
+                      , e.empnom as NomeEmpresa
+                      , p.prjcod as IdProjeto
+                      , (select nvl(sum(orc.prjorcval),0)
+                           from prjorc orc 
+                           where orc.prjorcver = 0 
+                             and orc.prjorcmes = extract(month from lcc.dt_lancamento_sap)
+                             and orc.prjorcano = extract(year from lcc.dt_lancamento_sap)
+                             and orc.prjorctip in ('2')
+                             and orc.prjorcfse > 0
+                             and orc.prjcod = p.prjcod
+                        ) as VlrReplan
+                      ,(select nvl(sum(orc.prjorcval),0)
+                           from prjorc orc 
+                           where orc.prjorcver = 0 
+                             and orc.prjorcmes = extract(month from lcc.dt_lancamento_sap)
+                             and orc.prjorcano = extract(year from lcc.dt_lancamento_sap)
+                             and orc.prjorctip in ('O')
+                             and orc.prjorcfse > 0
+                             and orc.prjcod = p.prjcod
+                      ) as VlrOrcado
+                      , lcc.valor as RealizadoAcumulado
+                      , lcc.dt_lancamento_sap as DtLancamentoSap
+                      , lcc.pep
+                      , nvl((select min(cl.ccocod)
+                          from prjfse fse
+                                inner join clacon cl on (fse.ccocod = cl.ccocod)
+                         where prjcod = p.prjcod and trim(prjfsepep) = lcc.pep ),'') as IdClassifContabil
+                  from lanc_classif_contabil lcc
                         inner join projeto p on (lcc.prjcod = p.prjcod and p.prjsit = 'A')
                         inner join corpora.empres e on (e.empcod = p.prjempcus and e.empcod = lcc.empcod)
-                        inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
-                        inner join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
-                        inner join pgmass m on (m.pgmasscod = p.pgmasscod 
-                                                    and m.pgmassver = gru.pgmgruver 
-                                                    and m.pgmgrucod = gru.pgmgrucod 
-                                                    and m.pgmassver = 0 
-                                                    and m.pgmcod = pro.pgmcod) 
-                        inner join prjorc orc on (orc.prjcod = p.prjcod 
-                                                    and orc.prjorcver = 0 
-                                                    and orc.prjorcmes = extract(month from lcc.dt_lancamento_sap)                                     
-                                                    and orc.prjorcano = extract(year from lcc.dt_lancamento_sap) 
-                                                    and orc.prjorctip in ('O','J','R','2','1')
-                                                    and orc.prjorcfse > 0)
-                        inner join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
-                        inner join clacon cl on (fse.ccocod = cl.ccocod)
-                  where 1 = 1 {parametros.ToString()}
-            ", new
+                 where lcc.pep = :pep", 
+            new
             {
-                dataInicio = filtro.DataInicio,
-                dataFim = filtro.DataFim,
-                idEmpresa = filtro.IdEmpresa,
-                idGrupoPrograma = filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
-                idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
-                idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
-                idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                pep = filtro.Pep
             });
         }
         public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)

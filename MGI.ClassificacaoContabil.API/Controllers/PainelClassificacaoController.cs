@@ -136,6 +136,11 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             var retorno = await _service.FiltroPainelClassificacaoContabil(filtro);
             return Ok(retorno);
         }
+        [HttpPost("v1/consultar/lancamentosap")]
+        public async Task<IActionResult> ConsultarLancamentoSap([FromBody] FiltroLancamentoSap filtro)
+        {
+            return Ok(await _service.ConsultarLancamentoSap(filtro));
+        }
 
         /// <summary>
         /// Retorna dados para combo Projeto

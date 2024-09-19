@@ -4,7 +4,6 @@ using DTO.Payload;
 using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
-using OfficeOpenXml.ConditionalFormatting.Contracts;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
@@ -215,7 +214,6 @@ namespace Service.PainelClassificacao
             #endregion
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
             var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(filtro);
-            var lancamentosSap = await _PainelClassificacaoRepository.ConsultarLancamentoSap(filtro);
             var classificacoesMgp = await _classificacaoEsgService.ConsultarClassificacaoContabilMGP();
 
             PainelClassificacaoContabilDTO classificacaoContabil = new PainelClassificacaoContabilDTO();
@@ -436,6 +434,10 @@ namespace Service.PainelClassificacao
                 Totalizador = totalizador,
                 Cabecalho = classificacoesMgp.ToList()
             };
+        }
+        public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro)
+        {
+            return await _PainelClassificacaoRepository.ConsultarLancamentoSap(filtro);
         }
         public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
