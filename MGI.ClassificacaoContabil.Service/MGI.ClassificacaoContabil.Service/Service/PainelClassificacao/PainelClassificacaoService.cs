@@ -287,7 +287,7 @@ namespace Service.PainelClassificacao
                                                                                     select new ProjetoDTO()
                                                                                     {
                                                                                         CodProjeto = grpPrj.Key.IdProjeto,
-                                                                                        NomeProjeto = grpPrj.Key.NomeProjeto,
+                                                                                        Nome = grpPrj.Key.NomeProjeto,
                                                                                         IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                         Lancamentos = new LancamentoContabilDTO()
                                                                                         {
@@ -305,7 +305,7 @@ namespace Service.PainelClassificacao
                                                                                                          {
                                                                                                              IdEmpresa = grpFse.Key.IdEmpresa,
                                                                                                              FseSeq = grpFse.Key.FseSeq,
-                                                                                                             NomeFase = grpFse.Key.NomeFase,
+                                                                                                             Nome = grpFse.Key.NomeFase,
                                                                                                              Pep = grpFse.Key.Pep,
                                                                                                              IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                                              Lancamentos = new LancamentoContabilDTO()

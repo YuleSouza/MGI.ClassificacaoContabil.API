@@ -383,7 +383,7 @@ namespace Repository.Classificacao
 
         public async Task<IEnumerable<ClassificacaoContabilMgpDTO>> ConsultarClassificacaoContabilMGP()
         {
-            return await _session.Connection.QueryAsync<ClassificacaoContabilMgpDTO>("select ccocod as Id, clacon.cconom as Nome from clacon ");
+            return await _session.Connection.QueryAsync<ClassificacaoContabilMgpDTO>("select ccocod as Id, clacon.cconom as Nome from clacon where ccosit = 'A'");
         }
         #endregion
     } 
