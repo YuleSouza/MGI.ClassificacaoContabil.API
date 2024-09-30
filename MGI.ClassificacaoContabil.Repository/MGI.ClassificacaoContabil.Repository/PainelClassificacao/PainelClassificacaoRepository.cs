@@ -384,6 +384,7 @@ namespace Repository.PainelClassificacao
                       , lcc.valor as RealizadoAcumulado
                       , lcc.dt_lancamento_sap as DtLancamentoSap
                       , lcc.pep
+                      , lcc.nomenclatura as  DescricaoLancamento
                       , nvl((select min(cl.ccocod)
                           from prjfse fse
                                 inner join clacon cl on (fse.ccocod = cl.ccocod)
