@@ -39,5 +39,7 @@
                 Indicador = value;
             }
         }
+
+        public decimal ValorTendencia { get; set; }
     }
 }
