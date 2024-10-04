@@ -4,6 +4,7 @@
     {
         public int IdClassificacaoEsg { get; set; }
         public decimal OrcadoAcumulado { get; set; }
+        public decimal ValorReplan { get; set; }
         public decimal RealizadoAcumulado { get; set; }
         public decimal Variacao
         {
@@ -41,5 +42,40 @@
         }
 
         public decimal ValorTendencia { get; set; }
+
+        public decimal VariacaoReplan
+        {
+            get
+            {
+                return ValorReplan - RealizadoAcumulado;
+            }
+            set
+            {
+                Variacao = value;
+            }
+        }
+        public decimal PercentualVariacaoReplan
+        {
+            get
+            {
+                return ValorReplan == 0 ? 0 : Math.Round(Variacao / ValorReplan * 100, 2);
+            }
+            set
+            {
+                PercentualVariacao = value;
+            }
+        }
+
+        public bool IndicadorReplan
+        {
+            get
+            {
+                return ValorReplan > RealizadoAcumulado;
+            }
+            set
+            {
+                Indicador = value;
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@
         public string NomeProjeto { get; set; }
         public decimal ValorOrcado { get; set; }
         public decimal ValorRealizado { get; set; }
+        public decimal ValorReplan {  get; set; }
         public decimal ValorTendencia { get; set; }
         public int IdTipoClassificacao { get; set; }
         public decimal ValorRealizadoSap { get; set; }
