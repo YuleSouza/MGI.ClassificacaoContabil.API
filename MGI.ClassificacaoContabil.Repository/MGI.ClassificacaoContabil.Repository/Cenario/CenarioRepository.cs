@@ -62,7 +62,8 @@ namespace Repository.Cenario
                                                 dtalteracao         as DataModificacao,
                                                 usalteracao         as UsuarioModificacao
                                             from cenario_classif_contabil
-                                            where 1 = 1");
+                                            where 1 = 1
+                                              and status = 'A'");
             return resultado;
         }
         public async Task<IEnumerable<CenarioDTO>> ConsultarCenario(CenarioFiltro filtro)

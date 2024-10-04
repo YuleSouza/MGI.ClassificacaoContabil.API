@@ -74,7 +74,7 @@ namespace Repository.Classificacao
                                                            cc.usalteracao                as UsuarioModificacao
                                                      from classificacao_contabil cc 
                                                      inner join corpora.empres a on cc.id_empresa = a.empcod
-                                                     where 1 = 1
+                                                     where 1 = 1 and status = 'A'
                                                      order by mesano_fim");
             return resultado;
         }
