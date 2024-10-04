@@ -341,6 +341,7 @@ namespace Service.PainelClassificacao
                                                 {
                                                     TotalOrcado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorOrcado),
                                                     TotalReplan = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorReplan),
+                                                    TotalPrevisto = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorTendencia),
                                                     TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
                                                 },
                                                 TotalGrupoPrograma = from g in lancamentos
@@ -351,6 +352,7 @@ namespace Service.PainelClassificacao
                                                                          IdGrupoPrograma = grpTotGru.Key.IdGrupoPrograma,
                                                                          TotalOrcado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa && p.IdGrupoPrograma == grpTotGru.Key.IdGrupoPrograma).Sum(p => p.ValorOrcado),
                                                                          TotalReplan = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa && p.IdGrupoPrograma == grpTotGru.Key.IdGrupoPrograma).Sum(p => p.ValorReplan),
+                                                                         TotalPrevisto = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa && p.IdGrupoPrograma == grpTotGru.Key.IdGrupoPrograma).Sum(p => p.ValorTendencia),
                                                                          TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa && p.IdGrupoPrograma == grpTotGru.Key.IdGrupoPrograma).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
                                                                      },
                                                 TotalPrograma = from g in lancamentos
@@ -367,6 +369,9 @@ namespace Service.PainelClassificacao
                                                                     TotalReplan = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa 
                                                                                                     && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                     && p.IdPrograma == grpTotPrg.Key.IdPrograma).Sum(p => p.ValorReplan),
+                                                                    TotalPrevisto = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
+                                                                                                    && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
+                                                                                                    && p.IdPrograma == grpTotPrg.Key.IdPrograma).Sum(p => p.ValorTendencia),
                                                                     TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa 
                                                                                                     && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                     && p.IdPrograma == grpTotPrg.Key.IdPrograma).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
@@ -388,6 +393,10 @@ namespace Service.PainelClassificacao
                                                                                                    && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                    && p.IdPrograma == grpTotPrg.Key.IdPrograma
                                                                                                    && p.IdProjeto == grpTotPrg.Key.IdProjeto).Sum(p => p.ValorReplan),
+                                                                   TotalPrevisto = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
+                                                                                                   && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
+                                                                                                   && p.IdPrograma == grpTotPrg.Key.IdPrograma
+                                                                                                   && p.IdProjeto == grpTotPrg.Key.IdProjeto).Sum(p => p.ValorTendencia),
                                                                    TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
                                                                                                    && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                    && p.IdPrograma == grpTotPrg.Key.IdPrograma
@@ -414,6 +423,11 @@ namespace Service.PainelClassificacao
                                                                                                 && p.IdPrograma == grpTotPrg.Key.IdPrograma
                                                                                                 && p.IdProjeto == grpTotPrg.Key.IdProjeto
                                                                                                 && p.FseSeq == grpTotPrg.Key.FseSeq).Sum(p => p.ValorReplan),
+                                                                TotalPrevisto = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
+                                                                                                && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
+                                                                                                && p.IdPrograma == grpTotPrg.Key.IdPrograma
+                                                                                                && p.IdProjeto == grpTotPrg.Key.IdProjeto
+                                                                                                && p.FseSeq == grpTotPrg.Key.FseSeq).Sum(p => p.ValorTendencia),
                                                                 TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
                                                                                                 && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                 && p.IdPrograma == grpTotPrg.Key.IdPrograma
