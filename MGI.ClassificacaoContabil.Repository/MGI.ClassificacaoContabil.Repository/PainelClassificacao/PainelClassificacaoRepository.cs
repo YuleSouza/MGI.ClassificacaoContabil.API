@@ -277,10 +277,10 @@ namespace Repository.PainelClassificacao
                                       , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
-                                        inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
-                                        inner join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+                                        left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                        left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
                                         inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','2','1') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
-                                        inner join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
+                                        left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
                                         inner join clacon cl on (fse.ccocod = cl.ccocod)
                                  where p.prjsit = 'A'
                                    and orc.prjorcano > 2016
@@ -337,8 +337,8 @@ namespace Repository.PainelClassificacao
                                       , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
-                                        inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
-                                        inner join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+                                        left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                        left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
                                         inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','1','2') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
                                         left join prjfse fse on (fse.prjcod = orc.prjcod and fse.prjfseseq = orc.prjorcfse)
                                  where p.prjsit = 'A'
