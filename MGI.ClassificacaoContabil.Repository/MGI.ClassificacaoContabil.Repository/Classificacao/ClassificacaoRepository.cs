@@ -97,7 +97,7 @@ namespace Repository.Classificacao
                 parametros += " and id_projeto = :idprojeto";
             }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
-                                                    select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
+                                                    select nvl(cc.id_classificacao_contabil,1)  as IdClassificacaoContabil, 
                                                            a.empcod                      as IdEmpresa,
                                                            ltrim(rtrim(a.empnomfan))     as NomeEmpresa,
                                                            cc.status                     as Status, 
@@ -106,7 +106,7 @@ namespace Repository.Classificacao
                                                            cc.dtcriacao                  as DataCriacao,
                                                            cc.uscriacao                  as UsuarioCriacao,
                                                            cc.dtalteracao                as DataModificacao,
-                                                           cc.usalteracao                as UsuarioModificacao
+                                                           cc.usalteracao                as UsuarioModificacao,
                                                            cc.dat_termino_concessao      as DataTerminoConcessao
                                                      from classificacao_contabil cc 
                                                             right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
