@@ -24,14 +24,15 @@ namespace Repository.Classificacao
         #region Contabil
         public async Task<bool> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
-            int result = await _session.Connection.ExecuteAsync(@"insert into classificacao_contabil (id_empresa, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao) 
-                                                                  values (:idempresa, :status, :dataInicial, :dataFinal, :uscriacao, sysdate)",
+            int result = await _session.Connection.ExecuteAsync(@"insert into classificacao_contabil (id_empresa, status, mesano_inicio, mesano_fim, uscriacao, dtcriacao, dat_termino_concessao) 
+                                                                  values (:idempresa, :status, :dataInicial, :dataFinal, :uscriacao, sysdate, :dat_termino_concessao)",
             new
             {
                 idempresa = classificacao.IdEmpresa,
                 status = classificacao.Status,
-                dataInicial = classificacao.MesAnoInicio,
-                dataFinal = classificacao.MesAnoFim,
+                dataInicial = classificacao.MesAnoInicio.ToString("01/01/yyyy"),
+                dataFinal = classificacao.MesAnoFim.ToString("01/01/yyyy"),
+                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
                 uscriacao = classificacao.Usuario?.UsuarioCriacao
             });
             return result == 1;
@@ -44,17 +45,19 @@ namespace Repository.Classificacao
                                                                          mesano_inicio   = :dataInicial,
                                                                          mesano_fim      = :dataFinal,
                                                                          usalteracao     = :usalteracao, 
-                                                                         dtalteracao     = :dtalteracao
+                                                                         dtalteracao     = :dtalteracao,
+                                                                         dat_termino_concessao     = :dat_termino_concessao,
                                                                    where id_classificacao_contabil = :idclassificacao",
             new
             {
                 idclassificacao = classificacao.IdClassificacaoContabil,
                 idempresa = classificacao.IdEmpresa,
                 status = classificacao.Status,
-                dataInicial = classificacao.MesAnoInicio,
-                dataFinal = classificacao.MesAnoFim,
+                dataInicial = classificacao.MesAnoInicio.ToString("01/01/yyyy"),
+                dataFinal = classificacao.MesAnoFim.ToString("01/01/yyyy"),
                 usalteracao = classificacao.Usuario?.UsuarioModificacao,
-                dtalteracao = classificacao.Usuario?.DataModificacao
+                dtalteracao = classificacao.Usuario?.DataModificacao,
+                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/01/yyyy"),
             });
             return result == 1;
         }
@@ -95,7 +98,7 @@ namespace Repository.Classificacao
             }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
                                                     select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
-                                                           cc.id_empresa                 as IdEmpresa,       
+                                                           a.empcod                      as IdEmpresa,
                                                            ltrim(rtrim(a.empnomfan))     as NomeEmpresa,
                                                            cc.status                     as Status, 
                                                            cc.mesano_inicio              as MesAnoInicio,
@@ -104,8 +107,9 @@ namespace Repository.Classificacao
                                                            cc.uscriacao                  as UsuarioCriacao,
                                                            cc.dtalteracao                as DataModificacao,
                                                            cc.usalteracao                as UsuarioModificacao
+                                                           cc.dat_termino_concessao      as DataTerminoConcessao
                                                      from classificacao_contabil cc 
-                                                     right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
+                                                            right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
                                                      where 1 = 1
                                                      {parametros}
                                                      order by mesano_fim

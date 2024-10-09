@@ -8,6 +8,7 @@
         public string? Status { get; set; }
         public DateTime MesAnoInicio { get; set; }
         public DateTime MesAnoFim { get; set; }
+        public DateTime? DataTerminoConcessao { get; set; }
         public IEnumerable<ClassificacaoProjetoDTO>? Projetos { get; set; } 
         public UsuarioDTO? Usuario { get; set; }
     }
