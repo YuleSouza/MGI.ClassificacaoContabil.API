@@ -105,7 +105,7 @@ namespace Repository.Classificacao
                                                            cc.dtalteracao                as DataModificacao,
                                                            cc.usalteracao                as UsuarioModificacao
                                                      from classificacao_contabil cc 
-                                                     right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')empcod
+                                                     right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
                                                      where 1 = 1
                                                      {parametros}
                                                      order by mesano_fim
