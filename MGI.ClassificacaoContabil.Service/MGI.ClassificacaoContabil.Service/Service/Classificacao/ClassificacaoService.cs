@@ -98,23 +98,19 @@ namespace Service.Classificacao
         public async Task<PayloadDTO> ConsultarClassificacaoContabil()
         {
             var resultado = await _repository.ConsultarClassificacaoContabil();
-            return new PayloadDTO(string.Empty, true, string.Empty, resultado);
-        }
-        public async Task<PayloadDTO> ConsultarClassificacaoContabil(FiltroClassificacaoContabil filtro)
-        {
-            var resultado = await _repository.ConsultarClassificacaoContabil(filtro);
-
             if (resultado?.Count() > 0)
             {
                 foreach (var item in resultado)
                 {
-                    filtro.IdClassificacaoContabil = item.IdClassificacaoContabil;
-                    item.Projetos = await _repository.ConsultarProjetoClassificacaoContabil(filtro);
+                    item.Projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil()
+                    {
+                        IdClassificacaoContabil = item.IdClassificacaoContabil
+                    });
                 }
             }
 
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
-        }
+        }       
         public async Task<PayloadDTO> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
             using (IUnitOfWork unitOfWork = _unitOfWork)

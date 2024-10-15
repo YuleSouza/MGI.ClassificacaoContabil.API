@@ -66,7 +66,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
-            var retorno = await _service.ConsultarClassificacaoContabil(filtro);
+            var retorno = await _service.ConsultarClassificacaoContabil();
             return Ok(retorno);
         }
 

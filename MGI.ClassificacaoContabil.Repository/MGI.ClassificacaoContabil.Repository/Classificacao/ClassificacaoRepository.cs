@@ -98,7 +98,7 @@ namespace Repository.Classificacao
                 parametros += " and id_projeto = :idprojeto";
             }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
-                                                    select nvl(cc.id_classificacao_contabil,1)   as IdClassificacaoContabil, 
+                                                    select nvl(cc.id_classificacao_contabil,0)   as IdClassificacaoContabil, 
                                                            a.empcod                              as IdEmpresa,
                                                            ltrim(rtrim(a.empnomfan))             as NomeEmpresa,
                                                            cc.status                             as Status,
