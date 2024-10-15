@@ -76,9 +76,10 @@ namespace Repository.Classificacao
                                                            cc.dtalteracao                as DataModificacao,
                                                            cc.usalteracao                as UsuarioModificacao,
                                                            nvl(cc.dat_termino_concessao,null) as DataTerminoConcessao
-                                                     from classificacao_contabil cc 
-                                                      right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
+                                                      from corpora.empres a
+                                                            left join classificacao_contabil cc  on (cc.id_empresa = a.empcod)
                                                      where 1 = 1
+                                                       and a.empsit = 'A'
                                                      order by mesano_fim");
             return resultado;
         }
