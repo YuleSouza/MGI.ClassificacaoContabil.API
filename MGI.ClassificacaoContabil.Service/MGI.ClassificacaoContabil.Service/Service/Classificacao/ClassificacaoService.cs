@@ -76,9 +76,15 @@ namespace Service.Classificacao
                             await _repository.InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
                         }
                     }
-
-                   
-                    bool ok = await _repository.AlterarClassificacaoContabil(classificacao);
+                    bool ok = false;
+                    if (classificacao!.IdClassificacaoContabil == 0)
+                    {
+                        ok = await _repository.InserirClassificacaoContabil(classificacao);
+                    }
+                    else
+                    {
+                        ok = await _repository.AlterarClassificacaoContabil(classificacao);
+                    }
                     unitOfWork.Commit();
                     return new PayloadDTO("Classificação Contábil alterada com successo", ok, string.Empty);
                 }

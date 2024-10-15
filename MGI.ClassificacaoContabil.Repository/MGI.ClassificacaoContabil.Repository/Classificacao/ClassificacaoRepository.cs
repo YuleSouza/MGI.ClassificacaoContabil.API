@@ -29,10 +29,10 @@ namespace Repository.Classificacao
             new
             {
                 idempresa = classificacao.IdEmpresa,
-                status = classificacao.Status,
+                status = 1,
                 dataInicial = classificacao.MesAnoInicio.ToString("01/01/yyyy"),
                 dataFinal = classificacao.MesAnoFim.ToString("01/01/yyyy"),
-                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
+                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/01/yyyy"),
                 uscriacao = classificacao.Usuario?.UsuarioCriacao
             });
             return result == 1;
@@ -46,7 +46,7 @@ namespace Repository.Classificacao
                                                                          mesano_fim      = :dataFinal,
                                                                          usalteracao     = :usalteracao, 
                                                                          dtalteracao     = :dtalteracao,
-                                                                         dat_termino_concessao     = :dat_termino_concessao,
+                                                                         dat_termino_concessao     = :dat_termino_concessao
                                                                    where id_classificacao_contabil = :idclassificacao",
             new
             {
@@ -65,19 +65,20 @@ namespace Repository.Classificacao
         {
 
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
-                                                    select cc.id_classificacao_contabil  as IdClassificacaoContabil, 
+                                                    select nvl(cc.id_classificacao_contabil,0)  as IdClassificacaoContabil, 
                                                            cc.id_empresa                 as IdEmpresa,         
                                                            ltrim(rtrim(a.empnomfan))     as Nome,
                                                            cc.status                     as Status, 
-                                                           cc.mesano_inicio              as MesAnoInicio,
-                                                           cc.mesano_fim                 as MesAnoFim,
+                                                           nvl(cc.mesano_inicio,sysdate)              as MesAnoInicio,
+                                                           nvl(cc.mesano_fim,sysdate)                 as MesAnoFim,
                                                            cc.dtcriacao                  as DataCriacao,
                                                            cc.uscriacao                  as UsuarioCriacao,
                                                            cc.dtalteracao                as DataModificacao,
-                                                           cc.usalteracao                as UsuarioModificacao
+                                                           cc.usalteracao                as UsuarioModificacao,
+                                                           nvl(cc.dat_termino_concessao,sysdate) as DataTerminoConcessao
                                                      from classificacao_contabil cc 
-                                                     inner join corpora.empres a on cc.id_empresa = a.empcod
-                                                     where 1 = 1 and status = 'A'
+                                                      right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
+                                                     where 1 = 1
                                                      order by mesano_fim");
             return resultado;
         }
@@ -97,17 +98,17 @@ namespace Repository.Classificacao
                 parametros += " and id_projeto = :idprojeto";
             }
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilDTO>($@"
-                                                    select nvl(cc.id_classificacao_contabil,1)  as IdClassificacaoContabil, 
-                                                           a.empcod                      as IdEmpresa,
-                                                           ltrim(rtrim(a.empnomfan))     as NomeEmpresa,
-                                                           cc.status                     as Status, 
-                                                           cc.mesano_inicio              as MesAnoInicio,
-                                                           cc.mesano_fim                 as MesAnoFim,
-                                                           cc.dtcriacao                  as DataCriacao,
-                                                           cc.uscriacao                  as UsuarioCriacao,
-                                                           cc.dtalteracao                as DataModificacao,
-                                                           cc.usalteracao                as UsuarioModificacao,
-                                                           cc.dat_termino_concessao      as DataTerminoConcessao
+                                                    select nvl(cc.id_classificacao_contabil,1)   as IdClassificacaoContabil, 
+                                                           a.empcod                              as IdEmpresa,
+                                                           ltrim(rtrim(a.empnomfan))             as NomeEmpresa,
+                                                           cc.status                             as Status,
+                                                           nvl(cc.mesano_inicio,sysdate)         as MesAnoInicio,
+                                                           nvl(cc.mesano_fim,sysdate)            as MesAnoFim,
+                                                           cc.dtcriacao                          as DataCriacao,
+                                                           cc.uscriacao                          as UsuarioCriacao,
+                                                           cc.dtalteracao                        as DataModificacao,
+                                                           cc.usalteracao                        as UsuarioModificacao,
+                                                           nvl(cc.dat_termino_concessao,sysdate) as DataTerminoConcessao
                                                      from classificacao_contabil cc 
                                                             right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
                                                      where 1 = 1
