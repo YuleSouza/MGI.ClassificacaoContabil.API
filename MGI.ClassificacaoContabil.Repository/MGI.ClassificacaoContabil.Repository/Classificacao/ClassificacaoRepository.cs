@@ -30,8 +30,8 @@ namespace Repository.Classificacao
             {
                 idempresa = classificacao.IdEmpresa,
                 status = 1,
-                dataInicial = classificacao.MesAnoInicio.ToString("01/01/yyyy"),
-                dataFinal = classificacao.MesAnoFim.ToString("01/01/yyyy"),
+                dataInicial = classificacao.MesAnoInicio.Value.ToString("01/01/yyyy"),
+                dataFinal = classificacao.MesAnoFim.Value.ToString("01/01/yyyy"),
                 dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/01/yyyy"),
                 uscriacao = classificacao.Usuario?.UsuarioCriacao
             });
@@ -53,8 +53,8 @@ namespace Repository.Classificacao
                 idclassificacao = classificacao.IdClassificacaoContabil,
                 idempresa = classificacao.IdEmpresa,
                 status = classificacao.Status,
-                dataInicial = classificacao.MesAnoInicio.ToString("01/01/yyyy"),
-                dataFinal = classificacao.MesAnoFim.ToString("01/01/yyyy"),
+                dataInicial = classificacao.MesAnoInicio.Value.ToString("01/01/yyyy"),
+                dataFinal = classificacao.MesAnoFim.Value.ToString("01/01/yyyy"),
                 usalteracao = classificacao.Usuario?.UsuarioModificacao,
                 dtalteracao = classificacao.Usuario?.DataModificacao,
                 dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/01/yyyy"),
@@ -69,13 +69,13 @@ namespace Repository.Classificacao
                                                            a.empcod                      as idEmpresa,         
                                                            ltrim(rtrim(a.empnomfan))     as NomeEmpresa,
                                                            cc.status                     as Status, 
-                                                           nvl(cc.mesano_inicio,sysdate)              as MesAnoInicio,
-                                                           nvl(cc.mesano_fim,sysdate)                 as MesAnoFim,
+                                                           nvl(cc.mesano_inicio,null)              as MesAnoInicio,
+                                                           nvl(cc.mesano_fim,null)                 as MesAnoFim,
                                                            cc.dtcriacao                  as DataCriacao,
                                                            cc.uscriacao                  as UsuarioCriacao,
                                                            cc.dtalteracao                as DataModificacao,
                                                            cc.usalteracao                as UsuarioModificacao,
-                                                           nvl(cc.dat_termino_concessao,sysdate) as DataTerminoConcessao
+                                                           nvl(cc.dat_termino_concessao,null) as DataTerminoConcessao
                                                      from classificacao_contabil cc 
                                                       right join corpora.empres a on (cc.id_empresa = a.empcod and a.empsit = 'A')
                                                      where 1 = 1
