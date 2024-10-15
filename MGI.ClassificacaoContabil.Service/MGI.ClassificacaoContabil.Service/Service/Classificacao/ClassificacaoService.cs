@@ -76,6 +76,10 @@ namespace Service.Classificacao
                             await _repository.InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
                         }
                     }
+                    if (!classificacao.MesAnoFim.HasValue || !classificacao.MesAnoInicio.HasValue)
+                    {
+                        return new PayloadDTO(string.Empty, false, "Data de início e fim são obrigatórias!");
+                    }
                     bool ok = false;
                     if (classificacao!.IdClassificacaoContabil == 0)
                     {
