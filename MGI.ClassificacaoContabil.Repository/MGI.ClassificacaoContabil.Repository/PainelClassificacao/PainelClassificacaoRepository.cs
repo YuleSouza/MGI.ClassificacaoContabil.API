@@ -455,6 +455,26 @@ namespace Repository.PainelClassificacao
             throw new NotImplementedException();
         }
 
-        
+        public async Task<LancamentoClassificacaoEsgDTO> ConsultarClassifEsgPorProjeto(int idProjeto, int seqFase, int idEmpresa)
+        {
+            var retorno = await _session.Connection.QueryFirstOrDefaultAsync<LancamentoClassificacaoEsgDTO>(@"select e.empcod  as IdEmpresa
+                                                                                       ,p.prjcod as IdProjeto
+                                                                                       ,gru.pgmgrucod as IdGrupoPrograma
+                                                                                       ,pro.pgmcod as IdPrograma
+                                                                                  from prjfse fse
+                                                                                        inner join projeto p on (p.prjcod = fse.prjcod)
+                                                                                        inner join corpora.empres e on (e.empcod = p.prjempcus)
+                                                                                        left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                                                                        left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+                                                                                  where fse.prjcod = :idProjeto
+                                                                                  and fse.prjfseseq = :seqFase
+                                                                                  and e.empcod = :idEmpresa", new
+                                                                                            {
+                                                                                                idProjeto,
+                                                                                                seqFase,
+                                                                                                idEmpresa
+                                                                                            });
+            return retorno;
+        }
     }
 }

@@ -181,6 +181,17 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return File(relatorio,"text/csv",filename);
         }
 
+        [HttpGet("v1/consultar/classifesg/{idprojeto}/{idcenario}/{seqfase}")]
+        public async Task<IActionResult> ConsultarClassifEsg([FromRoute]int idprojeto, int idcenario, int seqfase)
+        {
+            var retorno = await _service.ConsultarClassifEsgPorCenario(new FiltroPainelClassificacaoEsg() 
+            { 
+                IdCenario = idcenario,
+                IdProjeto = idprojeto,
+                SeqFase = seqfase
+            });
+            return Ok(retorno);
+        }
         #endregion
     }
 }

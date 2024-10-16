@@ -694,6 +694,17 @@ namespace Service.PainelClassificacao
             return memoryStream.ToArray();
         }
 
+        public async Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro)
+        {
+            await PopularParametrizacoes();
+            var retorno = await _PainelClassificacaoRepository.ConsultarClassifEsgPorProjeto(filtro.IdProjeto.Value, filtro.SeqFase, filtro.IdEmpresa);
+            //filtro.IdPrograma = retorno.IdPrograma;
+            //filtro.IdGrupoPrograma = retorno.IdGrupoPrograma;
+            filtro.IdCenario = filtro.IdCenario;
+            (int id, string descricao) = RetornarClassificacaoEsg(filtro);
+            return id;
+        }
+
 
         #endregion
 

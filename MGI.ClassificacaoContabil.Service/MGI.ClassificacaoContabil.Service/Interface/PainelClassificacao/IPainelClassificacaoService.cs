@@ -34,6 +34,8 @@ namespace Service.Interface.PainelClassificacao
 
         Task<byte[]> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro);
         byte[] GerarExcel<T>(IEnumerable<T> data);
+
+        Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro);
         #endregion
     }
 }

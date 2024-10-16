@@ -15,5 +15,6 @@
         public int? IdPrograma { get; set; }
         public int? IdGestor { get; set; }
         public int? IdProjeto { get; set; }
+        public int SeqFase { get; set; }
     }
 }
