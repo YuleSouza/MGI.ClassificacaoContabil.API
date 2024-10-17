@@ -262,15 +262,15 @@ namespace Repository.Classificacao
         public async Task<IEnumerable<ClassificacaoProjetoDTO>> ConsultarProjetoClassificacaoContabil(FiltroClassificacaoContabil filtro)
         {
             string parametros = string.Empty;
-            if (filtro.IdClassificacaoContabil > 0)
+            if (filtro.IdClassificacaoContabil >= 0)
             {
                 parametros += " and cp.id_classificacao_contabil = :idclassificacao";
             }
-            if (filtro.IdProjeto > 0)
+            if (filtro.IdProjeto >= 0)
             {
                 parametros += " and cp.id_projeto = :idprojeto";
             }
-            if (filtro.Ano.HasValue && filtro.Ano > 0)
+            if (filtro.Ano.HasValue && filtro.Ano >= 0)
             {
                 parametros += " and :ano between extract(year from cp.mesano_inicio)  and extract(year from cp.mesano_fim)";
             }

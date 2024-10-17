@@ -106,10 +106,13 @@ namespace Service.Classificacao
             {
                 foreach (var item in resultado)
                 {
-                    item.Projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil()
+                    var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil()
                     {
                         IdClassificacaoContabil = item.IdClassificacaoContabil
                     });
+                    if (projetos.Any()) 
+                        item.Projetos = projetos;
+                    projetos = null;
                 }
             }
 

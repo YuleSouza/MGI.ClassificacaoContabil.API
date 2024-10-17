@@ -9,7 +9,7 @@
         public string? Status { get; set; }
         public string? NomeCenario {  get; set; }
         public string? NomeClassifEsg { get; set; }
-        public string? NomeEmpresa { get; set; }
+        public string? NomeClassifContabil { get; set; }
         public UsuarioDTO? Usuario { get; set; }
     }
 }

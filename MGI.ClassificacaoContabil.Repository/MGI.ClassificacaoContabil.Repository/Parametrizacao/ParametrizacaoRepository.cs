@@ -68,14 +68,14 @@ namespace Repository.Parametrizacao
                                                 p.uscriacao                       as UsuarioCriacao,
                                                 p.dtalteracao                     as DataModificacao,
                                                 p.usalteracao                     as UsuarioModificacao,
-                                                c.nome                          as NomeCenario,
-                                                e.nome                          as NomeClassifEsg,
-                                                s.empnomfan                     as NomeEmpresa
+                                                c.nome                            as NomeCenario,
+                                                e.nome                            as NomeClassifEsg,
+                                                c.cconom                          as NomeClassifContabil,
+                                                p.Status                          as Status
                                             from parametrizacao_cenario p
                                                     inner join cenario_classif_contabil c on p.id_cenario = c.id_cenario
                                                     inner join classificacao_esg e on (p.id_classificacao_esg = e.id_classificacao_esg)
-                                                    left join classificacao_contabil t on (p.id_classificacao_contabil = t.id_classificacao_contabil)
-                                                    left join corpora.empres s on (t.id_empresa = s.empcod)
+                                                    left join clacon c on (p.id_classificacao_contabil = c.ccocod)
                                             where 1 = 1");
             return resultado;
         }

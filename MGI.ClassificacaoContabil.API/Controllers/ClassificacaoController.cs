@@ -27,18 +27,15 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
             var retorno = await _service.InserirClassificacaoContabil(classificacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
+            if (!retorno.Sucesso)
             {
                 _logger.LogError("Erro inserir dados da classificação contábil.", retorno);
                 return BadRequest(new
                 {
                     message = retorno.MensagemErro
-                });
+                });                
             }
+            return Ok(retorno);
         }
 
         [HttpPost]
@@ -47,11 +44,7 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
             var retorno = await _service.AlterarClassificacaoContabil(classificacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
+            if (!retorno.Sucesso)
             {
                 _logger.LogError("Erro alteracao dados da classificação contábil.", retorno);
                 return BadRequest(new
@@ -59,6 +52,7 @@ namespace API.Controllers
                     message = retorno.MensagemErro
                 });
             }
+            return Ok(retorno);
         }
 
         [HttpPost]

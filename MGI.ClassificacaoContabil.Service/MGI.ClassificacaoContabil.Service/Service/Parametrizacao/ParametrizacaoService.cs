@@ -87,6 +87,10 @@ namespace Service.Parametrizacao
                 try
                 {
                     unitOfWork.BeginTransaction();
+                    if (parametrizacao.IdGrupoPrograma == 0)
+                    {
+                        return new PayloadDTO(string.Empty, false, "Obrigatório o envio do grupo de programa");
+                    }
                     bool ok = await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
                     unitOfWork.Commit();
                     return new PayloadDTO("Parametrização da classificação esg geral alterada com successo", ok, string.Empty);

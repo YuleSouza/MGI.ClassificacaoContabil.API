@@ -100,11 +100,7 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosParametrizacaoClassificacaoGeral([FromBody] ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             var retorno = await _service.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
+            if (!retorno.Sucesso)
             {
                 _logger.LogError("Erro alteração dados da parametrização da classificação esg geral.", retorno);
                 return BadRequest(new
@@ -112,6 +108,7 @@ namespace API.Controllers
                     message = retorno.MensagemErro
                 });
             }
+            return Ok(retorno);
         }
 
         [HttpGet]
