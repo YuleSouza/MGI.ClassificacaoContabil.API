@@ -4,6 +4,7 @@ using Service.DTO.Filtros;
 using Service.DTO.Classificacao;
 using Service.Interface.Classificacao;
 using Service.Repository.Classificacao;
+using OfficeOpenXml.Interfaces.Drawing.Text;
 
 namespace Service.Classificacao
 {
@@ -106,13 +107,10 @@ namespace Service.Classificacao
             {
                 foreach (var item in resultado)
                 {
-                    var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil()
+                    item.Projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil()
                     {
                         IdClassificacaoContabil = item.IdClassificacaoContabil
                     });
-                    if (projetos.Any()) 
-                        item.Projetos = projetos;
-                    projetos = null;
                 }
             }
 
