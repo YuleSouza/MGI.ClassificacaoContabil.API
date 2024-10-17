@@ -137,7 +137,7 @@ namespace Repository.PainelClassificacao
         public async Task<IEnumerable<GrupoProgramaDTO>>FiltroPainelGrupoPrograma(FiltroPainelGrupoPrograma filtro)
         {
             return await _session.Connection.QueryAsync<GrupoProgramaDTO>(
-                    $@"SELECT pgmgrucod codGrupoPrograma, ltrim(rtrim(pgmgrunom)) Nome
+                    $@"SELECT pgmgrucod as IdGrupoPrograma, ltrim(rtrim(pgmgrunom)) Nome
                               FROM servdesk.pgmgru g
                              WHERE pgmgruver = 0
                                AND g.pgmgrusit = 'A'
