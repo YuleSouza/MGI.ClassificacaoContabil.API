@@ -32,7 +32,7 @@ namespace Repository.Classificacao
                 status = 1,
                 dataInicial = classificacao.MesAnoInicio!.Value.ToString("01/01/yyyy"),
                 dataFinal = classificacao.MesAnoFim!.Value.ToString("01/01/yyyy"),
-                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/01/yyyy"),
+                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
                 uscriacao = classificacao.Usuario?.UsuarioCriacao
             });
             return result == 1;
@@ -57,7 +57,7 @@ namespace Repository.Classificacao
                 dataFinal = classificacao.MesAnoFim!.Value.ToString("01/01/yyyy"),
                 usalteracao = classificacao.Usuario?.UsuarioModificacao,
                 dtalteracao = classificacao.Usuario?.DataModificacao,
-                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/01/yyyy"),
+                dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
             });
             return result == 1;
         }
