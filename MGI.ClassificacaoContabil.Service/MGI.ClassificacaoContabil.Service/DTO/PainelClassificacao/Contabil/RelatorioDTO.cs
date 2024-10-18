@@ -17,5 +17,11 @@
         public decimal ValorRealizado { get; set; }
         public decimal ValorReplan { get; set; }
         public decimal ValorCiclo { get; set; }
+
+        public int IdEmpresa { get; set; }
+        public int IdGrupoPrograma { get; set; }
+        public int IdPrograma   { get; set; }
+        public int IdProjeto { get; set; }
+        public int IdGestor { get; set; }
     }
 }
