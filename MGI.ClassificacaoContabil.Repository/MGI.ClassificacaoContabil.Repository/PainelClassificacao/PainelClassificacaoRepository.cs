@@ -233,29 +233,31 @@ namespace Repository.PainelClassificacao
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
+            parametros.AppendLine(" and sub.DtLancamentoProjeto between :dataInicio and :dataFim");
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
-                parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
+                parametros.AppendLine(" and sub.IdGrupoPrograma = :idGrupoPrograma ");
             }
             if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
             {
-                parametros.AppendLine(" and pro.pgmcod = :idPrograma ");
+                parametros.AppendLine(" and sub.IdPrograma = :idPrograma ");
             }
             if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
             {
-                parametros.AppendLine(" and p.prjcod = :idProjeto");
+                parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
             if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
             {
-                parametros.AppendLine(" and p.prjges = :idGestor");
+                parametros.AppendLine(" and sub.IdGestor = :idGestor");
             }
             if (filtro.IdEmpresa >= 0)
             {
-                parametros.AppendLine(" and e.empcod = :idEmpresa");
+                parametros.AppendLine(" and sub.IdEmpresa = :idEmpresa");
             }
             #endregion
             return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"
-                                select e.empcod as IdEmpresa
+                                select * 
+                                  from (select e.empcod as IdEmpresa
                                       , e.empnom as NomeEmpresa
                                       , gru.pgmgrucod as IdGrupoPrograma
                                       , gru.pgmgrunom as GrupoDePrograma
@@ -284,7 +286,7 @@ namespace Repository.PainelClassificacao
                                         inner join clacon cl on (fse.ccocod = cl.ccocod)
                                  where p.prjsit = 'A'
                                    and orc.prjorcano > 2016
-                                    {parametros}",
+                                    ) sub where 1 = 1 {parametros}",
                 new
                 {
                     idEmpresa = filtro.IdEmpresa,
@@ -292,6 +294,8 @@ namespace Repository.PainelClassificacao
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
                     idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                    dataInicio = filtro.DataInicio.AddYears(-2),
+                    dataFim = filtro.DataInicio.AddYears(2),
                 });
         }
 
@@ -430,29 +434,69 @@ namespace Repository.PainelClassificacao
                 });
         }
 
-        public Task<IEnumerable<ClassificacaoContabilItemDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IEnumerable<RelatorioDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
-            parametros.AppendLine(" and 1 = 1");
+            parametros.AppendLine(" where 1 = 1");
             #region [ filtros ]
+            if (filtro.IdEmpresa >= 0)
+            {
+                parametros.AppendLine(" and e.empcod = :idEmpresa ");
+            }
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
-                parametros.AppendLine(" and a.idGrupoPrograma = :idGrupoPrograma ");
+                parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
             }
             if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
             {
-                parametros.AppendLine(" and a.idPrograma = :idPrograma ");
+                parametros.AppendLine(" and pro.pgmcod = :idPrograma ");
             }
             if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
             {
-                parametros.AppendLine(" and a.idProjeto = :idProjeto");
+                parametros.AppendLine(" and p.prjcod = :idProjeto");
             }
             if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
             {
-                parametros.AppendLine(" and a.idGestor = :idGestor");
+                parametros.AppendLine(" and LTRIM(RTRIM(U.USUNOM)) = :idGestor");
             }
             #endregion
-            throw new NotImplementedException();
+            var retorno = await _session.Connection.QueryAsync<RelatorioDTO>($@"
+                               select nvl(pro.pgmcod,0) ||'.'||cl.ccocod||pro.pgmnom||' - '||cl.cconom as CodExterno
+                                    , orc.prjorcmes ||'/'||orc.prjorcano as Data
+                                    , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
+                                    , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
+                                    , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
+                                    , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
+                                    , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                    , '' as QtdProdutcaoTotal
+                                    , '' as SaldoInicialAndamento
+                                    , '' as TxImobilizado
+                                    , '' as TxTransfDespesa
+                                    , '' as TxProducao
+                                    , '' as TxDepreciacao
+                                  from projeto p
+                                        inner join corpora.empres e on (p.prjempcus = e.empcod)
+                                        inner join prjorc orc on (p.prjcod = orc.prjcod 
+                                                                and orc.prjorcfse > 0 
+                                                                and orc.prjorcver = 0 
+                                                                and orc.prjorcmes > 0 
+                                                                and orc.prjorcano > 0
+                                                                and orc.prjorctip in ('O','J','R','2','1'))
+                                        left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                        left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+                                        left join corpora.usuari u on (u.USULOG = p.PRJGES)
+                                        left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
+                                        inner join clacon cl on (fse.ccocod = cl.ccocod)
+                                {parametros.ToString()}
+                                order by orc.prjorcano, orc.prjorcmes",new
+            {
+                idEmpresa = filtro.IdEmpresa,
+                idGrupoPrograma = filtro.IdGrupoPrograma,
+                idPrograma = filtro.IdPrograma,
+                idProjeto = filtro.IdProjeto,
+                idGestor = filtro.IdGestor,
+            });
+            return retorno;
         }
 
         public async Task<LancamentoClassificacaoEsgDTO> ConsultarClassifEsgPorProjeto(int idProjeto, int seqFase, int idEmpresa)
