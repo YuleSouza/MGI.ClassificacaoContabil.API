@@ -441,39 +441,46 @@ namespace Repository.PainelClassificacao
             #region [ filtros ]
             if (filtro.IdEmpresa >= 0)
             {
-                parametros.AppendLine(" and e.empcod = :idEmpresa ");
+                parametros.AppendLine(" and sub.IdEmpresa = :idEmpresa ");
             }
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
-                parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
+                parametros.AppendLine(" and sub.IdGrupoPrograma = :idGrupoPrograma ");
             }
             if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
             {
-                parametros.AppendLine(" and pro.pgmcod = :idPrograma ");
+                parametros.AppendLine(" and sub.IdPrograma = :idPrograma ");
             }
             if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
             {
-                parametros.AppendLine(" and p.prjcod = :idProjeto");
+                parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
             if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
             {
-                parametros.AppendLine(" and LTRIM(RTRIM(U.USUNOM)) = :idGestor");
+                parametros.AppendLine(" and sub.IdGestor = :idGestor");
             }
             #endregion
             var retorno = await _session.Connection.QueryAsync<RelatorioDTO>($@"
-                               select nvl(pro.pgmcod,0) ||'.'||cl.ccocod||pro.pgmnom||' - '||cl.cconom as CodExterno
-                                    , orc.prjorcmes ||'/'||orc.prjorcano as Data
-                                    , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
-                                    , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
-                                    , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
-                                    , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
-                                    , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
-                                    , '' as QtdProdutcaoTotal
-                                    , '' as SaldoInicialAndamento
-                                    , '' as TxImobilizado
-                                    , '' as TxTransfDespesa
-                                    , '' as TxProducao
-                                    , '' as TxDepreciacao
+                               select * from (
+                                select nvl(pro.pgmcod,0) ||'.'||cl.ccocod||pro.pgmnom||' - '||cl.cconom as CodExterno
+                                      , orc.prjorcmes ||'/'||orc.prjorcano as Data
+                                      , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
+                                      , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
+                                      , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
+                                      , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
+                                      , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                      , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
+                                      , ''                                               as QtdProdutcaoTotal
+                                      , ''                                               as SaldoInicialAndamento
+                                      , ''                                               as TxImobilizado
+                                      , ''                                               as TxTransfDespesa
+                                      , ''                                               as TxProducao
+                                      , ''                                               as TxDepreciacao
+                                      , e.empcod                                         as IdEmpresa
+                                      , gru.pgmgrucod                                    as IdGrupoPrograma
+                                      , pro.pgmcod                                       as IdPrograma
+                                      , p.prjcod                                         as IdProjeto
+                                      , LTRIM(RTRIM(U.USUNOM))                           as IdGestor
                                   from projeto p
                                         inner join corpora.empres e on (p.prjempcus = e.empcod)
                                         inner join prjorc orc on (p.prjcod = orc.prjcod 
@@ -487,8 +494,10 @@ namespace Repository.PainelClassificacao
                                         left join corpora.usuari u on (u.USULOG = p.PRJGES)
                                         left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
                                         inner join clacon cl on (fse.ccocod = cl.ccocod)
-                                {parametros.ToString()}
-                                order by orc.prjorcano, orc.prjorcmes",new
+                                 where p.prjsit = 'A'
+                                   and orc.prjorcano > 2016
+                                 order by orc.prjorcano, orc.prjorcmes ) sub 
+                                 where {parametros}",new
             {
                 idEmpresa = filtro.IdEmpresa,
                 idGrupoPrograma = filtro.IdGrupoPrograma,
