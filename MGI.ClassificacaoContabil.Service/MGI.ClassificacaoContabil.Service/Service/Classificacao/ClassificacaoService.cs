@@ -46,37 +46,36 @@ namespace Service.Classificacao
                 try
                 {
                     unitOfWork.BeginTransaction();
-                    if (classificacao?.Projetos.Count() > 0)
-                    { 
-                        var projetos = _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
+                    
+                    var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
                  
-                        if (projetos.Result.Count() > 0)
+                    if (projetos.Any())
+                    {
+                        var projetosExistente = projetos.Except(classificacao.Projetos);
+
+                        if (projetosExistente.Count() > classificacao.Projetos.Count())
                         {
-                            var projetosExistente = projetos.Result.Except(classificacao.Projetos);
+                            var projetosInativos = projetos.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
+                            projetosInativos.ToList().ForEach(P => P.Status = "I");
 
-                            if (projetosExistente.Count() > classificacao.Projetos.Count())
-                            {
-                                var projetosInativos = projetos.Result.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
-                                projetosInativos.ToList().ForEach(P => P.Status = "I");
-
-                                await _repository.DeletarProjetosClassificacaoContabil(projetosInativos.ToList());
-                            }
-                            else if (projetosExistente.Count() == classificacao.Projetos.Count())
-                            {
-                                await _repository.AlterarProjetosClassificacaoContabil(classificacao.Projetos.ToList());
-                            }
-                            else
-                            {
-                                var projetosNovos = classificacao.Projetos.Where(a => !projetos.Result.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
-
-                                await _repository.InserirProjetosClassificacaoContabil(projetosNovos.ToList());
-                            }
+                            await _repository.DeletarProjetosClassificacaoContabil(projetosInativos.ToList());
+                        }
+                        else if (projetosExistente.Count() == classificacao.Projetos.Count())
+                        {
+                            await _repository.AlterarProjetosClassificacaoContabil(classificacao.Projetos.ToList());
                         }
                         else
                         {
-                            await _repository.InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
+                            var projetosNovos = classificacao.Projetos.Where(a => !projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
+
+                            await _repository.InserirProjetosClassificacaoContabil(projetosNovos.ToList());
                         }
                     }
+                    else
+                    {
+                        await _repository.InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
+                    }
+                    
                     if (!classificacao.MesAnoFim.HasValue || !classificacao.MesAnoInicio.HasValue)
                     {
                         return new PayloadDTO(string.Empty, false, "Data de início e fim são obrigatórias!");

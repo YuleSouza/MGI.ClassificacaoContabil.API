@@ -623,7 +623,7 @@ namespace Service.PainelClassificacao
             string nome = string.Empty;
             if (_parametrizacaoCenarioDTOs.Any())
             {
-                var paramCenario = _parametrizacaoCenarioDTOs.Where(p => p.IdParametrizacaoCenario == filtro.IdCenario);
+                var paramCenario = _parametrizacaoCenarioDTOs.Where(p => p.IdParametrizacaoCenario == filtro.IdCenario && p.IdClassificacaoContabil == filtro.IdClassificacaoContabil);
                 if (paramCenario.Any())
                 {
                     idEsg = paramCenario.FirstOrDefault().IdClassificacaoEsg;
@@ -635,29 +635,28 @@ namespace Service.PainelClassificacao
                     idEsg = paramGeral.FirstOrDefault().IdClassificacaoEsg;
                     nome = paramGeral.FirstOrDefault().NomeClassificacaoEsg;
                 }
-                var paramExcecao = _parametrizacaoExecoes.Where(p => p.IdEmpresa == filtro.IdEmpresa
-                                                                    && p.IdCenario == filtro.IdCenario);
+                var paramExcecao = _parametrizacaoExecoes.Where(p => p.IdCenario == filtro.IdCenario);
                 if (paramExcecao.Any())
                 {
-                    if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
-                    {
-                        paramExcecao = paramExcecao.Where(p => p.IdGrupoPrograma == filtro.IdGrupoPrograma);
-                    }
-                    if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
-                    {
-                        paramExcecao = paramExcecao.Where(p => p.IdPrograma == filtro.IdPrograma);
-                    }
                     if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
                     {
                         paramExcecao = paramExcecao.Where(p => p.IdProjeto == filtro.IdProjeto);
+                        if (paramExcecao.Any()) {
+                            idEsg = paramExcecao.FirstOrDefault().IdParametrizacaoEsgExc;
+                            nome = paramExcecao.FirstOrDefault().NomeClassificacaoEsg;
+                            return (idEsg, nome);
+                        }
                     }
+                    paramExcecao = paramExcecao.Where(p => p.IdEmpresa == filtro.IdEmpresa 
+                                                    || p.IdGrupoPrograma == (filtro.IdGrupoPrograma.HasValue ? filtro.IdGrupoPrograma.Value : p.IdGrupoPrograma)
+                                                    || p.IdPrograma == (filtro.IdPrograma.HasValue ? filtro.IdPrograma : p.IdPrograma));
+                                                
                     if (paramExcecao.Any())
                     {
                         idEsg = paramExcecao.FirstOrDefault().IdParametrizacaoEsgExc;
                         nome = paramExcecao.FirstOrDefault().NomeClassificacaoEsg;
                     }
-                }
-                return (idEsg,nome);
+                }                
             }
             return (idEsg, nome);
         }
@@ -698,8 +697,8 @@ namespace Service.PainelClassificacao
         {
             await PopularParametrizacoes();
             var retorno = await _PainelClassificacaoRepository.ConsultarClassifEsgPorProjeto(filtro.IdProjeto.Value, filtro.SeqFase, filtro.IdEmpresa);
-            //filtro.IdPrograma = retorno.IdPrograma;
-            //filtro.IdGrupoPrograma = retorno.IdGrupoPrograma;
+            filtro.IdPrograma = retorno.IdPrograma;
+            filtro.IdGrupoPrograma = retorno.IdGrupoPrograma;
             filtro.IdCenario = filtro.IdCenario;
             (int id, string descricao) = RetornarClassificacaoEsg(filtro);
             return id;

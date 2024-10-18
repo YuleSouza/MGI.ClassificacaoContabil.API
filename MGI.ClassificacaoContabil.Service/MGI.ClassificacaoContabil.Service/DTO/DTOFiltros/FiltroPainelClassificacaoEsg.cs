@@ -16,5 +16,6 @@
         public int? IdGestor { get; set; }
         public int? IdProjeto { get; set; }
         public int SeqFase { get; set; }
+        public int IdClassificacaoContabil { get; set; }
     }
 }
