@@ -437,7 +437,7 @@ namespace Repository.PainelClassificacao
         public async Task<IEnumerable<RelatorioDTO>> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
-            parametros.AppendLine(" where 1 = 1");
+            parametros.AppendLine(" where sub.DtLancamentoProjeto between :datainicial and :datafinal");
             #region [ filtros ]
             if (filtro.IdEmpresa >= 0)
             {
@@ -457,7 +457,7 @@ namespace Repository.PainelClassificacao
             }
             if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
             {
-                parametros.AppendLine(" and sub.IdGestor = :idGestor");
+                parametros.AppendLine(" and sub.IdGestor = ':idGestor'");
             }
             #endregion
             var retorno = await _session.Connection.QueryAsync<RelatorioDTO>($@"
@@ -469,6 +469,7 @@ namespace Repository.PainelClassificacao
                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
                                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                       , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                      , orc.prjorctip                                    as TipoValorProjeto
                                       , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                       , ''                                               as QtdProdutcaoTotal
                                       , ''                                               as SaldoInicialAndamento
@@ -497,13 +498,15 @@ namespace Repository.PainelClassificacao
                                  where p.prjsit = 'A'
                                    and orc.prjorcano > 2016
                                  order by orc.prjorcano, orc.prjorcmes ) sub 
-                                 where {parametros}",new
+                                 {parametros}",new
             {
                 idEmpresa = filtro.IdEmpresa,
                 idGrupoPrograma = filtro.IdGrupoPrograma,
                 idPrograma = filtro.IdPrograma,
                 idProjeto = filtro.IdProjeto,
                 idGestor = filtro.IdGestor,
+                datainicial = filtro.DataInicio.AddYears(-2).ToString("01/MM/yyyy"),
+                datafinal = filtro.DataFim.AddYears(2).ToString("01/MM/yyyy"),
             });
             return retorno;
         }

@@ -26,6 +26,7 @@ namespace Service.Interface.PainelClassificacao
         Task<byte[]> GerarRelatorioContabilg(FiltroPainelClassificacaoContabil filtro);
 
         Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro);
+        Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
         #endregion
 
         #region [ESG]

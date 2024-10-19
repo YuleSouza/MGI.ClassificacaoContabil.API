@@ -669,6 +669,38 @@ namespace Service.PainelClassificacao
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
             return GerarExcel(lancamentos);
         }
+        public async Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro)
+        {
+            await PopularParametrizacoes();
+            var retorno = await _PainelClassificacaoRepository.ConsultarClassifEsgPorProjeto(filtro.IdProjeto.Value, filtro.SeqFase, filtro.IdEmpresa);
+            filtro.IdPrograma = retorno.IdPrograma;
+            filtro.IdGrupoPrograma = retorno.IdGrupoPrograma;
+            filtro.IdCenario = filtro.IdCenario;
+            (int id, string descricao) = RetornarClassificacaoEsg(filtro);
+            return id;
+        }
+        public async Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        {
+            IEnumerable<RelatorioDTO> dados = await _PainelClassificacaoRepository.GerarRelatorioContabil(filtro);
+            string tipoValor = filtro.TipoValorExcel == 0 ? "O" : "R";
+            var dadosExcel = from a in dados
+                             where a.DtLancamentoProjeto >= filtro.DataInicio && a.DtLancamentoProjeto <= filtro.DataFim
+                             && a.TipoValorProjeto == tipoValor
+                             group a by new { a.CodExterno, a.TxDepreciacao, a.QtdProdutcaoTotal, a.SaldoInicialAndamento, a.TxImobilizado, a.Data, a.TxProducao, a.TxTransfDespesa } into grp
+                             select new RelatorioExcelDTO()
+                             {
+                                 CodExterno = grp.Key.CodExterno,
+                                 TxDepreciacao = grp.Key.TxDepreciacao,
+                                 QtdProdutcaoTotal = grp.Key.QtdProdutcaoTotal,
+                                 SaldoInicialAndamento = grp.Key.SaldoInicialAndamento,
+                                 TxImobilizado = grp.Key.TxImobilizado,
+                                 Data = grp.Key.Data,
+                                 TxProducao = grp.Key.TxProducao,
+                                 TxTransfDespesa = grp.Key.TxTransfDespesa,
+                                 ValorInvestimento = grp.Sum(p => filtro.TipoValorExcel == 0 ? p.ValorOrcado : p.ValorRealizado)
+                             };
+            return GerarExcel(dadosExcel);
+        }
         public byte[] GerarExcel<T>(IEnumerable<T> data)
         {
             using var memoryStream = new MemoryStream();
@@ -692,19 +724,6 @@ namespace Service.PainelClassificacao
 
             return memoryStream.ToArray();
         }
-
-        public async Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro)
-        {
-            await PopularParametrizacoes();
-            var retorno = await _PainelClassificacaoRepository.ConsultarClassifEsgPorProjeto(filtro.IdProjeto.Value, filtro.SeqFase, filtro.IdEmpresa);
-            filtro.IdPrograma = retorno.IdPrograma;
-            filtro.IdGrupoPrograma = retorno.IdGrupoPrograma;
-            filtro.IdCenario = filtro.IdCenario;
-            (int id, string descricao) = RetornarClassificacaoEsg(filtro);
-            return id;
-        }
-
-
         #endregion
 
     }

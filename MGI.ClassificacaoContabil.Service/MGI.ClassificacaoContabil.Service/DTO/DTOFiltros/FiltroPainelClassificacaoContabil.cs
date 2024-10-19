@@ -37,5 +37,10 @@
         /// </summary>
         public char BaseOrcamento { get; set; }
         public int ClassificacaoContabil {  get; set; }
+        /// <summary>
+        /// 0 - ORcado
+        /// 1 - realizado
+        /// </summary>
+        public int TipoValorExcel { get; set; }
     }
 }

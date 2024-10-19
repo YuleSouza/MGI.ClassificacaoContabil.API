@@ -154,6 +154,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             var retorno = await _service.FiltroPainelClassificacaoEsg(filtro);
             return Ok(retorno);
         }
+        #endregion
 
         [HttpPost("v1/consultar")]
         public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
@@ -192,6 +193,13 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             });
             return Ok(retorno);
         }
-        #endregion
+
+        [HttpGet("v1/contabil/relatorio")]
+        public async Task<IActionResult> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        {
+            var retorno = await _service.GerarRelatorioContabil(filtro);
+            return File(retorno, "text/csv", $"relatorio_contabil_{DateTime.Now.Millisecond}.csv");
+        }
+        
     }
 }

@@ -22,6 +22,8 @@
         public int IdGrupoPrograma { get; set; }
         public int IdPrograma   { get; set; }
         public int IdProjeto { get; set; }
-        public int IdGestor { get; set; }
+        public string IdGestor { get; set; }
+        public DateTime DtLancamentoProjeto { get; set; }
+        public string TipoValorProjeto { get; set; }
     }
 }
