@@ -53,17 +53,17 @@ namespace Repository.Cenario
         {
             
             var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
-                                           select 
-                                                id_cenario          as IdCenario,
-                                                nome                as Nome,
-                                                status              as Status,
-                                                dtcriacao           as DataCriacao,
-                                                uscriacao           as UsuarioCriacao,
-                                                dtalteracao         as DataModificacao,
-                                                usalteracao         as UsuarioModificacao
-                                            from cenario_classif_contabil
+                                           select id_cenario          as IdCenario,
+                                                  nome                as Nome,
+                                                  status              as Status,
+                                                  dtcriacao           as DataCriacao,
+                                                  uscriacao           as UsuarioCriacao,
+                                                  dtalteracao         as DataModificacao,
+                                                  usalteracao         as UsuarioModificacao
+                                             from cenario_classif_contabil
                                             where 1 = 1
-                                              and status = 'A'");
+                                              and status = 'A'
+                                            order by nome");
             return resultado;
         }
         public async Task<IEnumerable<CenarioDTO>> ConsultarCenario(CenarioFiltro filtro)

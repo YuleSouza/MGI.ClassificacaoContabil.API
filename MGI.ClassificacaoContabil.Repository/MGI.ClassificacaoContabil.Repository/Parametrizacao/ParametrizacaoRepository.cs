@@ -76,7 +76,8 @@ namespace Repository.Parametrizacao
                                                     inner join cenario_classif_contabil c on p.id_cenario = c.id_cenario
                                                     inner join classificacao_esg e on (p.id_classificacao_esg = e.id_classificacao_esg)
                                                     left join clacon c on (p.id_classificacao_contabil = c.ccocod)
-                                            where 1 = 1");
+                                            where 1 = 1
+                                            order by p.status, c.nome");
             return resultado;
         }
         #endregion
@@ -117,21 +118,21 @@ namespace Repository.Parametrizacao
         {
 
             var resultado = await _session.Connection.QueryAsync<ParametrizacaoClassificacaoGeralDTO>($@"
-                                           select 
-                                                pg.id_param_esg_geral          as IdParametrizacaoEsgGeral,
-                                                pg.id_classificacao_esg        as IdClassificacaoEsg,
-                                                ces.nome                       as NomeClassificacaoEsg,
-                                                pg.id_grupo_programa           as IdGrupoPrograma,
-                                                gp.pgmgrunom                   as NomeGrupoPrograma,
-                                                pg.dtcriacao                      as DataCriacao,
-                                                pg.uscriacao                      as UsuarioCriacao,
-                                                pg.dtalteracao                    as DataModificacao,
-                                                pg.usalteracao                    as UsuarioModificacao
-                                            from parametrizacao_esg_geral pg
-                                            join servdesk.pgmgru gp on pg.id_grupo_programa = gp.pgmgrucod
-                                            join servdesk.classificacao_esg ces on pg.id_classificacao_esg = ces.id_classificacao_esg
+                                           select pg.id_param_esg_geral          as IdParametrizacaoEsgGeral,
+                                                  pg.id_classificacao_esg        as IdClassificacaoEsg,
+                                                  ces.nome                       as NomeClassificacaoEsg,
+                                                  pg.id_grupo_programa           as IdGrupoPrograma,
+                                                  gp.pgmgrunom                   as NomeGrupoPrograma,
+                                                  pg.dtcriacao                   as DataCriacao,
+                                                  pg.uscriacao                   as UsuarioCriacao,
+                                                  pg.dtalteracao                 as DataModificacao,
+                                                  pg.usalteracao                 as UsuarioModificacao
+                                             from parametrizacao_esg_geral pg
+                                                    join servdesk.pgmgru gp on pg.id_grupo_programa = gp.pgmgrucod
+                                                    join servdesk.classificacao_esg ces on pg.id_classificacao_esg = ces.id_classificacao_esg
                                             where 1 = 1
-                                            and gp.pgmgrusit = 'A'");
+                                              and gp.pgmgrusit = 'A'
+                                            order by ces.nome, gp.pgmgrunom");
             return resultado;
         }
         #endregion
@@ -202,14 +203,15 @@ namespace Repository.Parametrizacao
                                                  pe.dtalteracao                     as DataModificacao,
                                                  pe.usalteracao                     as UsuarioModificacao
                                             from parametrizacao_esg_exc pe
-                                            join corpora.empres e on pe.id_empresa = e.empcod            
-                                            join servdesk.pgmgru gp on pe.id_grupo_programa = gp.pgmgrucod
-                                            join servdesk.pgmass pgp on pgp.pgmgrucod = gp.pgmgrucod 
-                                            join servdesk.pgmpro p on p.pgmcod = pe.id_programa
-                                            join servdesk.cenario_classif_contabil c on pe.id_cenario = c.id_cenario
-                                            join servdesk.classificacao_esg ces on pe.id_classificacao_esg = ces.id_classificacao_esg
-                                            join servdesk.projeto prj on pe.id_programa = prj.prjcod
-                                            where 1 = 1");
+                                                    join corpora.empres e on pe.id_empresa = e.empcod            
+                                                    join servdesk.pgmgru gp on pe.id_grupo_programa = gp.pgmgrucod
+                                                    join servdesk.pgmass pgp on pgp.pgmgrucod = gp.pgmgrucod 
+                                                    join servdesk.pgmpro p on p.pgmcod = pe.id_programa
+                                                    join servdesk.cenario_classif_contabil c on pe.id_cenario = c.id_cenario
+                                                    join servdesk.classificacao_esg ces on pe.id_classificacao_esg = ces.id_classificacao_esg
+                                                    join servdesk.projeto prj on pe.id_programa = prj.prjcod
+                                            where 1 = 1
+                                            order by ltrim(rtrim(e.empnomfan)), gp.pgmgrunom, p.pgmnom ");
             return resultado;
         }
         
