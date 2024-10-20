@@ -80,7 +80,7 @@ namespace Repository.Classificacao
                                                             left join classificacao_contabil cc  on (cc.id_empresa = a.empcod)
                                                      where 1 = 1
                                                        and a.empsit = 'A'
-                                                     order by mesano_fim");
+                                                     order by nvl(cc.mesano_inicio,null), ltrim(rtrim(a.empnomfan))");
             return resultado;
         }
         public async Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(FiltroClassificacaoContabil filtro)
@@ -122,6 +122,89 @@ namespace Repository.Classificacao
             });
             return resultado;
         }
+
+        public async Task SalvarParametrizacaoContabil(ClassificacaoContabilDTO classificacaoContabil)
+        {
+            int novoId = 0;
+
+            if (classificacaoContabil.IdClassificacaoContabil == 0)
+            {
+                novoId = await _session.Connection.QuerySingleAsync<int>("SELECT SERVDESK.SEQ_CLASSIFICACAO_CONTABIL.NEXTVAL FROM DUAL");
+            }
+
+            var mergeCommand = @"
+                            MERGE INTO classificacao_contabil cc
+                            USING (SELECT :IdClassificacaoContabil AS IdClassificacaoContabil, 
+                                          :IdEmpresa AS IdEmpresa, 
+                                          :MesAnoInicio AS MesAnoInicio, 
+                                          :MesAnoFim AS MesAnoFim,
+                                          :DataTerminoConcessao AS DataTerminoConcessao, 
+                                          :UsCriacao AS UsCriacao, 
+                                          :UsAlteracao AS UsAlteracao
+                                   FROM DUAL) src
+                            ON (cc.ID_CLASSIFICACAO_CONTABIL = src.IdClassificacaoContabil)
+                            WHEN MATCHED THEN
+                                UPDATE SET cc.ID_EMPRESA = src.IdEmpresa, cc.MESANO_INICIO = src.MesAnoInicio, 
+                                           cc.MESANO_FIM = src.MesAnoFim, cc.DAT_TERMINO_CONCESSAO = src.DataTerminoConcessao,
+                                           cc.USALTERACAO = src.UsAlteracao
+                            WHEN NOT MATCHED THEN
+                                INSERT (ID_CLASSIFICACAO_CONTABIL, ID_EMPRESA, STATUS, MESANO_INICIO, MESANO_FIM, 
+                                        DAT_TERMINO_CONCESSAO, USCRIACAO, USALTERACAO)
+                                VALUES (:IdClassificacaoContabil, :IdEmpresa, 'A', :MesAnoInicio, 
+                                        :MesAnoFim, :DataTerminoConcessao, :UsCriacao, :UsAlteracao)";
+
+            await _session.Connection.ExecuteAsync(mergeCommand, new
+            {
+                IdClassificacaoContabil = classificacaoContabil.IdClassificacaoContabil == 0 ? novoId : classificacaoContabil.IdClassificacaoContabil,
+                IdEmpresa = classificacaoContabil.IdEmpresa,
+                MesAnoInicio = classificacaoContabil.MesAnoInicio!.Value.ToString("01/01/yyyy"),
+                MesAnoFim = classificacaoContabil.MesAnoFim!.Value.ToString("01/01/yyyy"),
+                DataTerminoConcessao = classificacaoContabil.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
+                UsCriacao = classificacaoContabil.Usuario?.UsuarioCriacao,
+                UsAlteracao = classificacaoContabil.Usuario?.UsuarioModificacao
+            });
+
+            if (classificacaoContabil.Projetos != null && classificacaoContabil.Projetos.Any())
+            {
+                mergeCommand = @"
+                        MERGE INTO classif_contabil_prj cp
+                        USING (SELECT 
+                                      :IdClassificacaoContabil AS IdClassificacaoContabil, 
+                                      :IdProjeto AS IdProjeto,
+                                      :MesAnoInicio as MesAnoInicio,
+                                      :MesAnoFim as MesAnoFim,
+                                      :IdClassifContabilPrj as IdClassifContabilPrj
+                               FROM DUAL) src
+                        ON (cp.id_classif_contabil_prj = src.IdClassifContabilPrj)
+                        WHEN MATCHED THEN
+                            UPDATE SET cp.MESANO_INICIO = :MesAnoInicio, 
+                                       cp.MESANO_FIM = :MesAnoFim,
+                                       cp.UsAlteracao = :UsAlteracao,
+                                       cp.Id_Projeto = :IdProjeto
+                        WHEN NOT MATCHED THEN
+                            INSERT (ID_CLASSIFICACAO_CONTABIL, ID_PROJETO, STATUS,MESANO_INICIO, MESANO_FIM, DTCRIACAO)
+                            VALUES (:IdClassificacaoContabil, :IdProjeto, 'A', :MesAnoInicio, :MesAnoFim, SYSDATE)";
+
+                IList<BulkMapping<ClassificacaoProjetoDTO>> bulkMappings = new List<BulkMapping<ClassificacaoProjetoDTO>>();
+                var prop = new BulkMapping<ClassificacaoProjetoDTO>("IdClassificacaoContabil", p => p.IdClassificacaoContabil == 0 ? novoId : p.IdClassificacaoContabil, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("IdClassifContabilPrj", p => p.IdClassificacaoContabilProjeto, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("IdProjeto", p => p.IdProjeto, Dapper.Oracle.OracleMappingType.Int32);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("MesAnoInicio", p => p.MesAnoInicio, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("MesAnoFim", p => p.MesAnoFim, Dapper.Oracle.OracleMappingType.Date);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("uscriacao", p => p.Usuario?.UsuarioCriacao, Dapper.Oracle.OracleMappingType.Varchar2);
+                bulkMappings.Add(prop);
+                prop = new BulkMapping<ClassificacaoProjetoDTO>("UsAlteracao", p => p.Usuario?.UsuarioModificacao, Dapper.Oracle.OracleMappingType.Varchar2);
+                bulkMappings.Add(prop);
+
+                var bulk = await BulkOperation.SqlBulkAsync(_session.Connection, mergeCommand, classificacaoContabil.Projetos.AsEnumerable(), bulkMappings.AsEnumerable());
+            }
+        }
+
 
         public async Task<bool> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
@@ -225,7 +308,7 @@ namespace Repository.Classificacao
 
         public async Task<bool> DeletarProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos)
         {
-            if (projetos.Count > 0)
+            if (projetos.Any())
             {
                 IList<BulkMapping<ClassificacaoProjetoDTO>> bulkMappings = new List<BulkMapping<ClassificacaoProjetoDTO>>();
                 var prop = new BulkMapping<ClassificacaoProjetoDTO>("id_classif_contabil_prj", p => p.IdClassificacaoContabilProjeto, Dapper.Oracle.OracleMappingType.Int32);

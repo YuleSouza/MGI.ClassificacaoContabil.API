@@ -11,6 +11,7 @@ namespace Service.Repository.Classificacao
         Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil();
         Task<IEnumerable<ClassificacaoContabilDTO>> ConsultarClassificacaoContabil(FiltroClassificacaoContabil filtro);
 
+        Task SalvarParametrizacaoContabil(ClassificacaoContabilDTO classificacaoContabil);
         Task<bool> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto);
         Task<bool> InserirProjetosClassificacaoContabil(IList<ClassificacaoProjetoDTO> projetos);
 

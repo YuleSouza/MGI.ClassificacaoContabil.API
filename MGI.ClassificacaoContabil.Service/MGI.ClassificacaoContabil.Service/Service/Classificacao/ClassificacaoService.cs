@@ -46,51 +46,12 @@ namespace Service.Classificacao
                 try
                 {
                     unitOfWork.BeginTransaction();
-                    
                     var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
-                 
-                    if (projetos.Any())
-                    {
-                        var projetosExistente = projetos.Except(classificacao.Projetos);
-
-                        if (projetosExistente.Count() > classificacao.Projetos.Count())
-                        {
-                            var projetosInativos = projetos.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
-                            projetosInativos.ToList().ForEach(P => P.Status = "I");
-
-                            await _repository.DeletarProjetosClassificacaoContabil(projetosInativos.ToList());
-                        }
-                        else if (projetosExistente.Count() == classificacao.Projetos.Count())
-                        {
-                            await _repository.AlterarProjetosClassificacaoContabil(classificacao.Projetos.ToList());
-                        }
-                        else
-                        {
-                            var projetosNovos = classificacao.Projetos.Where(a => !projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
-
-                            await _repository.InserirProjetosClassificacaoContabil(projetosNovos.ToList());
-                        }
-                    }
-                    else
-                    {
-                        await _repository.InserirProjetosClassificacaoContabil(classificacao.Projetos.ToList());
-                    }
-                    
-                    if (!classificacao.MesAnoFim.HasValue || !classificacao.MesAnoInicio.HasValue)
-                    {
-                        return new PayloadDTO(string.Empty, false, "Data de início e fim são obrigatórias!");
-                    }
-                    bool ok = false;
-                    if (classificacao!.IdClassificacaoContabil == 0)
-                    {
-                        ok = await _repository.InserirClassificacaoContabil(classificacao);
-                    }
-                    else
-                    {
-                        ok = await _repository.AlterarClassificacaoContabil(classificacao);
-                    }
+                    var projetoExcluidos = projetos.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
+                    await _repository.DeletarProjetosClassificacaoContabil(projetoExcluidos.ToList());
+                    await _repository.SalvarParametrizacaoContabil(classificacao);                    
                     unitOfWork.Commit();
-                    return new PayloadDTO("Classificação Contábil alterada com successo", ok, string.Empty);
+                    return new PayloadDTO("Classificação Contábil alterada com successo", true);
                 }
                 catch (Exception ex)
                 {
