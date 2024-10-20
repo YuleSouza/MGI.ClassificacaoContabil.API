@@ -29,7 +29,7 @@ namespace Service.Parametrizacao
                     bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario 
                                                                 && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg 
                                                                 && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil);
-                    if (!registroExistente) {
+                    if (registroExistente) {
                         return new PayloadDTO(string.Empty, false, "Cenário, Classificação ESG e Classificação contábil já cadastrados!");
                     }
                     bool ok = await _repository.InserirParametrizacaoCenario(parametrizacao);
