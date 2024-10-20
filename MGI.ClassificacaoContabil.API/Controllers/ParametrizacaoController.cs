@@ -80,11 +80,7 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosParametrizacaoClassificacaoGeral([FromBody] ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             var retorno = await _service.InserirParametrizacaoClassificacaoGeral(parametrizacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
+            if (!retorno.Sucesso)
             {
                 _logger.LogError("Erro inserir dados da classificação esg geral.", retorno);
                 return BadRequest(new
@@ -92,6 +88,7 @@ namespace API.Controllers
                     message = retorno.MensagemErro
                 });
             }
+            return Ok(retorno);
         }
 
         [HttpPost]
