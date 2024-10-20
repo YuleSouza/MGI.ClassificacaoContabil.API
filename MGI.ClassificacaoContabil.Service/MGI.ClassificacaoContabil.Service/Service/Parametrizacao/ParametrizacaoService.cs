@@ -25,6 +25,13 @@ namespace Service.Parametrizacao
                 try
                 {
                     unitOfWork.BeginTransaction();
+                    var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
+                    bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario 
+                                                                && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg 
+                                                                && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil);
+                    if (!registroExistente) {
+                        return new PayloadDTO(string.Empty, false, "Cenário, Classificação ESG e Classificação contábil já cadastrados!");
+                    }
                     bool ok = await _repository.InserirParametrizacaoCenario(parametrizacao);
                     unitOfWork.Commit();
                     return new PayloadDTO("Parametrização cenário inserido com successo", ok, string.Empty);
