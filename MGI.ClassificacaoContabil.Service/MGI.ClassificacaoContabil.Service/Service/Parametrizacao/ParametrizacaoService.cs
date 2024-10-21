@@ -78,8 +78,8 @@ namespace Service.Parametrizacao
                 {
                     unitOfWork.BeginTransaction();
                     var parametrosEsgGEral = await _repository.ConsultarParametrizacaoClassificacaoGeral();
-                    parametrosEsgGEral.Any(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);
-                    if (parametrosEsgGEral.Any())
+                    bool registroExistente = parametrosEsgGEral.Any(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);
+                    if (registroExistente)
                     {
                         return new PayloadDTO("Parametrização geral Esg já inserida!", false);
                     }
