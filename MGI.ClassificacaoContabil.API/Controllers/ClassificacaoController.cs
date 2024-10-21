@@ -27,14 +27,7 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
             var retorno = await _service.InserirClassificacaoContabil(classificacao);
-            if (!retorno.Sucesso)
-            {
-                _logger.LogError("Erro inserir dados da classificação contábil.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });                
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);            
             return Ok(retorno);
         }
 
@@ -44,14 +37,7 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
             var retorno = await _service.AlterarClassificacaoContabil(classificacao);
-            if (!retorno.Sucesso)
-            {
-                _logger.LogError("Erro alteracao dados da classificação contábil.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
             return Ok(retorno);
         }
 
@@ -89,18 +75,8 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
         {
             var retorno = await _service.InserirProjetoClassificacaoContabil(projeto);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro inserir dados do projeto classificação contábil.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) BadRequest(retorno);            
+            return Ok(retorno);
         }
 
         [HttpPost]
@@ -109,18 +85,8 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
         {
             var retorno = await _service.AlterarProjetoClassificacaoContabil(projeto);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro alteracao dados do projeto classificação contábil.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
         }
 
         [HttpPost]
@@ -162,18 +128,8 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoEsgDTO classificacao)
         {
             var retorno = await _service.InserirClassificacaoEsg(classificacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro inserir dados da classificação ESG.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
         }
 
         [HttpPost]
@@ -182,18 +138,8 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoEsgDTO classificacao)
         {
             var retorno = await _service.AlterarClassificacaoEsg(classificacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro alteracao dados da classificação ESG.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
         }
 
         [HttpPost]

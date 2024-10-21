@@ -27,18 +27,9 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosCenario([FromBody] ParametrizacaoCenarioDTO parametrizacao)
         {
             var retorno = await _service.InserirParametrizacaoCenario(parametrizacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro inserir dados do cenário.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
+            
         }
 
         [HttpPost]
@@ -47,18 +38,9 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosCenario([FromBody] ParametrizacaoCenarioDTO parametrizacao)
         {
             var retorno = await _service.AlterarParametrizacaoCenario(parametrizacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro alteração dados da parametrização do cenário.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
+            
         }
 
         [HttpGet]
@@ -80,14 +62,7 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosParametrizacaoClassificacaoGeral([FromBody] ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             var retorno = await _service.InserirParametrizacaoClassificacaoGeral(parametrizacao);
-            if (!retorno.Sucesso)
-            {
-                _logger.LogError("Erro inserir dados da classificação esg geral.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
             return Ok(retorno);
         }
 
@@ -97,14 +72,7 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosParametrizacaoClassificacaoGeral([FromBody] ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             var retorno = await _service.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
-            if (!retorno.Sucesso)
-            {
-                _logger.LogError("Erro alteração dados da parametrização da classificação esg geral.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);            
             return Ok(retorno);
         }
 
@@ -127,18 +95,8 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosParametrizacaoClassificacaoExcecao([FromBody] ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
             var retorno = await _service.InserirParametrizacaoClassificacaoExcecao(parametrizacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro inserir dados da classificação esg exceção.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
         }
 
         [HttpPost]
@@ -147,18 +105,9 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosParametrizacaoClassificacaoExcecao([FromBody] ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
             var retorno = await _service.AlterarParametrizacaoClassificacaoExcecao(parametrizacao);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro alteração dados da parametrização da classificação esg exceção.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);
+            
         }
 
         [HttpGet]

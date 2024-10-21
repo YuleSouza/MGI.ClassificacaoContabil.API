@@ -24,13 +24,14 @@ namespace Service.Parametrizacao
             {
                 try
                 {
+
                     unitOfWork.BeginTransaction();
                     var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
                     bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario 
                                                                 && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg 
                                                                 && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil);
                     if (registroExistente) {
-                        return new PayloadDTO(string.Empty, false, "Cenário, Classificação ESG e Classificação contábil já cadastrados!");
+                        return new PayloadDTO("Cenário, Classificação ESG e Classificação contábil já cadastrados!", false);
                     }
                     bool ok = await _repository.InserirParametrizacaoCenario(parametrizacao);
                     unitOfWork.Commit();
@@ -80,7 +81,7 @@ namespace Service.Parametrizacao
                     parametrosEsgGEral.Any(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);
                     if (parametrosEsgGEral.Any())
                     {
-                        return new PayloadDTO(string.Empty, false, "Parametrização geral Esg já inserida!");
+                        return new PayloadDTO("Parametrização geral Esg já inserida!", false);
                     }
                     bool ok = await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao);
                     unitOfWork.Commit();
@@ -102,7 +103,7 @@ namespace Service.Parametrizacao
                     unitOfWork.BeginTransaction();
                     if (parametrizacao.IdGrupoPrograma == 0)
                     {
-                        return new PayloadDTO(string.Empty, false, "Obrigatório o envio do grupo de programa");
+                        return new PayloadDTO("Obrigatório o envio do grupo de programa", false);
                     }
                     bool ok = await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
                     unitOfWork.Commit();
