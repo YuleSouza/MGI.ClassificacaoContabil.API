@@ -1,6 +1,6 @@
 ﻿namespace Service.DTO.Filtros
 {
-    public class FiltroPainelClassificacaoContabil
+    public class FiltroLancamentoFase
     {
         public int IdEmpresa { get; set; }
 

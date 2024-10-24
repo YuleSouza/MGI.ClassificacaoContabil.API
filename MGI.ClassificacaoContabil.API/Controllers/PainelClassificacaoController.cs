@@ -131,7 +131,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("v1/combocontabil")]
-        public async Task<IActionResult> ComboClassificacaoContabil([FromBody] FiltroPainelClassificacaoContabil filtro)
+        public async Task<IActionResult> ComboClassificacaoContabil([FromBody] FiltroLancamentoFase filtro)
         {
             var retorno = await _service.FiltroPainelClassificacaoContabil(filtro);
             return Ok(retorno);
@@ -157,7 +157,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         #endregion
 
         [HttpPost("v1/consultar")]
-        public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IActionResult> Consultar(FiltroLancamentoFase filtro)
         {
             var retorno = await _service.ConsultarClassificacaoContabil(filtro);
             return Ok(retorno);
@@ -170,17 +170,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(retorno);
         }
 
-        [HttpGet("v1/relatorio/esg")]
-        public async Task<IActionResult> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
-        {
-            var relatorio = await _service.GerarRelatorioContabilEsg(filtro);
-            if (relatorio == null)
-            {
-                return BadRequest();
-            }
-            string filename = "relatorio.csv";
-            return File(relatorio,"text/csv",filename);
-        }
+        
 
         [HttpGet("v1/consultar/classifesg/{idprojeto}/{idcenario}/{seqfase}")]
         public async Task<IActionResult> ConsultarClassifEsg([FromRoute]int idprojeto, int idcenario, int seqfase)
@@ -194,12 +184,25 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(retorno);
         }
 
-        [HttpGet("v1/contabil/relatorio")]
-        public async Task<IActionResult> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        [HttpGet("v1/relatorio/contabil")]
+        public async Task<IActionResult> GerarRelatorioContabil(FiltroLancamentoFase filtro)
         {
             var retorno = await _service.GerarRelatorioContabil(filtro);
+            if (retorno == null) return BadRequest("Erro ao gerar relatório");
             return File(retorno, "text/csv", $"relatorio_contabil_{DateTime.Now.Millisecond}.csv");
         }
-        
+
+        [HttpGet("v1/relatorio/esg")]
+        public async Task<IActionResult> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
+        {
+            var retorno = await _service.GerarRelatorioEsg(filtro);
+            if (retorno == null)
+            {
+                return BadRequest("Erro ao gerar relatório");
+            }
+            string filename = "relatorio.csv";
+            return File(retorno, "text/csv", $"relatorio_esg_{DateTime.Now.Millisecond}.csv");
+        }
+
     }
 }

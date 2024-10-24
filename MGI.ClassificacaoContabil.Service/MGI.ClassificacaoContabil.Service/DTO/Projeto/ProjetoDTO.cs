@@ -1,4 +1,5 @@
 ﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 
 namespace Service.DTO.Projeto
 {

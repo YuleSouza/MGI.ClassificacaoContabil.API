@@ -6,5 +6,6 @@
         public string? NomeProjeto { get; set; }
         public LancamentoESG LancamentoESG { get; set; }
         public LancamentoTotalESG Total { get; set; }
+        public FaseEsgDTO Fase {  get; set; }
     }
 }

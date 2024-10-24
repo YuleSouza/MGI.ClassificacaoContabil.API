@@ -17,5 +17,7 @@
         public int? IdProjeto { get; set; }
         public int SeqFase { get; set; }
         public int IdClassificacaoContabil { get; set; }
+        public DateTime DataInicio { get; set; }
+        public DateTime DataFim { get; set; }
     }
 }

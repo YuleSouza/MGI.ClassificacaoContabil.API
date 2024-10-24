@@ -1,6 +1,6 @@
 ﻿namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil
 {
-    public class RelatorioDTO
+    public class RelatorioContabilDTO
     {
         public string CodExterno { get; set; }
         public string Data {  get; set; }

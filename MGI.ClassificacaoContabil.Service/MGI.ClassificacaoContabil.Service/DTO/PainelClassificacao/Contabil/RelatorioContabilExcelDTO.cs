@@ -1,13 +1,8 @@
 ﻿using CsvHelper.Configuration.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil
 {
-    public class RelatorioExcelDTO
+    public class RelatorioContabilExcelDTO
     {
         [Name("Cód Externo")]
         public string CodExterno { get; set; }

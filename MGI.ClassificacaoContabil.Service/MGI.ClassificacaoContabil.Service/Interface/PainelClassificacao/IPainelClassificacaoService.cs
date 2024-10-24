@@ -17,26 +17,24 @@ namespace Service.Interface.PainelClassificacao
         Task<PayloadDTO> FiltroPainelGrupoPrograma(FiltroPainelGrupoPrograma filtro);
         Task<PayloadDTO> FiltroPainelPrograma(FiltroPainelPrograma filtro); 
         Task<PayloadDTO> FiltroPainelCenario(FiltroPainelCenario filtro);
-        Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
+        Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroLancamentoFase filtro);
         Task<PayloadDTO> FiltroPainelClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         #endregion
 
         #region [Contabil]
-        Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
-        Task<byte[]> GerarRelatorioContabilg(FiltroPainelClassificacaoContabil filtro);
+        Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroLancamentoFase filtro);
 
         Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro);
-        Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
+        Task<byte[]> GerarRelatorioContabil(FiltroLancamentoFase filtro);
         #endregion
 
         #region [ESG]
 
         Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
-
-        Task<byte[]> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro);
         byte[] GerarExcel<T>(IEnumerable<T> data);
 
         Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro);
+        Task<byte[]> GerarRelatorioEsg(FiltroPainelClassificacaoEsg filtro);
         #endregion
     }
 }

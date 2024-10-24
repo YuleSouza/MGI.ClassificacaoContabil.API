@@ -4,12 +4,15 @@ using DTO.Payload;
 using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
+using Service.Cenario;
+using Service.DTO.Cenario;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 using Service.DTO.PainelClassificacao;
 using Service.DTO.Parametrizacao;
 using Service.DTO.Projeto;
+using Service.Interface.Cenario;
 using Service.Interface.Classificacao;
 using Service.Interface.PainelClassificacao;
 using Service.Interface.Parametrizacao;
@@ -24,6 +27,7 @@ namespace Service.PainelClassificacao
         private readonly IPainelClassificacaoRepository _PainelClassificacaoRepository;
         private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
         private IClassificacaoService _classificacaoEsgService;
+        private ICenarioService _cenarioService;
         private readonly IParametrizacaoService _parametrizacaoService;
         private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
         private IEnumerable<ParametrizacaoClassificacaoGeralDTO> _parametrizacaoGrupoDTOs;
@@ -36,12 +40,14 @@ namespace Service.PainelClassificacao
             IPainelClassificacaoRepository PainelClassificacaoRepository, 
             IUnitOfWork unitOfWork,
             IClassificacaoService classificacaoEsgService,
-            IParametrizacaoService parametrizacaoService)
+            IParametrizacaoService parametrizacaoService,
+            ICenarioService cenarioService)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
             _unitOfWork = unitOfWork;
             _classificacaoEsgService = classificacaoEsgService;
             _parametrizacaoService = parametrizacaoService;
+            _cenarioService = cenarioService;
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
             tiposLancamento.Add(3, "Imobilizado");
@@ -88,7 +94,7 @@ namespace Service.PainelClassificacao
             var resultado = await _PainelClassificacaoRepository.FiltroPainelCenario(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroLancamentoFase filtro)
         {
             var resultado = await _PainelClassificacaoRepository.FiltroPainelClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
@@ -103,7 +109,7 @@ namespace Service.PainelClassificacao
 
         #region [Consuta da Tela]        
 
-        public async Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroLancamentoFase filtro)
         {
             /*
                 Formato acompanhamento (Ciclo Orçamentário ou Tendência) – Se selecionado o Ciclo Orçamentário será 
@@ -588,7 +594,28 @@ namespace Service.PainelClassificacao
                                                                                                                                                 && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
                                                                                                                                                 && p.IdPrograma == grpPro.Key.IdPrograma
                                                                                                                                                 && p.IdProjeto == grpProj.Key.IdProjeto).Sum(p => p.ValorRealizadoSap)
-                                                                                                   }
+                                                                                                   },
+                                                                                                   //Fase = from fse in lancamentos
+                                                                                                   //       join p in grpPrj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
+                                                                                                   //       group fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
+                                                                                                   //       select new FaseContabilDTO
+                                                                                                   //       {
+                                                                                                   //           IdEmpresa = grpFse.Key.IdEmpresa,
+                                                                                                   //           FseSeq = grpFse.Key.FseSeq,
+                                                                                                   //           Nome = grpFse.Key.NomeFase,
+                                                                                                   //           Pep = grpFse.Key.Pep,
+                                                                                                   //           IdClassifContabil = grp.Key.IdClassifContabil,
+                                                                                                   //           Lancamentos = new LancamentoContabilDTO()
+                                                                                                   //           {
+                                                                                                   //               OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
+                                                                                                   //               RealizadoAcumulado = grpFse.AsQueryable().Where(predicateFaseRealizado).Sum(p => p.ValorRealizado),
+                                                                                                   //               ValorCiclo = grpFse.AsQueryable().Where(predicateFaseCiclo).Sum(p => p.ValorCiclo),
+                                                                                                   //               ValorTendencia = grpFse.Where(predicateFaseTendencia).Sum(p => p.ValorTendencia),
+                                                                                                   //               ValorReplan = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorReplan),
+                                                                                                   //               NomeTipoClassificacao = grp.Key.NomeClassifContabil
+                                                                                                   //           },
+                                                                                                   //       }
+
                                                                                                }
                                                                                 }
                                                                     
@@ -659,16 +686,7 @@ namespace Service.PainelClassificacao
                 }                
             }
             return (idEsg, nome);
-        }
-        public Task<byte[]> GerarRelatorioContabilg(FiltroPainelClassificacaoContabil filtro)
-        {
-            throw new NotImplementedException();
-        }
-        public async Task<byte[]> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
-        {
-            var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
-            return GerarExcel(lancamentos);
-        }
+        }        
         public async Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro)
         {
             await PopularParametrizacoes();
@@ -679,15 +697,15 @@ namespace Service.PainelClassificacao
             (int id, string descricao) = RetornarClassificacaoEsg(filtro);
             return id;
         }
-        public async Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<byte[]> GerarRelatorioContabil(FiltroLancamentoFase filtro)
         {
-            IEnumerable<RelatorioDTO> dados = await _PainelClassificacaoRepository.GerarRelatorioContabil(filtro);
+            IEnumerable<RelatorioContabilDTO> dados = await _PainelClassificacaoRepository.ConsultarDadosRelatorio(filtro);
             string tipoValor = filtro.TipoValorExcel == 0 ? "O" : "R";
             var dadosExcel = from a in dados
                              where a.DtLancamentoProjeto >= filtro.DataInicio && a.DtLancamentoProjeto <= filtro.DataFim
                              && a.TipoValorProjeto == tipoValor
                              group a by new { a.CodExterno, a.TxDepreciacao, a.QtdProdutcaoTotal, a.SaldoInicialAndamento, a.TxImobilizado, a.Data, a.TxProducao, a.TxTransfDespesa } into grp
-                             select new RelatorioExcelDTO()
+                             select new RelatorioContabilExcelDTO()
                              {
                                  CodExterno = grp.Key.CodExterno,
                                  TxDepreciacao = grp.Key.TxDepreciacao,
@@ -698,6 +716,44 @@ namespace Service.PainelClassificacao
                                  TxProducao = grp.Key.TxProducao,
                                  TxTransfDespesa = grp.Key.TxTransfDespesa,
                                  ValorInvestimento = grp.Sum(p => filtro.TipoValorExcel == 0 ? p.ValorOrcado : p.ValorRealizado)
+                             };
+            return GerarExcel(dadosExcel);
+        }
+        public async Task<byte[]> GerarRelatorioEsg(FiltroPainelClassificacaoEsg filtro)
+        {
+            IEnumerable<RelatorioEsgDTO> dados = await _PainelClassificacaoRepository.ConsultarDadosRelatorio(filtro);
+            var cenarios = await _cenarioService.ConsultarCenario(new CenarioFiltro() { IdCenario = filtro.IdCenario });
+            string nomCenario = ((IEnumerable<CenarioDTO>)cenarios.ObjetoRetorno).FirstOrDefault().Nome;
+            await PopularParametrizacoes();
+            (int, string) esgClassif = RetornarClassificacaoEsg(filtro);
+            foreach (var item in dados)
+            {
+                filtro.IdProjeto = item.IdProjeto;
+                filtro.IdPrograma = item.IdPrograma;
+                filtro.IdGrupoPrograma = Convert.ToInt32(item.IdGrupoPrograma);
+                esgClassif = RetornarClassificacaoEsg(filtro);
+                if (esgClassif.Item1 == filtro.IdCenario)
+                {
+                    item.IdClassificacaoEsg = esgClassif.Item1;
+                    item.NomeClassificacaoEsg = esgClassif.Item2;
+                }
+            }
+            var dadosExcel = from a in dados
+                             select new RelatorioEsgExcelDTO()
+                             {
+                                 DiretoriaExecutora = a.DiretoriaExecutora,
+                                 GerenciaExecutora = a.GerenciaExecutora,
+                                 DiretoriaSolicitante = a.GerenciaSolicitante,
+                                 GerenciaSolicitante = a.GerenciaSolicitante,
+                                 Gestor = a.Gestor,
+                                 IdProjeto = a.IdProjeto,
+                                 NomeFase = a.NomeFase,
+                                 NomeEmpresa = a.NomeEmpresa,
+                                 ValorOrcado = a.ValorOrcado,
+                                 ValorRealizado = a.ValorRealizado,
+                                 ClassifEsg = a.NomeClassificacaoEsg,
+                                 Cenario = nomCenario
+
                              };
             return GerarExcel(dadosExcel);
         }
@@ -723,7 +779,8 @@ namespace Service.PainelClassificacao
             memoryStream.Position = 0;
 
             return memoryStream.ToArray();
-        }
+        }       
+
         #endregion
 
     }
