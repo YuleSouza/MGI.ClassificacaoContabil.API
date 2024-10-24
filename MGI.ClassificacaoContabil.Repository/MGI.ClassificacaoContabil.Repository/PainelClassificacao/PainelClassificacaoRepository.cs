@@ -129,7 +129,7 @@ namespace Repository.PainelClassificacao
                                     )
                              ORDER BY 1, 2", new
                     {
-                        codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
+                        codEmpresa = !string.IsNullOrEmpty(filtro.IdEmpresa) ? filtro.IdEmpresa : "",
                         codGrupoPrograma = filtro.CodGrupoPrograma,
                         codPrograma = filtro.IdPrograma,
                         codProjeto = filtro.IdProjeto
