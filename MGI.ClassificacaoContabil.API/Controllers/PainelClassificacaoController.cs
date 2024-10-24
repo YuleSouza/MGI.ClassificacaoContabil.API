@@ -131,7 +131,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("v1/combocontabil")]
-        public async Task<IActionResult> ComboClassificacaoContabil([FromBody] FiltroLancamentoFase filtro)
+        public async Task<IActionResult> ComboClassificacaoContabil([FromBody] FiltroPainelClassificacaoContabil filtro)
         {
             var retorno = await _service.FiltroPainelClassificacaoContabil(filtro);
             return Ok(retorno);
@@ -157,7 +157,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         #endregion
 
         [HttpPost("v1/consultar")]
-        public async Task<IActionResult> Consultar(FiltroLancamentoFase filtro)
+        public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
         {
             var retorno = await _service.ConsultarClassificacaoContabil(filtro);
             return Ok(retorno);
@@ -185,7 +185,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpGet("v1/relatorio/contabil")]
-        public async Task<IActionResult> GerarRelatorioContabil(FiltroLancamentoFase filtro)
+        public async Task<IActionResult> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
         {
             var retorno = await _service.GerarRelatorioContabil(filtro);
             if (retorno == null) return BadRequest("Erro ao gerar relatório");

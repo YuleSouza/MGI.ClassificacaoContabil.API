@@ -190,7 +190,7 @@ namespace Repository.PainelClassificacao
                         id_cenario = Convert.ToInt32(filtro.IdCenarioClassificacaoContabil)
                     });
         }
-        public async Task<IEnumerable<ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroLancamentoFase filtro)
+        public async Task<IEnumerable<ClassificacaoContabilDTO>>FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             return await _session.Connection.QueryAsync<Service.DTO.Classificacao.ClassificacaoContabilDTO>(
                     $@"SELECT 
@@ -229,7 +229,7 @@ namespace Repository.PainelClassificacao
             });
         }
 
-        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroLancamentoFase filtro)
+        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
@@ -299,7 +299,7 @@ namespace Repository.PainelClassificacao
                 });
         }
 
-        public async Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroLancamentoFase filtro)
+        public async Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
@@ -406,7 +406,7 @@ namespace Repository.PainelClassificacao
         {
             StringBuilder parametros = new StringBuilder();
             parametros.AppendLine(" and 1 = 1");
-            parametros.AppendLine(" and sub.DtLancamentoProjeto between :dataInicio and :dataFim");
+            parametros.AppendLine(" and a.DtLancamentoProjeto between :dataInicio and :dataFim");
             #region [ filtros ]
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
@@ -458,7 +458,7 @@ namespace Repository.PainelClassificacao
                                                                                             });
             return retorno;
         }
-        public async Task<IEnumerable<RelatorioContabilDTO>> ConsultarDadosRelatorio(FiltroLancamentoFase filtro)
+        public async Task<IEnumerable<RelatorioContabilDTO>> ConsultarDadosRelatorio(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
             parametros.AppendLine(" where sub.DtLancamentoProjeto between :datainicial and :datafinal");

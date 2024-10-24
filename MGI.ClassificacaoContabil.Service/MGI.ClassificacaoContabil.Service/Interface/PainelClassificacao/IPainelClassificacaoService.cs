@@ -17,15 +17,15 @@ namespace Service.Interface.PainelClassificacao
         Task<PayloadDTO> FiltroPainelGrupoPrograma(FiltroPainelGrupoPrograma filtro);
         Task<PayloadDTO> FiltroPainelPrograma(FiltroPainelPrograma filtro); 
         Task<PayloadDTO> FiltroPainelCenario(FiltroPainelCenario filtro);
-        Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroLancamentoFase filtro);
+        Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         Task<PayloadDTO> FiltroPainelClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         #endregion
 
         #region [Contabil]
-        Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroLancamentoFase filtro);
+        Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
 
         Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro);
-        Task<byte[]> GerarRelatorioContabil(FiltroLancamentoFase filtro);
+        Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
         #endregion
 
         #region [ESG]

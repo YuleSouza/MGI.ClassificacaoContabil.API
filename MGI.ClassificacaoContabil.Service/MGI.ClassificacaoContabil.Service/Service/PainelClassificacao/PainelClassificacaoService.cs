@@ -94,7 +94,7 @@ namespace Service.PainelClassificacao
             var resultado = await _PainelClassificacaoRepository.FiltroPainelCenario(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroLancamentoFase filtro)
+        public async Task<PayloadDTO> FiltroPainelClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             var resultado = await _PainelClassificacaoRepository.FiltroPainelClassificacaoContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
@@ -109,7 +109,7 @@ namespace Service.PainelClassificacao
 
         #region [Consuta da Tela]        
 
-        public async Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroLancamentoFase filtro)
+        public async Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             /*
                 Formato acompanhamento (Ciclo Orçamentário ou Tendência) – Se selecionado o Ciclo Orçamentário será 
@@ -697,7 +697,7 @@ namespace Service.PainelClassificacao
             (int id, string descricao) = RetornarClassificacaoEsg(filtro);
             return id;
         }
-        public async Task<byte[]> GerarRelatorioContabil(FiltroLancamentoFase filtro)
+        public async Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
         {
             IEnumerable<RelatorioContabilDTO> dados = await _PainelClassificacaoRepository.ConsultarDadosRelatorio(filtro);
             string tipoValor = filtro.TipoValorExcel == 0 ? "O" : "R";
