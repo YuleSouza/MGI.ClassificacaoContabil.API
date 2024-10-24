@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using DTO.Payload;
 using Infra.Interface;
+using MGI.ClassificacaoContabil.Service.DTO.DTOFiltros;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.Cenario;
@@ -219,7 +220,14 @@ namespace Service.PainelClassificacao
             predicateCiclo = p => p.DtLancamentoProjeto >= filtro.DataCicloInicio && p.DtLancamentoProjeto <= filtro.DataCicloFim;
             #endregion
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
-            var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(filtro);
+            var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
+            {
+                IdEmpresa = filtro.IdEmpresa,
+                IdGestor = filtro.IdGestor,
+                IdGrupoPrograma = filtro.IdGrupoPrograma,
+                IdPrograma = filtro.IdPrograma,
+                IdProjeto = filtro.IdProjeto
+            });
             var classificacoesMgp = await _classificacaoEsgService.ConsultarClassificacaoContabilMGP();
 
             PainelClassificacaoContabilDTO classificacaoContabil = new PainelClassificacaoContabilDTO();

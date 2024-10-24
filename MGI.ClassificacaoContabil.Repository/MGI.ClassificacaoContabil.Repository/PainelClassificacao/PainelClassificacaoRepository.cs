@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Infra.Data;
+using MGI.ClassificacaoContabil.Service.DTO.DTOFiltros;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Classificacao;
@@ -246,7 +247,7 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
-            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            if (!string.IsNullOrEmpty(filtro.IdGestor))
             {
                 parametros.AppendLine(" and sub.IdGestor = :idGestor");
             }
@@ -293,13 +294,13 @@ namespace Repository.PainelClassificacao
                     idGrupoPrograma = filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
-                    idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                    idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2),
                     dataFim = filtro.DataInicio.AddYears(2),
                 });
         }
 
-        public async Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroLancamentoFase filtro)
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
@@ -315,7 +316,7 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and p.prjcod = :idProjeto");
             }
-            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            if (!string.IsNullOrEmpty(filtro.IdGestor))
             {
                 parametros.AppendLine(" and p.prjges = :idGestor");
             }
@@ -356,7 +357,7 @@ namespace Repository.PainelClassificacao
                     idGrupoPrograma = filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
-                    idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                    idGestor = !string.IsNullOrEmpty(filtro.IdGestor)  ? filtro.IdGestor : "0",
                 });
 
         }
@@ -420,7 +421,7 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and a.idProjeto = :idProjeto");
             }
-            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            if (!string.IsNullOrEmpty(filtro.IdGestor))
             {
                 parametros.AppendLine(" and a.idGestor = :idGestor");
             }
@@ -431,7 +432,7 @@ namespace Repository.PainelClassificacao
                     idGrupoPrograma = filtro.IdGrupoPrograma.HasValue  && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
-                    idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
+                    idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2).ToString("dd/MM/yyyy"),
                     dataFim = filtro.DataInicio.AddYears(2).ToString("dd/MM/yyyy"),
                 });
@@ -479,7 +480,7 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
-            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            if (!string.IsNullOrEmpty(filtro.IdGestor))
             {
                 parametros.AppendLine(" and sub.IdGestor = ':idGestor'");
             }
@@ -554,7 +555,7 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
-            if (filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0)
+            if (!string.IsNullOrEmpty(filtro.IdGestor))
             {
                 parametros.AppendLine(" and sub.IdGestor = ':idGestor'");
             }
