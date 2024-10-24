@@ -559,78 +559,90 @@ namespace Repository.PainelClassificacao
                 parametros.AppendLine(" and sub.IdGestor = ':idGestor'");
             }
             var retorno = await _session.Connection.QueryAsync<RelatorioEsgDTO>(@"
-                         select * from (
-                          select e.empcod as IdEmpresa, e.empnomfan                 as NomeEmpresa
-                               , p.prjcod                                           as IdProjeto
-                               , p.prjnom                                           as NomeProjeto       
-                               , fse.prjfseseq || '.' || fse.prjfsenom              as NomeFase
-                               , dirSol.gerdes                                      as DiretoriaSolicitante
-                               , coalesce(trim(gerSol.gconom),'Não tem')            as GerenciaSolicitante       
-                               , dirExec.gerdes                                     as DiretoriaExecutora
-                               , coalesce(trim(gerExec.gconom),'Não tem')           as GerenciaExecutora
-                               , LTRIM(RTRIM(U.USUNOM))                             as Gestor
-                               , to_char(p.prjdat,'MM/yyyy')                        as MesAnoProjeto
-                               , (select nvl(sum(orc.prjorcval),0)
-                                    from prjorc orc
-                                   where orc.prjorctip = 'O'
-                                     and orc.prjorcfse = fse.prjfseseq
-                                     and orc.prjorcver = 0
-                                     and orc.prjcod = p.prjcod
-                                     AND orc.prjorcmes > 0 
-                                     and orc.prjorcano > 0)                         as ValorOrcado
-                               , (select nvl(sum(orc.prjorcval),0)
-                                    from prjorc orc
-                                   where orc.prjorctip = 'R'
-                                     and orc.prjorcfse = fse.prjfseseq
-                                     and orc.prjorcver = 0
-                                     and orc.prjcod = p.prjcod
-                                     AND orc.prjorcmes > 0 
-                                     and orc.prjorcano > 0)                         as ValorRealizado
-                               , (select nvl(sum(orc.prjorcval),0)
-                                    from prjorc orc
-                                   where orc.prjorctip = 'J'
-                                     and orc.prjorcfse = fse.prjfseseq
-                                     and orc.prjorcver = 0
-                                     and orc.prjcod = p.prjcod
-                                     AND orc.prjorcmes > 0 
-                                     and orc.prjorcano > 0)                         as ValorTendencia
-                               , (select nvl(sum(orc.prjorcval),0)
-                                    from prjorc orc
-                                   where orc.prjorctip = '2'
-                                     and orc.prjorcfse = fse.prjfseseq
-                                     and orc.prjorcver = 0
-                                     and orc.prjcod = p.prjcod
-                                     AND orc.prjorcmes > 0 
-                                     and orc.prjorcano > 0)                         as ValorReplan
-                               , (select nvl(sum(orc.prjorcval),0)
-                                    from prjorc orc
-                                   where orc.prjorctip = '1'
-                                     and orc.prjorcfse = fse.prjfseseq
-                                     and orc.prjorcver = 0
-                                     and orc.prjcod = p.prjcod
-                                     AND orc.prjorcmes > 0 
-                                     and orc.prjorcano > 0)                         as ValorCiclo
-                                , nvl(fse.ccocod,0)                                 as IdClassificacaoContabil
-                                , nvl(gru.pgmgrucod,0)                              as IdGrupoPrograma
-                                , nvl(pro.pgmcod,0)                                 as IdPrograma
-                                , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
-                          from corpora.empres e
-                                inner join projeto p on (p.prjempcus = e.empcod)
-                                left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
-                                left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
-                                inner join prjfse fse on (fse.prjcod = p.prjcod)        
-                                left join corpora.usuari u on (u.USULOG = p.PRJGES)
-                                left join gerencia dirExec on (p.geremp = dirExec.geremp and dirExec.gersig = p.gersig)        
-                                left join coordenadoria gerExec on (p.geremp = gerExec.geremp and p.gersig = gerExec.gersig and p.gcocod = gerExec.gcocod)
-                                left join gerencia dirSol on (p.prjgeremp = dirSol.geremp and dirSol.gersig = p.prjger)
-                                left join coordenadoria gerSol on (p.prjgeremp = gerSol.geremp and p.gersig = gerSol.gersig and p.PrjGco = gerSol.gcocod)
-                        where p.prjsit = 'A'
-                          and orc.prjorcano > 2016) sub
-                        where 1 = 1", new 
+                                select * from (
+                                  select e.empcod as IdEmpresa, e.empnomfan                 as NomeEmpresa
+                                       , p.prjcod                                           as IdProjeto
+                                       , p.prjnom                                           as NomeProjeto       
+                                       , fse.prjfseseq || '.' || fse.prjfsenom              as NomeFase
+                                       , dirSol.gerdes                                      as DiretoriaSolicitante
+                                       , coalesce(trim(gerSol.gconom),'Não tem')            as GerenciaSolicitante       
+                                       , dirExec.gerdes                                     as DiretoriaExecutora
+                                       , coalesce(trim(gerExec.gconom),'Não tem')           as GerenciaExecutora
+                                       , LTRIM(RTRIM(U.USUNOM))                             as Gestor
+                                       , to_char(p.prjdat,'MM/yyyy')                        as MesAnoProjeto
+                                       , (select nvl(sum(orc.prjorcval),0)
+                                            from prjorc orc
+                                           where orc.prjorctip = 'O'
+                                             and orc.prjorcfse = fse.prjfseseq
+                                             and orc.prjorcver = 0
+                                             and orc.prjcod = p.prjcod
+                                             AND orc.prjorcmes = orc2.prjorcmes
+                                             and orc.prjorcano = orc2.prjorcano)                         as ValorOrcado
+                                       , (select nvl(sum(orc.prjorcval),0)
+                                            from prjorc orc
+                                           where orc.prjorctip = 'R'
+                                             and orc.prjorcfse = fse.prjfseseq
+                                             and orc.prjorcver = 0
+                                             and orc.prjcod = p.prjcod
+                                             AND orc.prjorcmes = orc2.prjorcmes
+                                             and orc.prjorcano = orc2.prjorcano)                         as ValorRealizado
+                                       , (select nvl(sum(orc.prjorcval),0)
+                                            from prjorc orc
+                                           where orc.prjorctip = 'J'
+                                             and orc.prjorcfse = fse.prjfseseq
+                                             and orc.prjorcver = 0
+                                             and orc.prjcod = p.prjcod
+                                             AND orc.prjorcmes = orc2.prjorcmes
+                                             and orc.prjorcano = orc2.prjorcano)                         as ValorTendencia
+                                       , (select nvl(sum(orc.prjorcval),0)
+                                            from prjorc orc
+                                           where orc.prjorctip = '2'
+                                             and orc.prjorcfse = fse.prjfseseq
+                                             and orc.prjorcver = 0
+                                             and orc.prjcod = p.prjcod
+                                             AND orc.prjorcmes = orc2.prjorcmes 
+                                             and orc.prjorcano = orc2.prjorcano)                         as ValorReplan
+                                       , (select nvl(sum(orc.prjorcval),0)
+                                            from prjorc orc
+                                           where orc.prjorctip = '1'
+                                             and orc.prjorcfse = fse.prjfseseq
+                                             and orc.prjorcver = 0
+                                             and orc.prjcod = p.prjcod
+                                             AND orc.prjorcmes = orc2.prjorcmes 
+                                             and orc.prjorcano = orc2.prjorcano)                         as ValorCiclo
+                                        , nvl(fse.ccocod,0)                                 as IdClassificacaoContabil
+                                        , nvl(gru.pgmgrucod,0)                              as IdGrupoPrograma
+                                        , nvl(pro.pgmcod,0)                                 as IdPrograma 
+                                        , to_date('01' || '/' || orc2.prjorcmes || '/' || orc2.prjorcano) as DtLancamentoProjeto
+                                  from corpora.empres e
+                                        inner join projeto p on (p.prjempcus = e.empcod)
+                                        left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                        left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+        
+                                        left join corpora.usuari u on (u.USULOG = p.PRJGES)
+                                        left join gerencia dirExec on (p.geremp = dirExec.geremp and dirExec.gersig = p.gersig)        
+                                        left join coordenadoria gerExec on (p.geremp = gerExec.geremp and p.gersig = gerExec.gersig and p.gcocod = gerExec.gcocod)
+                                        left join gerencia dirSol on (p.prjgeremp = dirSol.geremp and dirSol.gersig = p.prjger)
+                                        left join coordenadoria gerSol on (p.prjgeremp = gerSol.geremp and p.gersig = gerSol.gersig and p.PrjGco = gerSol.gcocod)
+                                        inner join prjorc orc2 on (orc2.prjcod = p.prjcod
+                                                                and orc2.prjorcver = 0 
+                                                                and orc2.prjorcmes between :mesInicial and :mesFinal
+                                                                and orc2.prjorctip in ('O','J','R','1','2') 
+                                                                and orc2.prjorcfse > 0
+                                                                and orc2.prjorcano between :anoInicial and :anoFinal) 
+                                        inner join prjfse fse on (fse.prjcod = p.prjcod and fse.prjfseseq = orc2.prjorcfse)
+                                where p.prjsit = 'A'
+                                  and orc2.prjorcano > 2016) sub
+                                where 1 = 1
+                                ", new 
                         {
                             dataInicio = filtro.DataInicio.AddYears(-2),
-                            dataFim = filtro.DataInicio.AddYears(2),
-                        });
+                            dataFim = filtro.DataFim.AddYears(2),
+                            mesInicial = filtro.DataInicio.AddYears(-2).Month,
+                            mesFinal = filtro.DataFim.AddYears(-2).Month,
+                            anoInicial = filtro.DataInicio.AddYears(-2).Year,
+                            anoFinal = filtro.DataFim.AddYears(-2).Year
+            });
             return retorno;
         }
     }
