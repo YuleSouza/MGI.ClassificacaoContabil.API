@@ -456,12 +456,13 @@ namespace Service.PainelClassificacao
             var totalizador = retorno.SelectMany(p => p.Totalizador).ToList();
             totalizador.AddRange(totais.SelectMany(p => p.Totalizador));
             var empresa = retorno.SelectMany(p => p.Empresas).AsQueryable();
-            var classifContabilEmpresa = empresa.Select(p => p.IdClassifContabil).ToList();
+            //var classifContabilEmpresa = empresa.Select(p => p.IdClassifContabil).Distinct().ToList();
             return new PainelClassificacaoContabilDTO()
             {
                 Empresas = empresa.ToList(),
                 Totalizador = totalizador,
-                Cabecalho = classificacoesMgp.Where(p => classifContabilEmpresa.Contains(p.Id)).ToList()
+                //Cabecalho = classificacoesMgp.Where(p => classifContabilEmpresa.Contains(p.Id)).ToList()
+                Cabecalho = classificacoesMgp.ToList()
             };
         }
         public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro)

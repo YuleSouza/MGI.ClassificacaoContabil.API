@@ -280,8 +280,8 @@ namespace Repository.PainelClassificacao
                                       , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
-                                        left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
-                                        left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
+                                        inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
+                                        inner join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
                                         inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','2','1') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
                                         left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
                                         inner join clacon cl on (fse.ccocod = cl.ccocod)
