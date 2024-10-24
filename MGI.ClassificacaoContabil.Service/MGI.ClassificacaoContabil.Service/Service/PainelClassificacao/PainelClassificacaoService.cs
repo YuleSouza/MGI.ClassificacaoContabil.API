@@ -19,6 +19,7 @@ using Service.Interface.PainelClassificacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.PainelClassificacao;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace Service.PainelClassificacao
@@ -454,13 +455,13 @@ namespace Service.PainelClassificacao
 
             var totalizador = retorno.SelectMany(p => p.Totalizador).ToList();
             totalizador.AddRange(totais.SelectMany(p => p.Totalizador));
-            var empresa = retorno.SelectMany(p => p.Empresas).AsQueryable(); 
-
+            var empresa = retorno.SelectMany(p => p.Empresas).AsQueryable();
+            var classifContabilEmpresa = empresa.Select(p => p.IdClassifContabil).ToList();
             return new PainelClassificacaoContabilDTO()
             {
                 Empresas = empresa.ToList(),
                 Totalizador = totalizador,
-                Cabecalho = classificacoesMgp.ToList()
+                Cabecalho = classificacoesMgp.Where(p => classifContabilEmpresa.Contains(p.Id)).ToList()
             };
         }
         public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro)
