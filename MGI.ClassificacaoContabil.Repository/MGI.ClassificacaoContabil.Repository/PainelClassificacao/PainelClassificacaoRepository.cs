@@ -432,8 +432,8 @@ namespace Repository.PainelClassificacao
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
                     idGestor = filtro.IdGestor.HasValue && filtro.IdGestor.Value > 0 ? filtro.IdGestor : 0,
-                    dataInicio = filtro.DataInicio.AddYears(-2),
-                    dataFim = filtro.DataInicio.AddYears(2),
+                    dataInicio = filtro.DataInicio.AddYears(-2).ToString("dd/MM/yyyy"),
+                    dataFim = filtro.DataInicio.AddYears(2).ToString("dd/MM/yyyy"),
                 });
         }
 
