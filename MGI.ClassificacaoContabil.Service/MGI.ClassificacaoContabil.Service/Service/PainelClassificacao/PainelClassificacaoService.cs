@@ -471,8 +471,26 @@ namespace Service.PainelClassificacao
         }
         public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
+            Func<ClassificacaoContabilItemDTO, bool> predicateTendencia = _ => true;
+            Func<ClassificacaoContabilItemDTO, bool> predicateRealizado = _ => true;
+            Func<ClassificacaoContabilItemDTO, bool> predicateCiclo = _ => true;
+            Func<ClassificacaoContabilItemDTO, bool> predicateOrcado = _ => true;
+
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseTendencia = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseCiclo = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
+
             int idCenario = filtro.IdCenario;
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
+            var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
+            {
+                IdEmpresa = filtro.IdEmpresa,
+                IdGestor = filtro.IdGestor,
+                IdGrupoPrograma = filtro.IdGrupoPrograma,
+                IdPrograma = filtro.IdPrograma,
+                IdProjeto = filtro.IdProjeto
+            });
             await PopularParametrizacoes();
             (int,string) esgClassif = RetornarClassificacaoEsg(filtro);
             foreach (var item in lancamentos)
@@ -605,8 +623,8 @@ namespace Service.PainelClassificacao
                                                                                                                                                 && p.IdPrograma == grpPro.Key.IdPrograma
                                                                                                                                                 && p.IdProjeto == grpProj.Key.IdProjeto).Sum(p => p.ValorRealizadoSap)
                                                                                                    },
-                                                                                                   //Fase = from fse in lancamentos
-                                                                                                   //       join p in grpPrj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
+                                                                                                   //Fase = from fse in lancamentosFase
+                                                                                                   //       join p in grpProj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
                                                                                                    //       group fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
                                                                                                    //       select new FaseContabilDTO
                                                                                                    //       {
@@ -614,7 +632,7 @@ namespace Service.PainelClassificacao
                                                                                                    //           FseSeq = grpFse.Key.FseSeq,
                                                                                                    //           Nome = grpFse.Key.NomeFase,
                                                                                                    //           Pep = grpFse.Key.Pep,
-                                                                                                   //           IdClassifContabil = grp.Key.IdClassifContabil,
+                                                                                                   //           IdClassifContabil = grp.Key.IdClassificacaoEsg,
                                                                                                    //           Lancamentos = new LancamentoContabilDTO()
                                                                                                    //           {
                                                                                                    //               OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
@@ -626,7 +644,7 @@ namespace Service.PainelClassificacao
                                                                                                    //           },
                                                                                                    //       }
 
-                                                                                               }
+                }
                                                                                 }
                                                                     
                                                                 }
