@@ -23,5 +23,8 @@
         public string Pep { get; set; }
         public string Nomenclatura { get; set; }
         public string NomeFase { get; set; }
+        public int SeqFase { get; set; }
+        public string NomeClassificacaoEsg { get; set; }
+        public DateTime DtLancamentoProjeto { get; set; }
     }
 }

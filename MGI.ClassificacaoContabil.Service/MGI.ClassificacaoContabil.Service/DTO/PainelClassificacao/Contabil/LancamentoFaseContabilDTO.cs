@@ -16,6 +16,7 @@
         public string NomeFase { get; set; }
         public int FseSeq { get; set; }
         public string Pep {  get; set; }
+        public int SeqFase { get; set; }
         public LancamentoContabilDTO Lancamentos { get; set; }
     }
 }

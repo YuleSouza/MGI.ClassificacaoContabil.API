@@ -4,6 +4,7 @@
     {
         public int IdTipoClassificacao {  get; set; }
         public int IdClassifContabil { get; set; }
+        public int IdClassificacaoEsg { get; set; }
 	    public decimal OrcadoAcumulado { get; set; }
 	    public decimal RealizadoAcumulado { get; set; }
         public decimal ValorCiclo { get; set; }

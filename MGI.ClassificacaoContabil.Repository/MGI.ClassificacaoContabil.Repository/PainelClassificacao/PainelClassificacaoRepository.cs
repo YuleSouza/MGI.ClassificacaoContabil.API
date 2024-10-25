@@ -276,7 +276,7 @@ namespace Repository.PainelClassificacao
                                       , p.prjges as IdGestor      
                                       , cl.cconom as NomeClassifContabil
                                       , cl.ccocod as IdClassifContabil
-                                      , orc.prjorcfse as FseSeq
+                                      , orc.prjorcfse as SeqFase
                                       , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
@@ -338,7 +338,7 @@ namespace Repository.PainelClassificacao
                                        , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                        , p.prjges as IdGestor
                                        , nvl(fse.prjfsenom,'') as NomeFase
-                                       , nvl(fse.prjfseseq,0) as FseSeq
+                                       , nvl(fse.prjfseseq,0) as SeqFase
                                       , fse.prjfsepep as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
@@ -434,7 +434,7 @@ namespace Repository.PainelClassificacao
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2).ToString("dd/MM/yyyy"),
-                    dataFim = filtro.DataInicio.AddYears(2).ToString("dd/MM/yyyy"),
+                    dataFim = filtro.DataFim.AddYears(2).ToString("dd/MM/yyyy"),
                 });
         }
 

@@ -77,5 +77,7 @@
                 Indicador = value;
             }
         }
+
+        public decimal ValorCiclo { get; internal set; }
     }
 }

@@ -298,7 +298,7 @@ namespace Service.PainelClassificacao
                                                                                        && prj.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
                                                                                        && prj.IdPrograma == grpGruPro.Key.IdPrograma
                                                                                        && prj.IdClassifContabil == grpGruPro.Key.IdClassifContabil
-                                                                                    group prj by new { prj.IdEmpresa, prj.IdGrupoPrograma, prj.IdPrograma, prj.IdProjeto, prj.NomeProjeto, prj.IdClassifContabil } into grpPrj
+                                                                                    group prj by new { prj.IdEmpresa, prj.IdGrupoPrograma, prj.IdPrograma, prj.IdProjeto, prj.NomeProjeto, prj.IdClassifContabil, prj.SeqFase } into grpPrj
                                                                                     select new ProjetoDTO()
                                                                                     {
                                                                                         CodProjeto = grpPrj.Key.IdProjeto,
@@ -314,7 +314,9 @@ namespace Service.PainelClassificacao
                                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                                                                         },
                                                                                         Fase = from fse in lancamentosFase
-                                                                                                         join p in grpPrj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
+                                                                                                         where fse.IdProjeto == grpPrj.Key.IdProjeto
+                                                                                                             && fse.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                             && fse.SeqFase == grpPrj.Key.SeqFase
                                                                                                          group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
                                                                                                          select new FaseContabilDTO
                                                                                                          {
@@ -329,7 +331,7 @@ namespace Service.PainelClassificacao
                                                                                                                     RealizadoAcumulado = grpFse.AsQueryable().Where(predicateFaseRealizado).Sum(p => p.ValorRealizado),
                                                                                                                     ValorCiclo = grpFse.AsQueryable().Where(predicateFaseCiclo).Sum(p => p.ValorCiclo),
                                                                                                                     ValorTendencia = grpFse.Where(predicateFaseTendencia).Sum(p => p.ValorTendencia),
-                                                                                                                    ValorReplan = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorReplan),                                                                                                                    
+                                                                                                                    ValorReplan = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorReplan),
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                                                                                             },
                                                                                                          }
@@ -419,35 +421,35 @@ namespace Service.PainelClassificacao
                                                                },
                                                 TotalFase = from g in lancamentos
                                                             where g.IdEmpresa == grpLan.Key.IdEmpresa
-                                                            group g by new { g.IdEmpresa, g.IdGrupoPrograma, g.IdPrograma, g.IdProjeto, g.FseSeq } into grpTotPrg
-                                                            orderby grpTotPrg.Key.FseSeq
+                                                            group g by new { g.IdEmpresa, g.IdGrupoPrograma, g.IdPrograma, g.IdProjeto, g.SeqFase } into grpTotPrg
+                                                            orderby grpTotPrg.Key.SeqFase
                                                             select new LancamentoContabilTotalDTO()
                                                             {
                                                                 IdGrupoPrograma = grpTotPrg.Key.IdGrupoPrograma,
                                                                 IdPrograma = grpTotPrg.Key.IdPrograma,
                                                                 IdProjeto = grpTotPrg.Key.IdProjeto,
-                                                                IdSeqFase = grpTotPrg.Key.FseSeq,
+                                                                IdSeqFase = grpTotPrg.Key.SeqFase,
                                                                 TotalOrcado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
                                                                                                 && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                 && p.IdPrograma == grpTotPrg.Key.IdPrograma
                                                                                                 && p.IdProjeto == grpTotPrg.Key.IdProjeto
-                                                                                                && p.FseSeq == grpTotPrg.Key.FseSeq
+                                                                                                && p.SeqFase == grpTotPrg.Key.SeqFase
                                                                                                 ).Sum(p => p.ValorOrcado),
                                                                 TotalReplan = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
                                                                                                 && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                 && p.IdPrograma == grpTotPrg.Key.IdPrograma
                                                                                                 && p.IdProjeto == grpTotPrg.Key.IdProjeto
-                                                                                                && p.FseSeq == grpTotPrg.Key.FseSeq).Sum(p => p.ValorReplan),
+                                                                                                && p.SeqFase == grpTotPrg.Key.SeqFase).Sum(p => p.ValorReplan),
                                                                 TotalPrevisto = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
                                                                                                 && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                 && p.IdPrograma == grpTotPrg.Key.IdPrograma
                                                                                                 && p.IdProjeto == grpTotPrg.Key.IdProjeto
-                                                                                                && p.FseSeq == grpTotPrg.Key.FseSeq).Sum(p => p.ValorTendencia),
+                                                                                                && p.SeqFase == grpTotPrg.Key.SeqFase).Sum(p => p.ValorTendencia),
                                                                 TotalRealizado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa
                                                                                                 && p.IdGrupoPrograma == grpTotPrg.Key.IdGrupoPrograma
                                                                                                 && p.IdPrograma == grpTotPrg.Key.IdPrograma
                                                                                                 && p.IdProjeto == grpTotPrg.Key.IdProjeto
-                                                                                                && p.FseSeq == grpTotPrg.Key.FseSeq).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
+                                                                                                && p.SeqFase == grpTotPrg.Key.SeqFase).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
                                                             },
 
                                             }).ToList()
@@ -471,18 +473,100 @@ namespace Service.PainelClassificacao
         }
         public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
-            Func<ClassificacaoContabilItemDTO, bool> predicateTendencia = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateRealizado = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateCiclo = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateOrcado = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateTendencia = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateRealizado = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateCiclo = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateOrcado = _ => true;
 
             Func<LancamentoFaseContabilDTO, bool> predicateFaseTendencia = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseCiclo = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
 
+            if (filtro.FormatAcompanhamento == 'C')
+            {
+                if (filtro.DataFim > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 0, 0, 0);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    filtro.DataCicloInicio = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, 1, 0, 0, 0);
+                    filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1, 0, 0, 0);
+                }
+                else if (filtro.DataFim < DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(1999, 1, 1, 0, 0, 0);
+                    filtro.DataTendenciaFim = new DateTime(1999, 1, 1, 0, 0, 0);
+
+                    DateTime dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+                else if (filtro.DataInicio > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(1999, 1, 1);
+                    filtro.DataRealizadoFim = new DateTime(1999, 1, 1);
+                    filtro.DataCicloInicio = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, 1);
+                    filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1);
+                }
+            }
+            else if (filtro.FormatAcompanhamento == 'T')
+            {
+                if (filtro.DataFim > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+                else if (filtro.DataFim < DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(1999, 1, 1);
+                    filtro.DataTendenciaFim = new DateTime(1999, 1, 1);
+
+                    DateTime dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+                else if (filtro.DataInicio > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(1999, 1, 1);
+                    filtro.DataRealizadoFim = new DateTime(1999, 1, 1);
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+            }
+            predicateTendencia = p => p.DtLancamentoProjeto >= filtro.DataTendenciaInicio && p.DtLancamentoProjeto <= filtro.DataTendenciaFim;
+            predicateRealizado = p => p.DtLancamentoProjeto >= filtro.DataRealizadoInicio && p.DtLancamentoProjeto <= filtro.DataRealizadoFim;
+            predicateCiclo = p => p.DtLancamentoProjeto >= filtro.DataCicloInicio && p.DtLancamentoProjeto <= filtro.DataCicloFim;
             int idCenario = filtro.IdCenario;
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
+            predicateOrcado = p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim;
             var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
             {
                 IdEmpresa = filtro.IdEmpresa,
@@ -502,6 +586,7 @@ namespace Service.PainelClassificacao
                 if (esgClassif.Item1 == filtro.IdCenario)
                 {
                     item.IdClassificacaoEsg = esgClassif.Item1;
+                    item.NomeClassificacaoEsg = esgClassif.Item2;
                 }
             }
             var classificacoesEsg = await _classificacaoEsgService.ConsultarClassificacaoEsg();
@@ -517,19 +602,19 @@ namespace Service.PainelClassificacao
                 var retorno = new PainelClassificacaoEsg()
                               {
                                  Cabecalho = cabecalhoEsg, 
-                                 Empresas = from a in lancamentos
+                                 Empresas = from a in lancamentos.AsQueryable().Where(predicateOrcado)
                                             group a by new { a.IdEmpresa, a.IdClassificacaoEsg, a.NomeEmpresa } into grp
                                             select new EmpresaEsgDTO()
                                             {
                                                 IdEmpresa = grp.Key.IdEmpresa,
-                                                Nome = grp.Key.NomeEmpresa,                                                
+                                                Nome = grp.Key.NomeEmpresa,
                                                 LancamentoESG = new LancamentoESG()
                                                 {
-                                                    IdClassificacaoEsg = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa).FirstOrDefault()!.IdClassificacaoEsg,
-                                                    OrcadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoEsg == grp.Key.IdClassificacaoEsg).Sum(p => p.ValorOrcado),
-                                                    ValorReplan = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoEsg == grp.Key.IdClassificacaoEsg).Sum(p => p.ValorReplan),
-                                                    ValorTendencia = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoEsg == grp.Key.IdClassificacaoEsg).Sum(p => p.ValorTendencia),
-                                                    RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa && p.IdClassificacaoEsg == grp.Key.IdClassificacaoEsg).Sum(p => p.ValorRealizadoSap)
+                                                    IdClassificacaoEsg = grp.Key.IdClassificacaoEsg,
+                                                    OrcadoAcumulado = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
+                                                    ValorReplan = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
+                                                    ValorTendencia = grp.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
+                                                    RealizadoAcumulado = grp.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
                                                 },
                                                 GrupoPrograma = from c in lancamentos
                                                                 where c.IdEmpresa == grp.Key.IdEmpresa
@@ -540,20 +625,11 @@ namespace Service.PainelClassificacao
                                                                     Nome = grpGru.Key.GrupoDePrograma,
                                                                     LancamentoESG = new LancamentoESG()
                                                                                     {
-                                                                                        IdClassificacaoEsg = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa 
-                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).FirstOrDefault()!.IdClassificacaoEsg,
-                                                                                        OrcadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa 
-                                                                                                                                && p.IdClassificacaoEsg == grpGru.Key.IdClassificacaoEsg 
-                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorOrcado),
-                                                                                        ValorReplan = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                && p.IdClassificacaoEsg == grpGru.Key.IdClassificacaoEsg
-                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorReplan),
-                                                                                        ValorTendencia = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa 
-                                                                                                                                && p.IdClassificacaoEsg == grpGru.Key.IdClassificacaoEsg 
-                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorTendencia),
-                                                                                        RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa 
-                                                                                                                                && p.IdClassificacaoEsg == grpGru.Key.IdClassificacaoEsg
-                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma).Sum(p => p.ValorRealizadoSap)
+                                                                                        IdClassificacaoEsg = grpGru.Key.IdClassificacaoEsg,
+                                                                                        OrcadoAcumulado = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
+                                                                                        ValorReplan = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
+                                                                                        ValorTendencia = lancamentos.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
+                                                                                        RealizadoAcumulado = lancamentos.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
                                                                                     },                                                                    
                                                                     Programas = from p in lancamentos
                                                                                 where p.IdEmpresa == grp.Key.IdEmpresa
@@ -566,85 +642,52 @@ namespace Service.PainelClassificacao
                                                                                     Nome = grpPro.Key.Programa,                                                                                    
                                                                                     LancamentoESG = new LancamentoESG()
                                                                                                     {
-                                                                                                        IdClassificacaoEsg = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa 
-                                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma).FirstOrDefault()!.IdClassificacaoEsg,
-                                                                                                        OrcadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma).Sum(p => p.ValorOrcado),
-                                                                                        ValorReplan = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma).Sum(p => p.ValorReplan),
-                                                                                        ValorTendencia = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma).Sum(p => p.ValorTendencia),
-                                                                                        RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma).Sum(p => p.ValorRealizadoSap)
+                                                                                                        IdClassificacaoEsg = grpPro.Key.IdClassificacaoEsg,
+                                                                                                        OrcadoAcumulado = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
+                                                                                                        ValorReplan = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
+                                                                                                        ValorTendencia = lancamentos.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
+                                                                                                        RealizadoAcumulado = lancamentos.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
                                                                                                     },
                                                                                     Projetos = from p in lancamentos
                                                                                                where p.IdEmpresa == grp.Key.IdEmpresa
                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma
                                                                                                && p.IdClassificacaoEsg == grp.Key.IdClassificacaoEsg
-                                                                                               group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.IdClassificacaoEsg, p.IdProjeto, p.NomeProjeto } into grpProj
+                                                                                               group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.IdClassificacaoEsg, p.IdProjeto, p.NomeProjeto, p.SeqFase } into grpPrj
                                                                                                select new ProjetoEsgDTO()
                                                                                                {
-                                                                                                   IdProjeto = grpProj.Key.IdProjeto,
-                                                                                                   NomeProjeto = grpProj.Key.NomeProjeto,                                                                                                  
+                                                                                                   IdProjeto = grpPrj.Key.IdProjeto,
+                                                                                                   NomeProjeto = grpPrj.Key.NomeProjeto,                                                                                                  
                                                                                                    LancamentoESG = new LancamentoESG()
                                                                                                    {
-                                                                                                       IdClassificacaoEsg = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma
-                                                                                                                                                && p.IdProjeto == grpProj.Key.IdProjeto).FirstOrDefault()!.IdClassificacaoEsg,
-                                                                                                       OrcadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma
-                                                                                                                                                && p.IdProjeto == grpProj.Key.IdProjeto).Sum(p => p.ValorOrcado),
-                                                                                                       ValorReplan = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma
-                                                                                                                                                && p.IdProjeto == grpProj.Key.IdProjeto).Sum(p => p.ValorReplan),
-                                                                                                       ValorTendencia = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma
-                                                                                                                                                && p.IdProjeto == grpProj.Key.IdProjeto).Sum(p => p.ValorTendencia),
-                                                                                                       RealizadoAcumulado = lancamentos.Where(p => p.IdEmpresa == grp.Key.IdEmpresa
-                                                                                                                                                && p.IdClassificacaoEsg == grpPro.Key.IdClassificacaoEsg
-                                                                                                                                                && p.IdGrupoPrograma == grpPro.Key.IdGrupoPrograma
-                                                                                                                                                && p.IdPrograma == grpPro.Key.IdPrograma
-                                                                                                                                                && p.IdProjeto == grpProj.Key.IdProjeto).Sum(p => p.ValorRealizadoSap)
+                                                                                                       IdClassificacaoEsg = grpPrj.Key.IdClassificacaoEsg,
+                                                                                                       OrcadoAcumulado = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
+                                                                                                       ValorReplan = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
+                                                                                                       ValorTendencia = lancamentos.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
+                                                                                                       RealizadoAcumulado = lancamentos.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
                                                                                                    },
-                                                                                                   //Fase = from fse in lancamentosFase
-                                                                                                   //       join p in grpProj on new { fse.IdProjeto, fse.FseSeq } equals new { p.IdProjeto, p.FseSeq } into qPrj
-                                                                                                   //       group fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
-                                                                                                   //       select new FaseContabilDTO
-                                                                                                   //       {
-                                                                                                   //           IdEmpresa = grpFse.Key.IdEmpresa,
-                                                                                                   //           FseSeq = grpFse.Key.FseSeq,
-                                                                                                   //           Nome = grpFse.Key.NomeFase,
-                                                                                                   //           Pep = grpFse.Key.Pep,
-                                                                                                   //           IdClassifContabil = grp.Key.IdClassificacaoEsg,
-                                                                                                   //           Lancamentos = new LancamentoContabilDTO()
-                                                                                                   //           {
-                                                                                                   //               OrcadoAcumulado = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorOrcado),
-                                                                                                   //               RealizadoAcumulado = grpFse.AsQueryable().Where(predicateFaseRealizado).Sum(p => p.ValorRealizado),
-                                                                                                   //               ValorCiclo = grpFse.AsQueryable().Where(predicateFaseCiclo).Sum(p => p.ValorCiclo),
-                                                                                                   //               ValorTendencia = grpFse.Where(predicateFaseTendencia).Sum(p => p.ValorTendencia),
-                                                                                                   //               ValorReplan = grpFse.AsQueryable().Where(predicateFaseOrcado).Sum(p => p.ValorReplan),
-                                                                                                   //               NomeTipoClassificacao = grp.Key.NomeClassifContabil
-                                                                                                   //           },
-                                                                                                   //       }
+                                                                                                   Fase = from fse in lancamentosFase
+                                                                                                          where fse.IdProjeto == grpPrj.Key.IdProjeto 
+                                                                                                             && fse.IdEmpresa == grpPrj.Key.IdEmpresa
+                                                                                                             && fse.SeqFase == grpPrj.Key.SeqFase
+                                                                                                          group fse by new { fse.IdEmpresa, fse.IdProjeto, fse.SeqFase, fse.NomeFase, fse.Pep } into grpFse
+                                                                                                          select new FaseEsgDTO
+                                                                                                          {
+                                                                                                              IdEmpresa = grpFse.Key.IdEmpresa,
+                                                                                                              SeqFase = grpFse.Key.SeqFase,
+                                                                                                              NomeFase = grpFse.Key.NomeFase,
+                                                                                                              Pep = grpFse.Key.Pep,
+                                                                                                              Lancamentos = new LancamentoESG()
+                                                                                                              {
+                                                                                                                  OrcadoAcumulado = grpFse.Sum(p => p.ValorOrcado),
+                                                                                                                  RealizadoAcumulado = grpFse.Sum(p => p.ValorRealizado),
+                                                                                                                  ValorCiclo = grpFse.Sum(p => p.ValorCiclo),
+                                                                                                                  ValorTendencia = grpFse.Sum(p => p.ValorTendencia),
+                                                                                                                  ValorReplan = grpFse.Sum(p => p.ValorReplan)
+                                                                                                              },
+                                                                                                          }
 
-                }
+                                                                                               }
                                                                                 }
                                                                     
                                                                 }
@@ -718,7 +761,7 @@ namespace Service.PainelClassificacao
         public async Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro)
         {
             await PopularParametrizacoes();
-            var retorno = await _PainelClassificacaoRepository.ConsultarClassifEsgPorProjeto(filtro.IdProjeto.Value, filtro.SeqFase, filtro.IdEmpresa);
+            var retorno = await _PainelClassificacaoRepository.ConsultarClassifEsgPorProjeto(filtro.IdProjeto.Value, filtro.SeqFase.Value, filtro.IdEmpresa);
             filtro.IdPrograma = retorno.IdPrograma;
             filtro.IdGrupoPrograma = retorno.IdGrupoPrograma;
             filtro.IdCenario = filtro.IdCenario;

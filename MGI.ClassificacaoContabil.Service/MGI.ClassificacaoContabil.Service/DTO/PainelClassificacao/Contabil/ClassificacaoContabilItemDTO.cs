@@ -12,7 +12,7 @@ namespace Service.DTO.PainelClassificacao
         public int IdPrograma { get; set; }
         public string Programa { get; set; }
         public int IdProjeto { get; set; }
-        public int FseSeq {  get; set; }
+        public int SeqFase {  get; set; }
         public string NomeProjeto { get; set; }
         public decimal ValorOrcado { get; set; }
         public decimal ValorTendencia { get; set; }
