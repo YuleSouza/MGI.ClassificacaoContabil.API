@@ -421,7 +421,7 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and a.idProjeto = :idProjeto");
             }
-            if (!string.IsNullOrEmpty(filtro.IdGestor))
+            if (!string.IsNullOrEmpty(filtro.IdGestor) && filtro.IdGestor != "0")
             {
                 parametros.AppendLine(" and a.idGestor = :idGestor");
             }
