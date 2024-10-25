@@ -458,13 +458,12 @@ namespace Service.PainelClassificacao
             var totalizador = retorno.SelectMany(p => p.Totalizador).ToList();
             totalizador.AddRange(totais.SelectMany(p => p.Totalizador));
             var empresa = retorno.SelectMany(p => p.Empresas).AsQueryable();
-            //var classifContabilEmpresa = empresa.Select(p => p.IdClassifContabil).Distinct().ToList();
+            var classifContabilEmpresa = empresa.Select(p => p.IdClassifContabil).Distinct().ToList();
             return new PainelClassificacaoContabilDTO()
             {
                 Empresas = empresa.ToList(),
                 Totalizador = totalizador,
-                //Cabecalho = classificacoesMgp.Where(p => classifContabilEmpresa.Contains(p.Id)).ToList()
-                Cabecalho = classificacoesMgp.ToList()
+                Cabecalho = classificacoesMgp.Where(p => classifContabilEmpresa.Contains(p.Id)).ToList()
             };
         }
         public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro)
@@ -564,7 +563,6 @@ namespace Service.PainelClassificacao
             predicateTendencia = p => p.DtLancamentoProjeto >= filtro.DataTendenciaInicio && p.DtLancamentoProjeto <= filtro.DataTendenciaFim;
             predicateRealizado = p => p.DtLancamentoProjeto >= filtro.DataRealizadoInicio && p.DtLancamentoProjeto <= filtro.DataRealizadoFim;
             predicateCiclo = p => p.DtLancamentoProjeto >= filtro.DataCicloInicio && p.DtLancamentoProjeto <= filtro.DataCicloFim;
-            int idCenario = filtro.IdCenario;
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
             predicateOrcado = p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim;
             var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
