@@ -317,11 +317,11 @@ namespace Service.PainelClassificacao
                                                                                                          where fse.IdProjeto == grpPrj.Key.IdProjeto
                                                                                                              && fse.IdEmpresa == grpPrj.Key.IdEmpresa
                                                                                                              && fse.SeqFase == grpPrj.Key.SeqFase
-                                                                                                         group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.FseSeq, fse.NomeFase, fse.Pep } into grpFse
+                                                                                                         group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.SeqFase, fse.NomeFase, fse.Pep } into grpFse
                                                                                                          select new FaseContabilDTO
                                                                                                          {
                                                                                                              IdEmpresa = grpFse.Key.IdEmpresa,
-                                                                                                             FseSeq = grpFse.Key.FseSeq,
+                                                                                                             FseSeq = grpFse.Key.SeqFase,
                                                                                                              Nome = grpFse.Key.NomeFase,
                                                                                                              Pep = grpFse.Key.Pep,
                                                                                                              IdClassifContabil = grp.Key.IdClassifContabil,
@@ -395,7 +395,7 @@ namespace Service.PainelClassificacao
                                                                 },
                                                 TotalProjeto = from g in lancamentos
                                                                where g.IdEmpresa == grpLan.Key.IdEmpresa
-                                                               group g by new { g.IdEmpresa, g.IdGrupoPrograma, g.IdPrograma, g.IdProjeto } into grpTotPrg
+                                                               group g by new { g.IdEmpresa, g.IdGrupoPrograma, g.IdPrograma, g.IdProjeto, g.SeqFase } into grpTotPrg
                                                                select new LancamentoContabilTotalDTO()
                                                                {
                                                                    IdGrupoPrograma = grpTotPrg.Key.IdGrupoPrograma,
@@ -420,7 +420,7 @@ namespace Service.PainelClassificacao
                                                                                                    && p.IdProjeto == grpTotPrg.Key.IdProjeto).Sum(p => p.ValorRealizado + p.ValorTendencia + p.ValorCiclo)
                                                                },
                                                 TotalFase = from g in lancamentos
-                                                            where g.IdEmpresa == grpLan.Key.IdEmpresa
+                                                            where g.IdEmpresa == grpLan.Key.IdEmpresa                                                            
                                                             group g by new { g.IdEmpresa, g.IdGrupoPrograma, g.IdPrograma, g.IdProjeto, g.SeqFase } into grpTotPrg
                                                             orderby grpTotPrg.Key.SeqFase
                                                             select new LancamentoContabilTotalDTO()
@@ -790,6 +790,96 @@ namespace Service.PainelClassificacao
         }
         public async Task<byte[]> GerarRelatorioEsg(FiltroPainelClassificacaoEsg filtro)
         {
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateTendencia = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateRealizado = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateCiclo = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateOrcado = _ => true;
+
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseTendencia = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseCiclo = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
+
+            if (filtro.FormatAcompanhamento == 'C')
+            {
+                if (filtro.DataFim > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 0, 0, 0);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    filtro.DataCicloInicio = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, 1, 0, 0, 0);
+                    filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1, 0, 0, 0);
+                }
+                else if (filtro.DataFim < DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(1999, 1, 1, 0, 0, 0);
+                    filtro.DataTendenciaFim = new DateTime(1999, 1, 1, 0, 0, 0);
+
+                    DateTime dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+                else if (filtro.DataInicio > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(1999, 1, 1);
+                    filtro.DataRealizadoFim = new DateTime(1999, 1, 1);
+                    filtro.DataCicloInicio = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, 1);
+                    filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1);
+                }
+            }
+            else if (filtro.FormatAcompanhamento == 'T')
+            {
+                if (filtro.DataFim > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+                else if (filtro.DataFim < DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(1999, 1, 1);
+                    filtro.DataTendenciaFim = new DateTime(1999, 1, 1);
+
+                    DateTime dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(-1);
+                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+                else if (filtro.DataInicio > DateTime.Now.AddMonths(-1))
+                {
+                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
+                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
+                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
+                    filtro.DataRealizadoInicio = new DateTime(1999, 1, 1);
+                    filtro.DataRealizadoFim = new DateTime(1999, 1, 1);
+                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
+                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                }
+            }
+
+
             IEnumerable<RelatorioEsgDTO> dados = await _PainelClassificacaoRepository.ConsultarDadosRelatorio(filtro);
             var cenarios = await _cenarioService.ConsultarCenario(new CenarioFiltro() { IdCenario = filtro.IdCenario });
             string nomCenario = ((IEnumerable<CenarioDTO>)cenarios.ObjetoRetorno).FirstOrDefault().Nome;
@@ -808,6 +898,7 @@ namespace Service.PainelClassificacao
                 }
             }
             var dadosExcel = from a in dados
+                             
                              select new RelatorioEsgExcelDTO()
                              {
                                  DiretoriaExecutora = a.DiretoriaExecutora,
