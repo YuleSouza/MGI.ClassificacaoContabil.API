@@ -9,6 +9,6 @@
         public int SeqFase { get; set; }
         public string Pep { get; set; }
         public int IdClassificacaoEsg { get; set; }
-        public LancamentoESG LancamentosESG { get; set; }
+        public LancamentoESG LancamentoESG { get; set; }
     }
 }

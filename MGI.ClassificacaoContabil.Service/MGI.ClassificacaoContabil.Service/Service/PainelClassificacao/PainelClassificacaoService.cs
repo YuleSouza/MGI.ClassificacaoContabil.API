@@ -675,7 +675,7 @@ namespace Service.PainelClassificacao
                                                                                                               SeqFase = grpFse.Key.SeqFase,
                                                                                                               NomeFase = grpFse.Key.NomeFase,
                                                                                                               Pep = grpFse.Key.Pep,
-                                                                                                              LancamentosESG = new LancamentoESG()
+                                                                                                              LancamentoESG = new LancamentoESG()
                                                                                                               {
                                                                                                                   OrcadoAcumulado = grpFse.Sum(p => p.ValorOrcado),
                                                                                                                   RealizadoAcumulado = grpFse.Sum(p => p.ValorRealizado),
