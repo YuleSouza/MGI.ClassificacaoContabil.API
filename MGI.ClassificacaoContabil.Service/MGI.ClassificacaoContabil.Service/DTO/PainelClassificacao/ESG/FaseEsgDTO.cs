@@ -1,6 +1,4 @@
-﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
-
-namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
+﻿namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
 {
     public class FaseEsgDTO
     {
@@ -11,6 +9,6 @@ namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
         public int SeqFase { get; set; }
         public string Pep { get; set; }
         public int IdClassificacaoEsg { get; set; }
-        public LancamentoESG Lancamentos { get; set; }
+        public LancamentoESG LancamentosESG { get; set; }
     }
 }
