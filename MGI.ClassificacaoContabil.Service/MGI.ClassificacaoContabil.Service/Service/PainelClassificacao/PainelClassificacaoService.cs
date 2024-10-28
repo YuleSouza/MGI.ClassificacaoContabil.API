@@ -673,7 +673,7 @@ namespace Service.PainelClassificacao
                                                                                                           {
                                                                                                               IdEmpresa = grpFse.Key.IdEmpresa,
                                                                                                               SeqFase = grpFse.Key.SeqFase,
-                                                                                                              NomeFase = grpFse.Key.NomeFase,
+                                                                                                              Nome = grpFse.Key.NomeFase,
                                                                                                               Pep = grpFse.Key.Pep,
                                                                                                               LancamentoESG = new LancamentoESG()
                                                                                                               {
