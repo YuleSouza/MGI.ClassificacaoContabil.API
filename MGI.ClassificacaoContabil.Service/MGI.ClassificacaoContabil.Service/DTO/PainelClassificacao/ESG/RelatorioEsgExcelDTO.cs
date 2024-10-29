@@ -35,16 +35,15 @@ namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
         public string AnoProjeto { get; set; }
 
         [Name("R$ Orçado")]
-        public decimal ValorOrcado { get; set; }
+        public decimal ValoBaseOrcamento { get; set; }
 
         [Name("Realizado/Tendendia")]
-        public decimal ValorRealizado { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
 
         [Name("Cenário")]
         public string Cenario {  get; set; }
 
         [Name("Classificação ESG")]
         public string ClassifEsg {  get; set; }
-        
     }
 }

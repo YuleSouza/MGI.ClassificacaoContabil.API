@@ -486,7 +486,13 @@ namespace Repository.PainelClassificacao
             }
             #endregion
             var retorno = await _session.Connection.QueryAsync<RelatorioContabilDTO>($@"
-                               select * from (
+                               select sub.* ,
+                                      nvl(case when :TipoValorProjeto = 'O' then sub.ValorOrcado
+                                      when :TipoValorProjeto = 'J' then sub.ValorTendencia
+                                      when :TipoValorProjeto = '1' then sub.ValorCiclo
+                                      when :TipoValorProjeto = '2' then sub.ValorReplan
+                                      when :TipoValorProjeto = 'P' then sub.ValorPrevisto end,0) as ValorProjeto 
+                                from (
                                 select nvl(pro.pgmcod,0) ||'.'||cl.ccocod||pro.pgmnom||' - '||cl.cconom as CodExterno
                                       , orc.prjorcmes ||'/'||orc.prjorcano as Data
                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
@@ -494,6 +500,7 @@ namespace Repository.PainelClassificacao
                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
                                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                       , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                      , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
                                       , orc.prjorctip                                    as TipoValorProjeto
                                       , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                       , ''                                               as QtdProdutcaoTotal
@@ -514,7 +521,7 @@ namespace Repository.PainelClassificacao
                                                                 and orc.prjorcver = 0 
                                                                 and orc.prjorcmes > 0 
                                                                 and orc.prjorcano > 0
-                                                                and orc.prjorctip in ('O','J','R','2','1'))
+                                                                and orc.prjorctip in ('O','J','R','2','1','P'))
                                         left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
                                         left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
                                         left join corpora.usuari u on (u.USULOG = p.PRJGES)
@@ -532,6 +539,7 @@ namespace Repository.PainelClassificacao
                 idGestor = filtro.IdGestor,
                 datainicial = filtro.DataInicio.AddYears(-2).ToString("01/MM/yyyy"),
                 datafinal = filtro.DataFim.AddYears(2).ToString("01/MM/yyyy"),
+                TipoValorProjeto = filtro.ValorInvestimento
             });
             return retorno;
         }
@@ -560,7 +568,13 @@ namespace Repository.PainelClassificacao
                 parametros.AppendLine(" and sub.IdGestor = ':idGestor'");
             }
             var retorno = await _session.Connection.QueryAsync<RelatorioEsgDTO>(@$"
-                                select * from (
+                                select sub.* 
+                                       ,nvl(case when :BaseOrcamento = 'O' then sub.ValorOrcado
+                                             when :BaseOrcamento = 'P' then sub.ValorPrevisto
+                                             when :BaseOrcamento = '2' then sub.ValorReplan end,0) as ValoBaseOrcamento
+                                       ,nvl(case when :FormatoAcomp = 'J' then sub.ValorTendencia
+                                           when :FormatoAcomp = '1' then sub.ValorCiclo end,0) as ValorFormatoAcompanhamento
+                                    from (
                                   select e.empcod as IdEmpresa, e.empnomfan                              as NomeEmpresa
                                        , p.prjcod                                                        as IdProjeto
                                        , p.prjnom                                                        as NomeProjeto
@@ -576,6 +590,7 @@ namespace Repository.PainelClassificacao
                                        , decode(orc2.prjorctip,'R',nvl(orc2.prjorcval,0),0)                as ValorRealizado
                                        , decode(orc2.prjorctip,'2',nvl(orc2.prjorcval,0),0)                as ValorReplan
                                        , decode(orc2.prjorctip,'1',nvl(orc2.prjorcval,0),0)                as ValorCiclo
+                                       , decode(orc2.prjorctip,'P',nvl(orc2.prjorcval,0),0)                as ValorPrevisto
                                        , nvl(fse.ccocod,0)                                               as IdClassificacaoContabil
                                        , nvl(gru.pgmgrucod,0)                                            as IdGrupoPrograma
                                        , nvl(pro.pgmcod,0)                                               as IdPrograma 
@@ -593,7 +608,7 @@ namespace Repository.PainelClassificacao
                                         inner join prjorc orc2 on (orc2.prjcod = p.prjcod
                                                                 and orc2.prjorcver = 0 
                                                                 and orc2.prjorcmes between :mesInicial and :mesFinal
-                                                                and orc2.prjorctip in ('O','J','R','1','2') 
+                                                                and orc2.prjorctip in ('O','J','R','1','2','P') 
                                                                 and orc2.prjorcfse > 0
                                                                 and orc2.prjorcano between :anoInicial and :anoFinal) 
                                         inner join prjfse fse on (fse.prjcod = p.prjcod and fse.prjfseseq = orc2.prjorcfse)
@@ -612,7 +627,9 @@ namespace Repository.PainelClassificacao
                             mesInicial = filtro.DataInicio.Month,
                             mesFinal = filtro.DataFim.Month,
                             anoInicial = filtro.DataInicio.Year,
-                            anoFinal = filtro.DataFim.Year
+                            anoFinal = filtro.DataFim.Year,
+                            BaseOrcamento = filtro.BaseOrcamento,                            
+                            FormatoAcomp = filtro.FormatAcompanhamento
             });
             return retorno;
         }

@@ -36,6 +36,7 @@ namespace Service.PainelClassificacao
         public IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
         public const int VALOR_ACUMULADO = 0;
         public const int VALOR_ANUAL = 1;
+        private Dictionary<string, string> _tiposValores;
 
         private IUnitOfWork _unitOfWork;
         public PainelClassificacaoService(
@@ -53,6 +54,12 @@ namespace Service.PainelClassificacao
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
             tiposLancamento.Add(3, "Imobilizado");
+            _tiposValores = new Dictionary<string, string>();
+            _tiposValores.Add("O", "O");
+            _tiposValores.Add("R", "R");
+            _tiposValores.Add("T", "J");
+            _tiposValores.Add("C", "2");
+            _tiposValores.Add("P", "P");
         }
 
         #region [Filtros]
@@ -714,7 +721,7 @@ namespace Service.PainelClassificacao
             }
         }
         private (int id, string nome) RetornarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
-        {
+        {            
             int idEsg = 0;
             string nome = string.Empty;
             if (_parametrizacaoCenarioDTOs.Any())
@@ -768,8 +775,8 @@ namespace Service.PainelClassificacao
         }
         public async Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro)
         {
+            string tipoValor = _tiposValores.GetValueOrDefault(filtro.ValorInvestimento);
             IEnumerable<RelatorioContabilDTO> dados = await _PainelClassificacaoRepository.ConsultarDadosRelatorio(filtro);
-            string tipoValor = filtro.TipoValorExcel == 0 ? "O" : "R";
             var dadosExcel = from a in dados
                              where a.DtLancamentoProjeto >= filtro.DataInicio && a.DtLancamentoProjeto <= filtro.DataFim
                              && a.TipoValorProjeto == tipoValor
@@ -784,7 +791,7 @@ namespace Service.PainelClassificacao
                                  Data = grp.Key.Data,
                                  TxProducao = grp.Key.TxProducao,
                                  TxTransfDespesa = grp.Key.TxTransfDespesa,
-                                 ValorInvestimento = grp.Sum(p => filtro.TipoValorExcel == 0 ? p.ValorOrcado : p.ValorRealizado)
+                                 ValorInvestimento = grp.Sum(p => p.ValorProjeto)
                              };
             return GerarExcel(dadosExcel);
         }
@@ -909,8 +916,8 @@ namespace Service.PainelClassificacao
                                  IdProjeto = a.IdProjeto,
                                  NomeFase = a.NomeFase,
                                  NomeEmpresa = a.NomeEmpresa,
-                                 ValorOrcado = a.ValorOrcado,
-                                 ValorRealizado = a.ValorRealizado,
+                                 ValoBaseOrcamento = a.ValoBaseOrcamento,
+                                 ValorFormatoAcompanhamento = a.ValorFormatoAcompanhamento,
                                  ClassifEsg = a.NomeClassificacaoEsg,
                                  Cenario = nomCenario
 

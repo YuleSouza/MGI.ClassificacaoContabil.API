@@ -30,5 +30,6 @@
         public DateTime? DataReplanInicio { get; set; }
         public DateTime? DataReplanFim { get; set; }
         public char FormatAcompanhamento { get; set; }
+        public char BaseOrcamento { get; set; }
     }
 }

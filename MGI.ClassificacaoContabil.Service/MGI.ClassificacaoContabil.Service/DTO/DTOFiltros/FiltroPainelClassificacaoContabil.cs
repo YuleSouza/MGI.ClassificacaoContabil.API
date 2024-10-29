@@ -39,8 +39,11 @@
         public int ClassificacaoContabil {  get; set; }
         /// <summary>
         /// 0 - ORcado
-        /// 1 - realizado
+        /// R - Replan
+        /// P - Previsto
+        /// C - Ciclo
+        /// T - Tendencia
         /// </summary>
-        public int TipoValorExcel { get; set; }
+        public string ValorInvestimento { get; set; }
     }
 }

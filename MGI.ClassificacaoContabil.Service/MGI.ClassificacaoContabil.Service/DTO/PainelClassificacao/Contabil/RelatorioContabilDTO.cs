@@ -11,13 +11,7 @@
         public string TxTransfDespesa { get; set; }
         public string TxProducao { get; set; }
         public string TxDepreciacao { get; set; }
-
-        public decimal ValorOrcado { get; set; }
-        public decimal ValorTendencia { get; set; }
-        public decimal ValorRealizado { get; set; }
-        public decimal ValorReplan { get; set; }
-        public decimal ValorCiclo { get; set; }
-
+        public decimal ValorProjeto { get; set; }
         public int IdEmpresa { get; set; }
         public int IdGrupoPrograma { get; set; }
         public int IdPrograma   { get; set; }
