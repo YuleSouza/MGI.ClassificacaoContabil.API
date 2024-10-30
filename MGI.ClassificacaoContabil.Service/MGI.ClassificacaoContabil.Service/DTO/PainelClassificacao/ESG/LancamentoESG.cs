@@ -6,6 +6,8 @@
         public decimal OrcadoAcumulado { get; set; }
         public decimal ValorReplan { get; set; }
         public decimal RealizadoAcumulado { get; set; }
+        public decimal ValoBaseOrcamento { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
         public decimal Variacao
         {
             get

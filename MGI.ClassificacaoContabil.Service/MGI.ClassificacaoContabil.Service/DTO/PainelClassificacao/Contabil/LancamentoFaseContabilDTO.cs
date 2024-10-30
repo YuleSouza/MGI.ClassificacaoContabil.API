@@ -11,6 +11,7 @@
         public decimal ValorRealizado { get; set; }
         public decimal ValorReplan { get; set; }
         public decimal ValorCiclo { get; set; }
+        public decimal ValorPrevisto { get; set; }
         public DateTime DtLancamentoProjeto { get; set; }
         public string IdGestor { get; set; }
         public string NomeFase { get; set; }
@@ -18,5 +19,7 @@
         public string Pep {  get; set; }
         public int SeqFase { get; set; }
         public LancamentoContabilDTO Lancamentos { get; set; }
+        public decimal ValoBaseOrcamento { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
     }
 }

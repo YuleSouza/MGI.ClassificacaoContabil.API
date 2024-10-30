@@ -26,5 +26,7 @@
         public int SeqFase { get; set; }
         public string NomeClassificacaoEsg { get; set; }
         public DateTime DtLancamentoProjeto { get; set; }
+        public decimal ValoBaseOrcamento { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
     }
 }

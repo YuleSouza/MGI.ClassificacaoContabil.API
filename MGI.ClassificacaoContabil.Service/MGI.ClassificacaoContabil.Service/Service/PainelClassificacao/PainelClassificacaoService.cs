@@ -619,7 +619,8 @@ namespace Service.PainelClassificacao
                                                     OrcadoAcumulado = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
                                                     ValorReplan = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
                                                     ValorTendencia = grp.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
-                                                    RealizadoAcumulado = grp.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
+                                                    RealizadoAcumulado = grp.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap),
+                                                    ValoBaseOrcamento = grp.AsQueryable().Where(predicateRealizado).Sum(p => p.),
                                                 },
                                                 GrupoPrograma = from c in lancamentos
                                                                 where c.IdEmpresa == grp.Key.IdEmpresa

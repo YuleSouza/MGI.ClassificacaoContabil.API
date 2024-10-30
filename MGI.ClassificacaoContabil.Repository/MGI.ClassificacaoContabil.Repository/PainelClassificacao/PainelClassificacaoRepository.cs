@@ -326,20 +326,27 @@ namespace Repository.PainelClassificacao
             }
             #endregion
             return await _session.Connection.QueryAsync<LancamentoFaseContabilDTO>($@"
-                                select e.empcod as IdEmpresa
-                                       , gru.pgmgrucod as IdGrupoPrograma
-                                       , pro.pgmcod as IdPrograma
-                                       , p.prjcod as IdProjeto
-                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
-                                       , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
-                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
-                                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
-                                       , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                select sub.* 
+                                      ,nvl(case when :BaseOrcamento = 'O' then sub.ValorOrcado
+                                             when :BaseOrcamento = 'P' then sub.ValorPrevisto
+                                             when :BaseOrcamento = '2' then sub.ValorReplan end,0)     as ValoBaseOrcamento
+                                       ,nvl(case when :FormatoAcomp = 'J' then sub.ValorTendencia
+                                           when :FormatoAcomp = '1' then sub.ValorCiclo end,0)         as ValorFormatoAcompanhamento
+                                  from (select e.empcod                                                as IdEmpresa
+                                       , gru.pgmgrucod                                                 as IdGrupoPrograma
+                                       , pro.pgmcod                                                    as IdPrograma
+                                       , p.prjcod                                                      as IdProjeto
+                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0)              as ValorOrcado
+                                       , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0)              as ValorTendencia
+                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0)              as ValorRealizado
+                                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0)              as ValorReplan
+                                       , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0)              as ValorCiclo
+                                       , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0)              as ValorPrevisto
                                        , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
-                                       , p.prjges as IdGestor
-                                       , nvl(fse.prjfsenom,'') as NomeFase
-                                       , nvl(fse.prjfseseq,0) as SeqFase
-                                      , fse.prjfsepep as Pep
+                                       , p.prjges                                                      as IdGestor
+                                       , nvl(fse.prjfsenom,'')                                         as NomeFase
+                                       , nvl(fse.prjfseseq,0)                                          as SeqFase
+                                      , fse.prjfsepep                                                  as Pep
                                   from projeto p
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
@@ -348,8 +355,8 @@ namespace Repository.PainelClassificacao
                                         left join prjfse fse on (fse.prjcod = orc.prjcod and fse.prjfseseq = orc.prjorcfse)
                                  where p.prjsit = 'A'
                                    and orc.prjorcano > 2016
-                                       {parametros}
-                                 order by 1, fse.prjfseseq
+                                       {parametros} 
+                                 order by 1, fse.prjfseseq ) sub
                                     ",
                 new
                 {
@@ -426,7 +433,15 @@ namespace Repository.PainelClassificacao
                 parametros.AppendLine(" and a.idGestor = :idGestor");
             }
             #endregion
-            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"
+                             select a.*,
+                                    nvl(case when :BaseOrcamento = 'O' then sub.ValorOrcado
+                                      when :BaseOrcamento = 'P' then sub.ValorPrevisto
+                                      when :BaseOrcamento = '2' then sub.ValorReplan end,0) as ValoBaseOrcamento
+                                    ,nvl(case when :FormatoAcomp = 'J' then sub.ValorTendencia
+                                      when :FormatoAcomp = '1' then sub.ValorCiclo end,0) as ValorFormatoAcompanhamento
+                                from v_lanc_classif_esg a 
+                               where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
                 new {
                     idEmpresa = filtro.IdEmpresa,
                     idGrupoPrograma = filtro.IdGrupoPrograma.HasValue  && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
@@ -435,6 +450,8 @@ namespace Repository.PainelClassificacao
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2).ToString("dd/MM/yyyy"),
                     dataFim = filtro.DataFim.AddYears(2).ToString("dd/MM/yyyy"),
+                    BaseOrcamento = filtro.BaseOrcamento,
+                    FormatoAcomp = filtro.FormatAcompanhamento
                 });
         }
 
