@@ -130,6 +130,7 @@ namespace Service.Parametrizacao
             {
                 try
                 {
+                    var validacao = ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
                     unitOfWork.BeginTransaction();
                     bool ok = await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao);
                     unitOfWork.Commit();
@@ -142,6 +143,21 @@ namespace Service.Parametrizacao
                 }
             }
         }
+
+        private async Task<PayloadDTO> ValidarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        {
+            PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
+            if (parametrizacao.IdClassificacaoEsg <= 0)
+            {
+                payloadDTO = new PayloadDTO("Obrigatóio o envio da classificação Esg !", false, string.Empty);
+            }
+            if (parametrizacao.IdCenario <= 0)
+            {
+                payloadDTO = new PayloadDTO("Obrigatóio o envio do cenário !", false, string.Empty);
+            }
+            return await Task.FromResult(payloadDTO);
+        }
+
         public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
             using (IUnitOfWork unitOfWork = _unitOfWork)
