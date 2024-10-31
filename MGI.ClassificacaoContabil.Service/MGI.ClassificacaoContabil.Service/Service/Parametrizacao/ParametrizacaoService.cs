@@ -77,9 +77,10 @@ namespace Service.Parametrizacao
             {
                 try
                 {
-                    unitOfWork.BeginTransaction();
                     var validacao = await ValidarParametrizacaoClassificacaoGeral(parametrizacao);
                     if (!validacao.Sucesso) return validacao;
+                    unitOfWork.BeginTransaction();
+                    bool ok = await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao);
                     unitOfWork.Commit();
                     return new PayloadDTO("Parametrização classificação esg geral inserida com successo", ok, string.Empty);
                 }
