@@ -26,14 +26,9 @@ namespace Service.Parametrizacao
                 try
                 {
 
+                    var validacao = await ValidarParametrizacaoCenario(parametrizacao);
+                    if (!validacao.Sucesso) return validacao;
                     unitOfWork.BeginTransaction();
-                    var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
-                    bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario 
-                                                                && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg 
-                                                                && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil);
-                    if (registroExistente) {
-                        return new PayloadDTO("Cenário, Classificação ESG e Classificação contábil já cadastrados!", false);
-                    }
                     bool ok = await _repository.InserirParametrizacaoCenario(parametrizacao);
                     unitOfWork.Commit();
                     return new PayloadDTO("Parametrização cenário inserido com successo", ok, string.Empty);
@@ -51,6 +46,8 @@ namespace Service.Parametrizacao
             {
                 try
                 {
+                    var validacao = await ValidarParametrizacaoCenario(parametrizacao);
+                    if (!validacao.Sucesso) return validacao;
                     unitOfWork.BeginTransaction();
                     bool ok = await _repository.AlterarParametrizacaoCenario(parametrizacao);
                     unitOfWork.Commit();
@@ -62,6 +59,20 @@ namespace Service.Parametrizacao
                     return new PayloadDTO("Erro na alteração parametrização cenário ", false, ex.Message);
                 }
             }
+        }
+
+        private async Task<PayloadDTO> ValidarParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
+        {
+            PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
+            var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
+            bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario
+                                                        && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg
+                                                        && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil);
+            if (registroExistente)
+            {
+                payloadDTO = new PayloadDTO("Cenário, Classificação ESG e Classificação contábil já cadastrados!", false);
+            }
+            return await Task.FromResult(payloadDTO);
         }
         public async Task<PayloadGeneric<IEnumerable<ParametrizacaoCenarioDTO>>> ConsultarParametrizacaoCenario()
         {
