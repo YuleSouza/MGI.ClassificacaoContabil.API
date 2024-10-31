@@ -78,13 +78,8 @@ namespace Service.Parametrizacao
                 try
                 {
                     unitOfWork.BeginTransaction();
-                    var parametrosEsgGEral = await _repository.ConsultarParametrizacaoClassificacaoGeral();
-                    bool registroExistente = parametrosEsgGEral.Any(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);
-                    if (registroExistente)
-                    {
-                        return new PayloadDTO("Parametrização geral Esg já inserida!", false);
-                    }
-                    bool ok = await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao);
+                    var validacao = await ValidarParametrizacaoClassificacaoGeral(parametrizacao);
+                    if (!validacao.Sucesso) return validacao;
                     unitOfWork.Commit();
                     return new PayloadDTO("Parametrização classificação esg geral inserida com successo", ok, string.Empty);
                 }
@@ -101,11 +96,9 @@ namespace Service.Parametrizacao
             {
                 try
                 {
-                    unitOfWork.BeginTransaction();
-                    if (parametrizacao.IdGrupoPrograma == 0)
-                    {
-                        return new PayloadDTO("Obrigatório o envio do grupo de programa", false);
-                    }
+                    var validacao = await ValidarParametrizacaoClassificacaoGeral(parametrizacao);
+                    if (!validacao.Sucesso) return validacao;
+                    unitOfWork.BeginTransaction();                    
                     bool ok = await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
                     unitOfWork.Commit();
                     return new PayloadDTO("Parametrização da classificação esg geral alterada com successo", ok, string.Empty);
@@ -116,6 +109,22 @@ namespace Service.Parametrizacao
                     return new PayloadDTO("Erro na alteração parametrização classificação esg geral ", false, ex.Message);
                 }
             }
+        }
+
+        private async Task<PayloadDTO> ValidarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        {
+            PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
+            if (parametrizacao.IdGrupoPrograma == 0)
+            {
+                payloadDTO = new PayloadDTO("Obrigatório o envio do grupo de programa", false);
+            }
+            var parametrosEsgGEral = await _repository.ConsultarParametrizacaoClassificacaoGeral();
+            bool registroExistente = parametrosEsgGEral.Any(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);
+            if (registroExistente)
+            {
+                payloadDTO = new PayloadDTO("Parametrização geral Esg já inserida!", false);
+            }
+            return await Task.FromResult(payloadDTO);
         }
         public async Task<PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>> ConsultarParametrizacaoClassificacaoGeral()
         {
