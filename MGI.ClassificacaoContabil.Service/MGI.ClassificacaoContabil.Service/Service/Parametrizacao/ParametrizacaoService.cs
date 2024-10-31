@@ -130,7 +130,11 @@ namespace Service.Parametrizacao
             {
                 try
                 {
-                    var validacao = ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
+                    var validacao = await ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
+                    if (!validacao.Sucesso)
+                    {
+                        return validacao;
+                    }
                     unitOfWork.BeginTransaction();
                     bool ok = await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao);
                     unitOfWork.Commit();
@@ -154,6 +158,16 @@ namespace Service.Parametrizacao
             if (parametrizacao.IdCenario <= 0)
             {
                 payloadDTO = new PayloadDTO("Obrigatóio o envio do cenário !", false, string.Empty);
+            }
+            var excecoes = await ConsultarParametrizacaoClassificacaoExcecao();
+            bool registroExistente = excecoes.ObjetoRetorno.Any(p => p.IdCenario == parametrizacao.IdCenario && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg 
+                    && (p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma 
+                            || p.IdPrograma == parametrizacao.IdPrograma 
+                            || p.IdEmpresa == parametrizacao.IdEmpresa
+                            || p.IdProjeto == parametrizacao.IdProjeto));
+            if (registroExistente) 
+            {
+                payloadDTO = new PayloadDTO("Já existe um cadastro de exceção com essas informações, favor escolher uma diferente !", false, string.Empty);
             }
             return await Task.FromResult(payloadDTO);
         }
