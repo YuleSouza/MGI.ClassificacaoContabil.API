@@ -132,10 +132,7 @@ namespace Service.Parametrizacao
                 try
                 {
                     var validacao = await ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
-                    if (!validacao.Sucesso)
-                    {
-                        return validacao;
-                    }
+                    if (!validacao.Sucesso) return validacao;                    
                     unitOfWork.BeginTransaction();
                     bool ok = await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao);
                     unitOfWork.Commit();
@@ -192,6 +189,8 @@ namespace Service.Parametrizacao
             {
                 try
                 {
+                    var validacao = await ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
+                    if (!validacao.Sucesso) return validacao;
                     unitOfWork.BeginTransaction();
                     bool ok = await _repository.AlterarParametrizacaoClassificacaoExcecao(parametrizacao);
                     unitOfWork.Commit();
