@@ -1,5 +1,6 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
+using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Parametrizacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;
@@ -160,11 +161,24 @@ namespace Service.Parametrizacao
                 payloadDTO = new PayloadDTO("Obrigatóio o envio do cenário !", false, string.Empty);
             }
             var excecoes = await ConsultarParametrizacaoClassificacaoExcecao();
-            bool registroExistente = excecoes.ObjetoRetorno.Any(p => p.IdCenario == parametrizacao.IdCenario && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg 
-                    && (p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma 
-                            || p.IdPrograma == parametrizacao.IdPrograma 
-                            || p.IdEmpresa == parametrizacao.IdEmpresa
-                            || p.IdProjeto == parametrizacao.IdProjeto));
+            excecoes.ObjetoRetorno = excecoes.ObjetoRetorno?.Where(p => p.IdCenario == parametrizacao.IdCenario && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);
+            if (parametrizacao.IdGrupoPrograma > 0)
+            {
+                excecoes.ObjetoRetorno = excecoes.ObjetoRetorno.Where(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma);
+            }
+            if (parametrizacao.IdPrograma > 0)
+            {
+                excecoes.ObjetoRetorno = excecoes.ObjetoRetorno.Where(p => p.IdPrograma == parametrizacao.IdPrograma);
+            }
+            if (parametrizacao.IdProjeto > 0)
+            {
+                excecoes.ObjetoRetorno = excecoes.ObjetoRetorno.Where(p => p.IdProjeto == parametrizacao.IdProjeto);
+            }
+            if (parametrizacao.IdEmpresa > 0) 
+            {
+                excecoes.ObjetoRetorno = excecoes.ObjetoRetorno.Where(p => p.IdEmpresa == parametrizacao.IdEmpresa);
+            }
+            bool registroExistente = excecoes.ObjetoRetorno.Any();
             if (registroExistente) 
             {
                 payloadDTO = new PayloadDTO("Já existe um cadastro de exceção com essas informações, favor escolher uma diferente !", false, string.Empty);

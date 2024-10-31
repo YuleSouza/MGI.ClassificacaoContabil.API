@@ -209,7 +209,7 @@ namespace Repository.Parametrizacao
                                                     left join servdesk.pgmpro p on p.pgmcod = pe.id_programa
                                                     left join servdesk.cenario_classif_contabil c on pe.id_cenario = c.id_cenario
                                                     inner join servdesk.classificacao_esg ces on pe.id_classificacao_esg = ces.id_classificacao_esg
-                                                    left join servdesk.projeto prj on pe.id_programa = prj.prjcod
+                                                    left join servdesk.projeto prj on pe.id_projeto = prj.prjcod
                                             where 1 = 1
                                             order by ltrim(rtrim(e.empnomfan)), gp.pgmgrunom, p.pgmnom ");
             return resultado;
