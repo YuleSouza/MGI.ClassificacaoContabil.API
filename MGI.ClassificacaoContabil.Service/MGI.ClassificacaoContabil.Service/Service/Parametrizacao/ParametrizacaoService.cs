@@ -1,6 +1,5 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Parametrizacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;

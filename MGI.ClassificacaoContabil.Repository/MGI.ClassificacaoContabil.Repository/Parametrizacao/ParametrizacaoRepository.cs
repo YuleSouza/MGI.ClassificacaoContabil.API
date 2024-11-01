@@ -195,7 +195,7 @@ namespace Repository.Parametrizacao
                                                  pe.id_programa                     as IdPrograma,
                                                  p.pgmnom                           as NomePrograma,
                                                  pe.id_projeto                      as IdProjeto,
-                                                 to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prj.prjnom)) nomeprojeto,
+                                                 case when nvl(prjcod,0) != 0 and nvl(trim(prj.prjnom),' ') != ' ' then prjcod || ' - ' || ltrim(rtrim(prj.prjnom)) else ' ' end NomeProjeto,
                                                  pe.id_classificacao_esg            as IdClassificacaoEsg,    
                                                  ces.nome                           as NomeClassificacaoEsg,
                                                  pe.dtcriacao                       as DataCriacao,
