@@ -44,6 +44,6 @@
         /// C - Ciclo
         /// T - Tendencia
         /// </summary>
-        public string ValorInvestimento { get; set; }
+        public string? ValorInvestimento { get; set; }
     }
 }
