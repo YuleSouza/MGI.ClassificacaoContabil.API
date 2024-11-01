@@ -67,7 +67,8 @@ namespace Service.Parametrizacao
             var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
             bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario
                                                         && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg
-                                                        && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil);
+                                                        && p.IdClassificacaoContabil == parametrizacao.IdClassificacaoContabil
+                                                        && p.Status == parametrizacao.Status);
             if (registroExistente)
             {
                 payloadDTO = new PayloadDTO("Cenário, Classificação ESG e Classificação contábil já cadastrados!", false);
