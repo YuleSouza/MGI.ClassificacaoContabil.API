@@ -1,10 +1,9 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
-using Service.DTO.Filtros;
 using Service.DTO.Classificacao;
+using Service.DTO.Filtros;
 using Service.Interface.Classificacao;
 using Service.Repository.Classificacao;
-using OfficeOpenXml.Interfaces.Drawing.Text;
 
 namespace Service.Classificacao
 {

@@ -1,29 +1,29 @@
 ﻿using Infra.Data;
 using Infra.Interface;
-using Service.Interface.Empresa;
-using Service.Interface.Cenario;
-using Service.Interface.FiltroTela;
-using Service.Interface.Classificacao;
-using Service.Interface.Parametrizacao;
-using Service.Interface.PainelClassificacao;
-using Service.Empresa;
-using Service.Cenario;
-using Service.FiltroTela;
-using Service.Classificacao;
-using Service.Parametrizacao;
-using Service.PainelClassificacao;
-using Service.Repository.Empresa;
-using Service.Repository.Cenario;
-using Service.Repository.FiltroTela;
-using Service.Repository.Classificacao;
-using Service.Repository.Parametrizacao;
-using Service.Repository.PainelClassificacao;
-using Repository.Empresa;
 using Repository.Cenario;
-using Repository.FiltroTela;
 using Repository.Classificacao;
-using Repository.Parametrizacao;
+using Repository.Empresa;
+using Repository.FiltroTela;
 using Repository.PainelClassificacao;
+using Repository.Parametrizacao;
+using Service.Cenario;
+using Service.Classificacao;
+using Service.Empresa;
+using Service.FiltroTela;
+using Service.Interface.Cenario;
+using Service.Interface.Classificacao;
+using Service.Interface.Empresa;
+using Service.Interface.FiltroTela;
+using Service.Interface.PainelClassificacao;
+using Service.Interface.Parametrizacao;
+using Service.PainelClassificacao;
+using Service.Parametrizacao;
+using Service.Repository.Cenario;
+using Service.Repository.Classificacao;
+using Service.Repository.Empresa;
+using Service.Repository.FiltroTela;
+using Service.Repository.PainelClassificacao;
+using Service.Repository.Parametrizacao;
 
 namespace API.Config
 {
@@ -41,6 +41,8 @@ namespace API.Config
             services.AddScoped<IParametrizacaoService, ParametrizacaoService>();
             services.AddScoped<IFiltroTelaService, FiltroTelaService>();
             services.AddScoped<IPainelClassificacaoService, PainelClassificacaoService>();
+            services.AddScoped<IParametrizacaoCenarioService, ParametrizacaoCenarioService>();
+            services.AddScoped<IParametrizacaoEsgGeralService, ParametrizacaoEsgGeralService>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();

@@ -5,7 +5,6 @@ using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.DTO.DTOFiltros;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
 using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
-using Service.Cenario;
 using Service.DTO.Cenario;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
@@ -19,7 +18,6 @@ using Service.Interface.PainelClassificacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.PainelClassificacao;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 
 namespace Service.PainelClassificacao
@@ -34,6 +32,8 @@ namespace Service.PainelClassificacao
         private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
         private IEnumerable<ParametrizacaoClassificacaoGeralDTO> _parametrizacaoGrupoDTOs;
         public IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
+        public readonly IParametrizacaoCenarioService _parametrizacaoCenarioService;
+        public readonly IParametrizacaoEsgGeralService _parametrizacaoEsgGeralService;
         public const int VALOR_ACUMULADO = 0;
         public const int VALOR_ANUAL = 1;
         private Dictionary<string, string> _tiposValores;
@@ -44,13 +44,16 @@ namespace Service.PainelClassificacao
             IUnitOfWork unitOfWork,
             IClassificacaoService classificacaoEsgService,
             IParametrizacaoService parametrizacaoService,
-            ICenarioService cenarioService)
+            ICenarioService cenarioService,
+            IParametrizacaoCenarioService parametrizacaoCenarioService,
+            IParametrizacaoEsgGeralService parametrizacaoEsgGeralService)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
             _unitOfWork = unitOfWork;
             _classificacaoEsgService = classificacaoEsgService;
             _parametrizacaoService = parametrizacaoService;
             _cenarioService = cenarioService;
+            _parametrizacaoCenarioService = parametrizacaoCenarioService;
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
             tiposLancamento.Add(3, "Imobilizado");
@@ -704,12 +707,12 @@ namespace Service.PainelClassificacao
         }
         private async Task PopularParametrizacoes()
         {
-            var parametrizacoes = await _parametrizacaoService.ConsultarParametrizacaoCenario();
+            var parametrizacoes = await _parametrizacaoCenarioService.ConsultarParametrizacaoCenario();
             if (parametrizacoes.ObjetoRetorno != null)
             {
                 _parametrizacaoCenarioDTOs = parametrizacoes.ObjetoRetorno;
             }
-            var parametrizacoesGeral = await _parametrizacaoService.ConsultarParametrizacaoClassificacaoGeral();
+            var parametrizacoesGeral = await _parametrizacaoEsgGeralService.ConsultarParametrizacaoClassificacaoGeral();
             if (parametrizacoesGeral.ObjetoRetorno != null)
             {
                 _parametrizacaoGrupoDTOs = parametrizacoesGeral.ObjetoRetorno;
