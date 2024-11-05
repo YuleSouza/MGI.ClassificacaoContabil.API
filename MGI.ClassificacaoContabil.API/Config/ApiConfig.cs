@@ -1,5 +1,6 @@
 ﻿using Infra.Data;
 using Infra.Interface;
+using MGI.ClassificacaoContabil.Service.Helper;
 using Repository.Cenario;
 using Repository.Classificacao;
 using Repository.Empresa;
@@ -51,6 +52,8 @@ namespace API.Config
             services.AddScoped<IParametrizacaoRepository, ParametrizacaoRepository>();
             services.AddScoped<IFiltroTelaRepository, FiltroTelaRepository>();
             services.AddScoped<IPainelClassificacaoRepository, PainelClassificacaoRepository>();
+
+            services.AddScoped<ITransactionHelper, TransactionHelper>(); 
 
             return services;
         }

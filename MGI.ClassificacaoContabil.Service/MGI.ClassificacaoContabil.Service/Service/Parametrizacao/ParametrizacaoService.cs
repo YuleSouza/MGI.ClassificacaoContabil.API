@@ -1,5 +1,6 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
+using MGI.ClassificacaoContabil.Service.Helper;
 using Service.DTO.Parametrizacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;
@@ -9,35 +10,35 @@ namespace Service.Parametrizacao
     public class ParametrizacaoService : IParametrizacaoService
     {
         private IParametrizacaoRepository _repository;
-        private IUnitOfWork _unitOfWork;
+        private ITransactionHelper _transactionHelper;
 
-        public ParametrizacaoService(IParametrizacaoRepository cenarioRepository, IUnitOfWork unitOfWork)
+        public ParametrizacaoService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper)
         {
             _repository = cenarioRepository;
-            _unitOfWork = unitOfWork;
+            _transactionHelper = transactionHelper;
         }
 
         public async Task<PayloadDTO> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    var validacao = await ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
-                    if (!validacao.Sucesso) return validacao;                    
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Parametrização classificação esg exceção inserido com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir parametrização classificação esg exceção ", false, ex.Message);
-                }
-            }
+            var validacao = await Validar(parametrizacao);
+            if (!validacao.Sucesso) return validacao;
+
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao),
+                "Parametrização classificação esg exceção inserido com successo"
+            );
         }
-        private async Task<PayloadDTO> ValidarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
+        {
+            var validacao = await Validar(parametrizacao);
+            if (!validacao.Sucesso) return validacao;
+
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.AlterarParametrizacaoClassificacaoExcecao(parametrizacao),
+                "Parametrização da classificação esg exceção alterada com successo"
+            );
+        }
+        private async Task<PayloadDTO> Validar(ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
             PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
             if (parametrizacao.IdClassificacaoEsg <= 0)
@@ -72,26 +73,6 @@ namespace Service.Parametrizacao
                 payloadDTO = new PayloadDTO("Já existe um cadastro de exceção com essas informações, favor escolher uma diferente !", false, string.Empty);
             }
             return await Task.FromResult(payloadDTO);
-        }
-        public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
-        {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    var validacao = await ValidarParametrizacaoClassificacaoExcecao(parametrizacao);
-                    if (!validacao.Sucesso) return validacao;
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.AlterarParametrizacaoClassificacaoExcecao(parametrizacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Parametrização da classificação esg exceção alterada com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração parametrização classificação esg exceção ", false, ex.Message);
-                }
-            }
         }
         public async Task<PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO>>> ConsultarParametrizacaoClassificacaoExcecao()
         {

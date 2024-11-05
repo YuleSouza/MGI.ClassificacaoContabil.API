@@ -2,6 +2,7 @@
 using Service.DTO.Parametrizacao;
 using Service.Interface.Parametrizacao;
 using Microsoft.AspNetCore.Mvc;
+using MGI.ClassificacaoContabil.API.ControllerAtributes;
 
 namespace API.Controllers
 {
@@ -30,6 +31,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/cenario/inserir")]
+        [ActionDescription("Inserir parametrização de cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosCenario([FromBody] ParametrizacaoCenarioDTO parametrizacao)
         {
@@ -41,6 +43,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/cenario/alterar")]
+        [ActionDescription("Alterar parametrização de cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosCenario([FromBody] ParametrizacaoCenarioDTO parametrizacao)
         {
@@ -52,6 +55,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/cenario/consultar")]
+        [ActionDescription("Consultar parametrização de cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosParametrizacaoCenario()
         {
@@ -65,6 +69,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/geral/inserir")]
+        [ActionDescription("Inserir parametrização geral")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosParametrizacaoClassificacaoGeral([FromBody] ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
@@ -75,6 +80,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/geral/alterar")]
+        [ActionDescription("Alterar parametrização geral")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosParametrizacaoClassificacaoGeral([FromBody] ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
@@ -85,6 +91,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/geral/consultar")]
+        [ActionDescription("Consultar parametrização geral")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosParametrizacaoClassificacaoGeral()
         {
@@ -98,6 +105,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/excecao/inserir")]
+        [ActionDescription("Inserir parametrização classificação exceção")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosParametrizacaoClassificacaoExcecao([FromBody] ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
@@ -108,6 +116,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/excecao/alterar")]
+        [ActionDescription("Alterar parametrização classificação exceção")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosParametrizacaoClassificacaoExcecao([FromBody] ParametrizacaoClassificacaoEsgDTO parametrizacao)
         {
@@ -119,6 +128,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/excecao/consultar")]
+        [ActionDescription("Consultar parametrização classificação exceção")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosParametrizacaoClassificacaoExcecao()
         {

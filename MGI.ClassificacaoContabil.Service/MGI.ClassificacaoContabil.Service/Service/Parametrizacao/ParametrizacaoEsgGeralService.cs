@@ -3,64 +3,40 @@ using Infra.Interface;
 using Service.Interface.Parametrizacao;
 using Service.DTO.Parametrizacao;
 using Service.Repository.Parametrizacao;
+using MGI.ClassificacaoContabil.Service.Helper;
 
 namespace Service.Parametrizacao
 {
     public class ParametrizacaoEsgGeralService : IParametrizacaoEsgGeralService
     {
         private IParametrizacaoRepository _repository;
-        private IUnitOfWork _unitOfWork;
-        public ParametrizacaoEsgGeralService(IParametrizacaoRepository cenarioRepository, IUnitOfWork unitOfWork)
+        private ITransactionHelper _transactionHelper;
+        public ParametrizacaoEsgGeralService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper)
         {
             _repository = cenarioRepository;
-            _unitOfWork = unitOfWork;
-        }
-        public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
-        {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    var validacao = await ValidarParametrizacaoClassificacaoGeral(parametrizacao);
-                    if (!validacao.Sucesso) return validacao;
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Parametrização da classificação esg geral alterada com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração parametrização classificação esg geral ", false, ex.Message);
-                }
-            }
-        }
-        public async Task<PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>> ConsultarParametrizacaoClassificacaoGeral()
-        {
-            var resultado = await _repository.ConsultarParametrizacaoClassificacaoGeral();
-            return new PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>(string.Empty, true, string.Empty, resultado);
+            _transactionHelper = transactionHelper;
         }
         public async Task<PayloadDTO> InserirParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    var validacao = await ValidarParametrizacaoClassificacaoGeral(parametrizacao);
-                    if (!validacao.Sucesso) return validacao;
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Parametrização classificação esg geral inserida com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir parametrização classificação esg geral ", false, ex.Message);
-                }
-            }
+            var validacao = await Validar(parametrizacao);
+            if (!validacao.Sucesso) return validacao;
+
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao),
+                "Parametrização classificação esg geral inserida com successo"
+            );
         }
-        private async Task<PayloadDTO> ValidarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        public async Task<PayloadDTO> AlterarParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
+        {
+            var validacao = await Validar(parametrizacao);
+            if (!validacao.Sucesso) return validacao;
+
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao),
+                "Parametrização da classificação esg geral alterada com successo"
+            );
+        }
+        private async Task<PayloadDTO> Validar(ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
             if (parametrizacao.IdGrupoPrograma == 0)
@@ -74,6 +50,11 @@ namespace Service.Parametrizacao
                 payloadDTO = new PayloadDTO("Parametrização geral Esg já inserida!", false);
             }
             return await Task.FromResult(payloadDTO);
+        }
+        public async Task<PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>> ConsultarParametrizacaoClassificacaoGeral()
+        {
+            var resultado = await _repository.ConsultarParametrizacaoClassificacaoGeral();
+            return new PayloadGeneric<IEnumerable<ParametrizacaoClassificacaoGeralDTO>>(string.Empty, true, string.Empty, resultado);
         }
     }
 }

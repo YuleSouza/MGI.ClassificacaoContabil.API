@@ -3,60 +3,40 @@ using Infra.Interface;
 using Service.Interface.Parametrizacao;
 using Service.DTO.Parametrizacao;
 using Service.Repository.Parametrizacao;
+using MGI.ClassificacaoContabil.Service.Helper;
 
 namespace Service.Parametrizacao
 {
     public class ParametrizacaoCenarioService : IParametrizacaoCenarioService
     {
         private IParametrizacaoRepository _repository;
-        private IUnitOfWork _unitOfWork;
-        public ParametrizacaoCenarioService(IParametrizacaoRepository cenarioRepository, IUnitOfWork unitOfWork)
+        private ITransactionHelper _transactionHelper;
+        public ParametrizacaoCenarioService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper)
         {
             _repository = cenarioRepository;
-            _unitOfWork = unitOfWork;
-        }
-        public async Task<PayloadDTO> AlterarParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
-        {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    var validacao = await ValidarParametrizacaoCenario(parametrizacao);
-                    if (!validacao.Sucesso) return validacao;
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.AlterarParametrizacaoCenario(parametrizacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Parametrização do cenário alterado com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração parametrização cenário ", false, ex.Message);
-                }
-            }
+            _transactionHelper = transactionHelper;
         }
         public async Task<PayloadDTO> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
+            var validacao = await Validar(parametrizacao);
+            if (!validacao.Sucesso) return validacao;
 
-                    var validacao = await ValidarParametrizacaoCenario(parametrizacao);
-                    if (!validacao.Sucesso) return validacao;
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.InserirParametrizacaoCenario(parametrizacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Parametrização cenário inserido com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir parametrização cenário ", false, ex.Message);
-                }
-            }
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.InserirParametrizacaoCenario(parametrizacao),
+                "Parametrização classificação esg geral inserida com successo"
+            );
         }
-        private async Task<PayloadDTO> ValidarParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
+        public async Task<PayloadDTO> AlterarParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
+        {
+            var validacao = await Validar(parametrizacao);
+            if (!validacao.Sucesso) return validacao;
+
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.AlterarParametrizacaoCenario(parametrizacao),
+                "Parametrização do cenário alterado com successo"
+            );
+        }
+        private async Task<PayloadDTO> Validar(ParametrizacaoCenarioDTO parametrizacao)
         {
             PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
             var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();

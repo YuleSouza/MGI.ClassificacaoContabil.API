@@ -59,6 +59,8 @@ app.UseSwaggerUI(c =>
 });
 app.UseDeveloperExceptionPage();
 app.UseCors("ClientPermission");
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
