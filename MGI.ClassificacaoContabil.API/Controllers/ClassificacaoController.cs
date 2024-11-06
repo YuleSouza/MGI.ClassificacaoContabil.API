@@ -16,10 +16,11 @@ namespace API.Controllers
         private readonly IClassificacaoContabilService _contabilService;
         private readonly ILogger<ClassificacaoController> _logger;
 
-        public ClassificacaoController(IClassificacaoEsgService service, ILogger<ClassificacaoController> logger)
+        public ClassificacaoController(IClassificacaoEsgService service, ILogger<ClassificacaoController> logger, IClassificacaoContabilService contabilService)
         {
             _service = service;
             _logger = logger;
+            _contabilService = contabilService;
         }
 
         #region Contábil
