@@ -12,10 +12,11 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ClassificacaoController : ControllerBase
     {
-        private readonly IClassificacaoService _service;
+        private readonly IClassificacaoEsgService _service;
+        private readonly IClassificacaoContabilService _contabilService;
         private readonly ILogger<ClassificacaoController> _logger;
 
-        public ClassificacaoController(IClassificacaoService service, ILogger<ClassificacaoController> logger)
+        public ClassificacaoController(IClassificacaoEsgService service, ILogger<ClassificacaoController> logger)
         {
             _service = service;
             _logger = logger;
@@ -28,7 +29,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
-            var retorno = await _service.InserirClassificacaoContabil(classificacao);
+            var retorno = await _contabilService.InserirClassificacaoContabil(classificacao);
             if (!retorno.Sucesso) return BadRequest(retorno);            
             return Ok(retorno);
         }
@@ -39,7 +40,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
-            var retorno = await _service.AlterarClassificacaoContabil(classificacao);
+            var retorno = await _contabilService.AlterarClassificacaoContabil(classificacao);
             if (!retorno.Sucesso) return BadRequest(retorno);
             return Ok(retorno);
         }
@@ -50,7 +51,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
-            var retorno = await _service.ConsultarClassificacaoContabil();
+            var retorno = await _contabilService.ConsultarClassificacaoContabil();
             return Ok(retorno);
         }
 
@@ -60,7 +61,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacaoMgp()
         {
-            var retorno = await _service.ConsultarClassificacaoContabilMGP();
+            var retorno = await _contabilService.ConsultarClassificacaoContabilMGP();
             return Ok(retorno);
         }
 
@@ -70,7 +71,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao()
         {
-            var retorno = await _service.ConsultarClassificacaoContabil();
+            var retorno = await _contabilService.ConsultarClassificacaoContabil();
             return Ok(retorno);
         }
 
@@ -81,7 +82,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
         {
-            var retorno = await _service.InserirProjetoClassificacaoContabil(projeto);
+            var retorno = await _contabilService.InserirProjetoClassificacaoContabil(projeto);
             if (!retorno.Sucesso) BadRequest(retorno);            
             return Ok(retorno);
         }
@@ -92,7 +93,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
         {
-            var retorno = await _service.AlterarProjetoClassificacaoContabil(projeto);
+            var retorno = await _contabilService.AlterarProjetoClassificacaoContabil(projeto);
             if (!retorno.Sucesso) return BadRequest(retorno);
             return Ok(retorno);
         }
@@ -103,7 +104,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadoProjetosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
-            var retorno = await _service.ConsultarProjetoClassificacaoContabil(filtro);
+            var retorno = await _contabilService.ConsultarProjetoClassificacaoContabil(filtro);
             return Ok(retorno);
         }
 
@@ -113,7 +114,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosProjetoClassificacao()
         {
-            var retorno = await _service.ConsultarProjetoClassificacaoContabil();
+            var retorno = await _contabilService.ConsultarProjetoClassificacaoContabil();
             return Ok(retorno);
         }
 
@@ -122,7 +123,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosProjetoClassificacao([FromRoute] int idprojeto, int ano)
         {
-            var retorno = await _service.VerificarRegraExcessaoContabil(new FiltroClassificacaoContabil()
+            var retorno = await _contabilService.VerificarRegraExcessaoContabil(new FiltroClassificacaoContabil()
             {
                 Ano = ano,
                 IdProjeto = idprojeto,

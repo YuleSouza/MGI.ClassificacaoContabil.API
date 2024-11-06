@@ -1,6 +1,7 @@
 ﻿using Infra.Data;
 using Infra.Interface;
 using MGI.ClassificacaoContabil.Service.Helper;
+using MGI.ClassificacaoContabil.Service.Service.Classificacao;
 using Repository.Cenario;
 using Repository.Classificacao;
 using Repository.Empresa;
@@ -38,12 +39,13 @@ namespace API.Config
             //Services
             services.AddScoped<IEmpresaService, EmpresaService>();
             services.AddScoped<ICenarioService, CenarioService>();
-            services.AddScoped<IClassificacaoService, ClassificacaoService>();
+            services.AddScoped<IClassificacaoEsgService, ClassificacaoEsgService>();
             services.AddScoped<IParametrizacaoService, ParametrizacaoService>();
             services.AddScoped<IFiltroTelaService, FiltroTelaService>();
             services.AddScoped<IPainelClassificacaoService, PainelClassificacaoService>();
             services.AddScoped<IParametrizacaoCenarioService, ParametrizacaoCenarioService>();
             services.AddScoped<IParametrizacaoEsgGeralService, ParametrizacaoEsgGeralService>();
+            services.AddScoped<IClassificacaoContabilService, ClassificacaoContabilService>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();

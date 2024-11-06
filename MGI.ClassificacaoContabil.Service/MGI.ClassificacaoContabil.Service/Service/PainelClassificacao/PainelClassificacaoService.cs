@@ -26,7 +26,8 @@ namespace Service.PainelClassificacao
     {
         private readonly IPainelClassificacaoRepository _PainelClassificacaoRepository;
         private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
-        private IClassificacaoService _classificacaoEsgService;
+        private IClassificacaoEsgService _classificacaoEsgService;
+        private IClassificacaoContabilService _classificacaoContabilService;
         private ICenarioService _cenarioService;
         private readonly IParametrizacaoService _parametrizacaoService;
         private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
@@ -42,11 +43,12 @@ namespace Service.PainelClassificacao
         public PainelClassificacaoService(
             IPainelClassificacaoRepository PainelClassificacaoRepository, 
             IUnitOfWork unitOfWork,
-            IClassificacaoService classificacaoEsgService,
+            IClassificacaoEsgService classificacaoEsgService,
             IParametrizacaoService parametrizacaoService,
             ICenarioService cenarioService,
             IParametrizacaoCenarioService parametrizacaoCenarioService,
-            IParametrizacaoEsgGeralService parametrizacaoEsgGeralService)
+            IParametrizacaoEsgGeralService parametrizacaoEsgGeralService,
+            IClassificacaoContabilService classificacaoContabilService)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
             _unitOfWork = unitOfWork;
@@ -54,6 +56,7 @@ namespace Service.PainelClassificacao
             _parametrizacaoService = parametrizacaoService;
             _cenarioService = cenarioService;
             _parametrizacaoCenarioService = parametrizacaoCenarioService;
+            _classificacaoContabilService = classificacaoContabilService;
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
             tiposLancamento.Add(3, "Imobilizado");
@@ -239,7 +242,7 @@ namespace Service.PainelClassificacao
                 IdPrograma = filtro.IdPrograma,
                 IdProjeto = filtro.IdProjeto
             });
-            var classificacoesMgp = await _classificacaoEsgService.ConsultarClassificacaoContabilMGP();
+            var classificacoesMgp = await _classificacaoContabilService.ConsultarClassificacaoContabilMGP();
 
             PainelClassificacaoContabilDTO classificacaoContabil = new PainelClassificacaoContabilDTO();
             classificacaoContabil.Empresas = new List<EmpresaDTO>();
