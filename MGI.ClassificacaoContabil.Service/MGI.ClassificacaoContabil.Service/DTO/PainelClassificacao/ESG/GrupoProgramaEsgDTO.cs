@@ -1,7 +1,6 @@
-﻿using Service.DTO.Empresa;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
+namespace Service.DTO.PainelClassificacao
 {
     public class GrupoProgramaEsgDTO
     {

@@ -1,4 +1,4 @@
-﻿namespace MGI.ClassificacaoContabil.Service.DTO.DTOFiltros
+﻿namespace Service.DTO.Filtros
 {
     public class FiltroLancamentoFase
     {

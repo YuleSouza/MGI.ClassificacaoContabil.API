@@ -1,6 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 
-namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
+namespace Service.DTO.PainelClassificacao
 {
     public class RelatorioEsgExcelDTO
     {       

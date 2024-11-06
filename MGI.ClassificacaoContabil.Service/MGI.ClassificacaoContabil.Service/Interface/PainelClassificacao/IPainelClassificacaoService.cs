@@ -1,6 +1,4 @@
 ﻿using DTO.Payload;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Filtros;
 using Service.DTO.PainelClassificacao;
 

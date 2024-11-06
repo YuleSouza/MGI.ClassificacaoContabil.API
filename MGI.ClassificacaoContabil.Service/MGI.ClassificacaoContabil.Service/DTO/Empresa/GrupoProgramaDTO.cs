@@ -1,4 +1,4 @@
-﻿using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
+﻿using Service.DTO.PainelClassificacao;
 
 namespace Service.DTO.Empresa
 {

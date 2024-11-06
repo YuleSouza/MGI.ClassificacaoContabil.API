@@ -2,9 +2,6 @@
 using CsvHelper.Configuration;
 using DTO.Payload;
 using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.DTO.DTOFiltros;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Cenario;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;

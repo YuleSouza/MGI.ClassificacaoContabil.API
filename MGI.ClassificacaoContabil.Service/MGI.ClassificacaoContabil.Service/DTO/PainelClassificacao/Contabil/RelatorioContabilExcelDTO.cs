@@ -1,6 +1,6 @@
 ﻿using CsvHelper.Configuration.Attributes;
 
-namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil
+namespace Service.DTO.PainelClassificacao
 {
     public class RelatorioContabilExcelDTO
     {

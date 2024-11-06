@@ -1,8 +1,5 @@
 ﻿using Dapper;
 using Infra.Data;
-using MGI.ClassificacaoContabil.Service.DTO.DTOFiltros;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.Contabil;
-using MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;

@@ -1,6 +1,4 @@
-﻿using Service.DTO.Projeto;
-
-namespace MGI.ClassificacaoContabil.Service.DTO.PainelClassificacao.ESG
+﻿namespace Service.DTO.PainelClassificacao
 {
     public class ProgramaEsgDTO
     {
