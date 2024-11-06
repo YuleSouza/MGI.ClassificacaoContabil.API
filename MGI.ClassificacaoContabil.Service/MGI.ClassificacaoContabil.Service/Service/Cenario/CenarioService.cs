@@ -20,7 +20,7 @@ namespace Service.Cenario
         public async Task<PayloadDTO> InserirCenario(CenarioDTO cenario)
         {
             return await _transactionHelper.ExecuteInTransactionAsync(
-                async () => await _repository.AlterarCenario(cenario),
+                async () => await _repository.InserirCenario(cenario),
                 "Cenário criado com successo"
             );
         }

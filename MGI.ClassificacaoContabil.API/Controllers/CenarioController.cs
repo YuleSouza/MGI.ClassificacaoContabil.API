@@ -28,18 +28,8 @@ namespace API.Controllers
         public async Task<IActionResult> InserirDadosCenario([FromBody] CenarioDTO cenario)
         {
             var retorno = await _service.InserirCenario(cenario);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro inserir dados do cenário.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);            
+            return Ok(retorno);
         }
 
         [HttpPost]
