@@ -4,6 +4,7 @@ using Service.DTO.Classificacao;
 using Service.Interface.Classificacao;
 
 using Microsoft.AspNetCore.Mvc;
+using MGI.ClassificacaoContabil.API.ControllerAtributes;
 
 namespace API.Controllers
 {
@@ -23,6 +24,7 @@ namespace API.Controllers
         #region Contábil
         [HttpPost]
         [Route("v1/contabil/inserir")]
+        [ActionDescription("Inserir classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
@@ -33,6 +35,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/contabil/alterar")]
+        [ActionDescription("Alterar classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoContabilDTO classificacao)
         {
@@ -43,6 +46,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/contabil/consultar")]
+        [ActionDescription("Consultar classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
@@ -52,6 +56,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/contabil/consultar/mgp")]
+        [ActionDescription("Consultar classificação contabil MGP")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacaoMgp()
         {
@@ -61,6 +66,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/contabil/consultar")]
+        [ActionDescription("Consultar classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacao()
         {
@@ -71,6 +77,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/contabil/projeto/inserir")]
+        [ActionDescription("Inserir projeto classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
         {
@@ -81,6 +88,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/contabil/projeto/alterar")]
+        [ActionDescription("Alterar projeto classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosProjetoClassificacao([FromBody] ClassificacaoProjetoDTO projeto)
         {
@@ -91,6 +99,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/contabil/projeto/consultar")]
+        [ActionDescription("Consultar projeto classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadoProjetosClassificacao([FromBody] FiltroClassificacaoContabil filtro)
         {
@@ -100,6 +109,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/contabil/projeto/consultar")]
+        [ActionDescription("Consultar projeto classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosProjetoClassificacao()
         {
@@ -108,6 +118,7 @@ namespace API.Controllers
         }
 
         [HttpGet("v1/contabil/projeto/regra-excessao/{idprojeto}/ano/{ano}")]
+        [ActionDescription("Consultar projeto classificação contábil")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosProjetoClassificacao([FromRoute] int idprojeto, int ano)
         {
@@ -124,6 +135,7 @@ namespace API.Controllers
         #region ESG
         [HttpPost]
         [Route("v1/esg/inserir")]
+        [ActionDescription("Inserir classificação ESG")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosClassificacao([FromBody] ClassificacaoEsgDTO classificacao)
         {
@@ -134,6 +146,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/esg/alterar")]
+        [ActionDescription("Alterar classificação ESG")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosClassificacao([FromBody] ClassificacaoEsgDTO classificacao)
         {
@@ -144,6 +157,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/esg/consultar")]
+        [ActionDescription("Cosnultar classificação ESG")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacaoEsg([FromBody] ClassificacaoEsgFiltro filtro)
         {
@@ -153,6 +167,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/esg/consultar")]
+        [ActionDescription("Cosnultar classificação ESG")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosClassificacaoEsg()
         {

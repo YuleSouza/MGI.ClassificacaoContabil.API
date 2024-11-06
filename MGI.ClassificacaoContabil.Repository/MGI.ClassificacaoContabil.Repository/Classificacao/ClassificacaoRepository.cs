@@ -123,7 +123,7 @@ namespace Repository.Classificacao
             return resultado;
         }
 
-        public async Task SalvarParametrizacaoContabil(ClassificacaoContabilDTO classificacaoContabil)
+        public async Task SalvarClassificacaoContabil(ClassificacaoContabilDTO classificacaoContabil)
         {
             int novoId = 0;
 

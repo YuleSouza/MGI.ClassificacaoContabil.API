@@ -1,5 +1,6 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
+using MGI.ClassificacaoContabil.Service.Helper;
 using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
 using Service.Interface.Classificacao;
@@ -11,53 +12,34 @@ namespace Service.Classificacao
     {
         private IClassificacaoRepository _repository;
         private IUnitOfWork _unitOfWork;
+        private readonly ITransactionHelper _transactionHelper;
 
-        public ClassificacaoService(IClassificacaoRepository classificacaoRepository, IUnitOfWork unitOfWork)
+        public ClassificacaoService(IClassificacaoRepository classificacaoRepository, ITransactionHelper transactionHelper)
         {
             _repository = classificacaoRepository;
-            _unitOfWork = unitOfWork;
+            _transactionHelper = transactionHelper;
         }
 
         #region Contabil
         public async Task<PayloadDTO> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-
-                    bool ok = await _repository.InserirClassificacaoContabil(classificacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Classificação Contábil inserida com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir Classificação Contábil", false, ex.Message);
-                }
-            }
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.InserirClassificacaoContabil(classificacao),
+                "Classificação Contábil inserida com successo"
+            );
         }
         public async Task<PayloadDTO> AlterarClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
-                    var projetoExcluidos = projetos.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
+            var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
+            var projetoExcluidos = projetos.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => {
                     await _repository.DeletarProjetosClassificacaoContabil(projetoExcluidos.ToList());
-                    await _repository.SalvarParametrizacaoContabil(classificacao);                    
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Classificação Contábil alterada com successo", true);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração Classificação Contábil", false, ex.Message);
-                }
-            }
+                    await _repository.SalvarClassificacaoContabil(classificacao);
+                    return true;
+                },
+                "Classificação Contábil inserida com successo"
+            );            
         }
         public async Task<PayloadDTO> ConsultarClassificacaoContabil()
         {
@@ -77,39 +59,15 @@ namespace Service.Classificacao
         }       
         public async Task<PayloadDTO> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.InserirProjetoClassificacaoContabil(projeto);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Projeto Classificação Contábil inserido com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir Projeto Classificação Contábil", false, ex.Message);
-                }
-            }
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.InserirProjetoClassificacaoContabil(projeto)
+            , "Projeto Classificação Contábil inserido com successo");
         }
         public async Task<PayloadDTO> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.AlterarProjetoClassificacaoContabil(projeto);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Projeto Classificação Contábil alterada com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração Projeto Classificação Contábil", false, ex.Message);
-                }
-            }
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.AlterarProjetoClassificacaoContabil(projeto)
+            , "jeto Classificação Contábil alterado com successo");
         }
         public async Task<PayloadDTO> ConsultarProjetoClassificacaoContabil()
         {
@@ -132,39 +90,15 @@ namespace Service.Classificacao
         #region ESG
         public async Task<PayloadDTO> InserirClassificacaoEsg(ClassificacaoEsgDTO classificacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.InserirClassificacaoEsg(classificacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Classificação Contábil inserida com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro ao inserir Classificação Contábil", false, ex.Message);
-                }
-            }
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.InserirClassificacaoEsg(classificacao)
+            , "Classificação Esg inserida com successo");
         }
         public async Task<PayloadDTO> AlterarClassificacaoEsg(ClassificacaoEsgDTO classificacao)
         {
-            using (IUnitOfWork unitOfWork = _unitOfWork)
-            {
-                try
-                {
-                    unitOfWork.BeginTransaction();
-                    bool ok = await _repository.AlterarClassificacaoEsg(classificacao);
-                    unitOfWork.Commit();
-                    return new PayloadDTO("Classificação Contábil alterada com successo", ok, string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    unitOfWork.Rollback();
-                    return new PayloadDTO("Erro na alteração Classificação Contábil", false, ex.Message);
-                }
-            }
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => await _repository.AlterarClassificacaoEsg(classificacao)
+            , "Classificação Esg alterada com successo");
         }
         public async Task<PayloadDTO> ConsultarClassificacaoEsg()
         {

@@ -4,6 +4,7 @@ using Service.DTO.Filtros;
 using Service.Interface.Cenario;
 
 using Microsoft.AspNetCore.Mvc;
+using MGI.ClassificacaoContabil.API.ControllerAtributes;
 
 namespace API.Controllers
 {
@@ -22,6 +23,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/inserir")]
+        [ActionDescription("Inserir cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> InserirDadosCenario([FromBody] CenarioDTO cenario)
         {
@@ -42,6 +44,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/alterar")]
+        [ActionDescription("Alterar cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> AlterarDadosCenario([FromBody] CenarioDTO cenario)
         {
@@ -62,6 +65,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("v1/consultar")]
+        [ActionDescription("Consultar cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosCenario([FromBody] CenarioFiltro filtro)
         {
@@ -71,6 +75,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("v1/consultar")]
+        [ActionDescription("Consultar cenário")]
         [ProducesResponseType(typeof(PayloadDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarDadosCenario()
         {
