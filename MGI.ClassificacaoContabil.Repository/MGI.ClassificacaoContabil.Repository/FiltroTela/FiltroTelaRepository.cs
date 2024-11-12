@@ -202,5 +202,19 @@ namespace Repository.FiltroTela
                                             where 1 = 1");
             return resultado;
         }
+
+        public async Task<IEnumerable<CoordenadoriaDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro)
+        {
+            return await _session.Connection.QueryAsync<CoordenadoriaDTO>(
+                $@"SELECT DISTINCT s.gsucod IdCoordenadoria, ltrim(rtrim(s.gsunom)) Nome
+                        FROM servdesk.supervisao s
+                    WHERE s.gsusit = 'A'
+                        AND s.gcocod = nvl(:idGerencia, s.gcocod)
+                        ORDER BY 2, 1", new
+                {
+                    idEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
+                    idGerencia = filtro.IdGerencia
+                });
+        }
     }
 }

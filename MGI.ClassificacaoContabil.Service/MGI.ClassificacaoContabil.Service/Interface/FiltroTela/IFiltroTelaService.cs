@@ -15,5 +15,6 @@ namespace Service.Interface.FiltroTela
         Task<PayloadDTO> ClassificacaoContabil(); 
         Task<PayloadDTO> ClassificacaoEsg();
         Task<PayloadDTO> Cenario();
+        Task<PayloadDTO> ConsultarCoordenadoria(FiltroCoordenadoria filtro);
     }
 }

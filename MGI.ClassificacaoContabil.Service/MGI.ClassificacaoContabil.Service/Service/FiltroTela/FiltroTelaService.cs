@@ -67,5 +67,17 @@ namespace Service.FiltroTela
             var resultado = await _FiltroTelaRepository.Cenario();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
+
+        public async Task<PayloadDTO> ConsultarCoordenadoria(FiltroCoordenadoria filtro)
+        {
+            var coordenadoria = await _FiltroTelaRepository.ConsultarCoordenadoria(filtro);
+
+            var retorno = coordenadoria.Select(item => new
+            {
+                IdCoordenadoria = item.IdCoordenadoria.ToString(),
+                Nome = item.Nome
+            }).ToList();
+            return new PayloadDTO(string.Empty, true, string.Empty, retorno);
+        }
     }
 }

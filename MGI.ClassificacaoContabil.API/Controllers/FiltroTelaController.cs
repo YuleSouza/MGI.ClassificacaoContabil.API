@@ -1,7 +1,7 @@
 ﻿using Service.DTO.Filtros;
 using Service.Interface.FiltroTela;
-
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace API.Controllers
 {
@@ -105,6 +105,18 @@ namespace API.Controllers
         public async Task<IActionResult> ComboProjeto([FromBody] FiltroProjeto filtro)
         {
             var retorno = await _telaFiltrosService.ProjetoClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Coordenadoria
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost("v1/combocoordenadoriajustificavariacao")]
+        public async Task<IActionResult> ComboCoordenadoria([FromBody] FiltroCoordenadoria filtro)
+        {
+            var retorno = await _telaFiltrosService.ConsultarCoordenadoria(filtro);
             return Ok(retorno);
         }
 

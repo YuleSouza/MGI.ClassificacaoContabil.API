@@ -7,22 +7,26 @@ using Repository.Classificacao;
 using Repository.Empresa;
 using Repository.FiltroTela;
 using Repository.PainelClassificacao;
+using Repository.PainelEsg;
 using Repository.Parametrizacao;
 using Service.Cenario;
 using Service.Classificacao;
 using Service.Empresa;
+using Service.Esg;
 using Service.FiltroTela;
 using Service.Interface.Cenario;
 using Service.Interface.Classificacao;
 using Service.Interface.Empresa;
 using Service.Interface.FiltroTela;
 using Service.Interface.PainelClassificacao;
+using Service.Interface.PainelEsg;
 using Service.Interface.Parametrizacao;
 using Service.PainelClassificacao;
 using Service.Parametrizacao;
 using Service.Repository.Cenario;
 using Service.Repository.Classificacao;
 using Service.Repository.Empresa;
+using Service.Repository.Esg;
 using Service.Repository.FiltroTela;
 using Service.Repository.PainelClassificacao;
 using Service.Repository.Parametrizacao;
@@ -46,6 +50,7 @@ namespace API.Config
             services.AddScoped<IParametrizacaoCenarioService, ParametrizacaoCenarioService>();
             services.AddScoped<IParametrizacaoEsgGeralService, ParametrizacaoEsgGeralService>();
             services.AddScoped<IClassificacaoContabilService, ClassificacaoContabilService>();
+            services.AddScoped<IPainelEsgService, PainelEsgService>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();
@@ -54,6 +59,7 @@ namespace API.Config
             services.AddScoped<IParametrizacaoRepository, ParametrizacaoRepository>();
             services.AddScoped<IFiltroTelaRepository, FiltroTelaRepository>();
             services.AddScoped<IPainelClassificacaoRepository, PainelClassificacaoRepository>();
+            services.AddScoped<IPainelEsgRepository, PainelEsgRepository>();
 
             services.AddScoped<ITransactionHelper, TransactionHelper>(); 
 
