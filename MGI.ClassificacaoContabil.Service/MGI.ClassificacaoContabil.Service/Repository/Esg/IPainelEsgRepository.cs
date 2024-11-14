@@ -6,5 +6,6 @@ namespace Service.Repository.Esg
     public interface IPainelEsgRepository
     {
         Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro);
+        Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
     }
 }

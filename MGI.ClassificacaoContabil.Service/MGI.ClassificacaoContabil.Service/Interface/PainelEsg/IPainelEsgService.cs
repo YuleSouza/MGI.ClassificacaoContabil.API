@@ -6,5 +6,6 @@ namespace Service.Interface.PainelEsg
     public interface IPainelEsgService
     {
         Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro);
+        Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
     }
 }

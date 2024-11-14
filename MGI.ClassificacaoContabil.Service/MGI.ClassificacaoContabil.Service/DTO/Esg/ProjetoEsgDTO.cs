@@ -4,6 +4,7 @@
     {
         public int IdProjeto { get; set; }
         public string NomeProjeto { get; set; }
+        public int IdEmpresa { get; set; }
         public string NomeEmpresa { get; set; }
         public string IdGestor {  get; set; }
         public decimal TotalOrcado { get; set; }

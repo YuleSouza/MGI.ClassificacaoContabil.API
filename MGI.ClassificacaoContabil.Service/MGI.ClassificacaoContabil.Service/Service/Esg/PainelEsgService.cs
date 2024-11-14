@@ -12,6 +12,12 @@ namespace Service.Esg
         {
             _painelEsgRepository = painelEsgRepository;
         }
+
+        public Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {            
             return await _painelEsgRepository.ConsultarProjetosEsg(filtro);

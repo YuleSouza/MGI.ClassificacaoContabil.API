@@ -15,6 +15,12 @@ namespace Repository.PainelEsg
         {
             _session = session;
         }
+
+        public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
+        {
+            return await _session.Connection.QueryAsync< CLassifInvestimentoDTO>(@$"select pgmtipcod as Id, pgmtipnom from PGMTIP");
+        }
+
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
             StringBuilder parametros = new StringBuilder();
@@ -24,29 +30,29 @@ namespace Repository.PainelEsg
             }
             if (!string.IsNullOrEmpty(filtro.IdGrupoPrograma))
             {
-                parametros.Append(" AND sub.IdGrupoPrograma = :idgrupoprogrma ");
+                parametros.Append(" and sub.IdGrupoPrograma = :idgrupoprogrma ");
             }
             if (!string.IsNullOrEmpty(filtro.IdGerencia))
             {
-                parametros.Append(" AND sub.IdGerencia = :idgerencia ");
+                parametros.Append(" and sub.IdGerencia = :idgerencia ");
             }
             if (!string.IsNullOrEmpty(filtro.IdGestor))
             {
-                parametros.Append(" AND TRIM(sub.IdGestor) = :idgestor ");
+                parametros.Append(" and TRIM(sub.IdGestor) = :idgestor ");
             }
             if (!string.IsNullOrEmpty(filtro.IdDiretoria))
             {
-                parametros.Append(" AND TRIM(sub.IdDiretoria) = :iddiretoria ");
+                parametros.Append(" and TRIM(sub.IdDiretoria) = :iddiretoria ");
             }
             if (!string.IsNullOrEmpty(filtro.StatusProjeto))
             {
                 // TO-DO - definir regra
-                parametros.Append(" AND 2 = 2");
+                parametros.Append(" and 2 = 2");
             }
             if (!string.IsNullOrEmpty(filtro.StatusAprovacao))
             {
                 // TO-DO - definir regra
-                parametros.Append(" AND 2 = 2");
+                parametros.Append(" and 2 = 2");
             }
             if (!string.IsNullOrEmpty(filtro.ClassificacaoInvestimento))
             {
@@ -56,6 +62,7 @@ namespace Repository.PainelEsg
             return await _session.Connection.QueryAsync<ProjetoEsgDTO>($@"
                 select  sub.IdProjeto
                         , sub.Nomeprojeto
+                        , sub.IdEmpresa
                         , sub.NomeEmpresa
                         , sub.IdGestor
                         , sum(sub.ValorReplan) as TotalReplan
@@ -66,11 +73,12 @@ namespace Repository.PainelEsg
                             when :TipoValorProjeto = '2' then sum(sub.ValorReplan)
                             when :TipoValorProjeto = 'P' then sum(sub.ValorPrevisto) end,0) as ValorProjeto 
                 from (
-                select p.prjcod as IdProjeto
-                        , p.prjnom as NomeProjeto
-                        , e.empnomfan as NomeEmpresa        
-                        , LTRIM(RTRIM(U.USUNOM)) as IdGestor
-                        , '' as Patrocinador
+                select p.prjcod                                            as IdProjeto
+                        , trim(p.prjnom)                                   as NomeProjeto
+                        , e.empcod                                         as IdEmpresa
+                        , trim(e.empnomfan)                                as NomeEmpresa        
+                        , LTRIM(RTRIM(U.USUNOM))                           as IdGestor
+                        , ''                                               as Patrocinador
                         , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                         , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
                         , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
@@ -91,6 +99,8 @@ namespace Repository.PainelEsg
                 ) sub
                 where 1 = 1 {parametros.ToString()}
                group by  sub.IdProjeto
+                        , sub.IdEmpresa
+                        , sub.IdProjeto
                         , sub.nomeprojeto
                         , sub.NomeEmpresa
                         , sub.IdGestor
