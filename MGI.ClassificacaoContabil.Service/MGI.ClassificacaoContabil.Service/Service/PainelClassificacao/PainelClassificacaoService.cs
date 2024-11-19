@@ -245,7 +245,7 @@ namespace Service.PainelClassificacao
             predicateFasePrevisto_Realizado = p => (p.DtLancamentoProjeto.Year < DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Realizado);
 
             #endregion
-            var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
+            IEnumerable<ClassificacaoContabilItemDTO> lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
             IEnumerable<LancamentoFaseContabilDTO> lancamentosFase = Enumerable.Empty<LancamentoFaseContabilDTO>();
             lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
             {
@@ -278,6 +278,7 @@ namespace Service.PainelClassificacao
                                           ValorTendencia = grp.Where(predicateTendencia).Sum(p => p.ValorTendencia),
                                           ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado),
                                           IdClassifContabil = grp.Key.IdClassifContabil,
+                                          ValorFormatoAcompanhamento = 0m,
                                           NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                       },
                                       #endregion  
@@ -296,7 +297,8 @@ namespace Service.PainelClassificacao
                                                                 ValorTendencia = grp.Where(predicateTendencia).Sum(p => p.ValorTendencia),
                                                                 ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado),                                                                
                                                                 IdClassifContabil = grp.Key.IdClassifContabil,
-                                                                NomeTipoClassificacao = grp.Key.NomeClassifContabil
+                                                                NomeTipoClassificacao = grp.Key.NomeClassifContabil,
+                                                                ValorFormatoAcompanhamento = 0m,
                                                           },
                                                           Programas = from gruPro in lancamentos
                                                                      where gruPro.IdEmpresa == grp.Key.IdEmpresa
@@ -314,7 +316,8 @@ namespace Service.PainelClassificacao
                                                                                 ValorCiclo = grp.AsQueryable().Where(predicateCiclo).Sum(p => p.ValorCiclo),
                                                                                 ValorTendencia = grp.Where(predicateTendencia).Sum(p => p.ValorTendencia),
                                                                                 ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGruPro, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado),
-                                                                                NomeTipoClassificacao = grp.Key.NomeClassifContabil
+                                                                                NomeTipoClassificacao = grp.Key.NomeClassifContabil,
+                                                                                ValorFormatoAcompanhamento = 0m,
                                                                          },                                                                         
                                                                          Projetos = from prj in lancamentos
                                                                                     where prj.IdEmpresa == grpGruPro.Key.IdEmpresa
@@ -333,7 +336,8 @@ namespace Service.PainelClassificacao
                                                                                                 ValorCiclo = grp.AsQueryable().Where(predicateCiclo).Sum(p => p.ValorCiclo),
                                                                                                 ValorTendencia = grp.Where(predicateTendencia).Sum(p => p.ValorTendencia),
                                                                                                 ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado),
-                                                                                                NomeTipoClassificacao = grp.Key.NomeClassifContabil
+                                                                                                NomeTipoClassificacao = grp.Key.NomeClassifContabil,
+                                                                                                ValorFormatoAcompanhamento = 0m,
                                                                                         },
                                                                                         Fase = from fse in lancamentosFase
                                                                                                          where fse.IdProjeto == grpPrj.Key.IdProjeto
@@ -358,6 +362,7 @@ namespace Service.PainelClassificacao
                                                                                                                                     + grpFse.AsQueryable().Where(predicateFasePrevisto_Realizado).Sum(p => p.ValorPrevisto),
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil,
                                                                                                                     ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,predicateFasePrevisto, predicateFasePrevisto_Realizado),
+                                                                                                                    ValorFormatoAcompanhamento = 0m,
                                                                                                             },
                                                                                                          }
                                                                                     }
@@ -381,6 +386,7 @@ namespace Service.PainelClassificacao
                                                 IdEmpresa = grpLan.Key.IdEmpresa,
                                                 TotalEmpresa = new LancamentoContabilTotalDTO()
                                                 {
+                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpLan, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado),
                                                     TotalOrcado = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorOrcado),
                                                     TotalReplan = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorReplan),
                                                     TotalTendencia = lancamentos.Where(p => p.IdEmpresa == grpLan.Key.IdEmpresa).Sum(p => p.ValorTendencia),
