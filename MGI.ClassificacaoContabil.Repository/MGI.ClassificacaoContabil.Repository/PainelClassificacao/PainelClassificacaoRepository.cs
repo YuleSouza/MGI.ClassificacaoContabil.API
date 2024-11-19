@@ -268,6 +268,7 @@ namespace Repository.PainelClassificacao
                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
                                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                       , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                      , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
                                       , orc.prjorctip as TipoLancamento
                                       , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                       , p.prjges as IdGestor      
@@ -279,7 +280,11 @@ namespace Repository.PainelClassificacao
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
                                         inner join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
-                                        inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','2','1') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
+                                        inner join prjorc orc on (p.prjcod = orc.prjcod 
+                                                                    and orc.prjorcfse > 0 
+                                                                    and orc.prjorcver = 0 
+                                                                    and orc.prjorctip in ('O','J','R','2','1','P') 
+                                                                    and orc.prjorcmes > 0 and orc.prjorcano > 0)
                                         left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
                                         inner join clacon cl on (fse.ccocod = cl.ccocod)
                                  where p.prjsit = 'A'
@@ -324,14 +329,16 @@ namespace Repository.PainelClassificacao
             #endregion
             return await _session.Connection.QueryAsync<LancamentoFaseContabilDTO>($@"
                                 select e.empcod as IdEmpresa
-                                       , gru.pgmgrucod as IdGrupoPrograma
-                                       , pro.pgmcod as IdPrograma
-                                       , p.prjcod as IdProjeto
+                                       , gru.pgmgrucod                                    as IdGrupoPrograma
+                                       , pro.pgmcod                                       as IdPrograma
+                                       , p.prjcod                                         as IdProjeto
                                        , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                                        , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
                                        , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
                                        , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                        , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                       , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
+                                       , to_char(orc.prjorctip)                            as TipoLancamentoProjeto
                                        , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                        , p.prjges as IdGestor
                                        , nvl(fse.prjfsenom,'') as NomeFase

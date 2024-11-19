@@ -10,6 +10,7 @@
         public decimal ValorCiclo { get; set; }
         public decimal ValorTendencia { get; set; }
         public decimal ValorReplan {  get; set; }
+        public decimal ValorPrevisto {  get; set; }
         public decimal ValorTotalRealizado
         {
             get 
@@ -65,5 +66,7 @@
 
         public string DescricaoLancSap { get; set; }
         public object NomeTipoClassificacao { get; internal set; }
+        public decimal ValorBaseOrcamento { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
     }
 }

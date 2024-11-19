@@ -1,4 +1,6 @@
-﻿namespace Service.DTO.PainelClassificacao
+﻿using Service.Enum;
+
+namespace Service.DTO.PainelClassificacao
 {
     public class RelatorioContabilDTO
     {

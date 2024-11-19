@@ -2,6 +2,8 @@
 using Service.Interface.PainelClassificacao;
 
 using Microsoft.AspNetCore.Mvc;
+using MGI.ClassificacaoContabil.API.Model;
+using Service.Enum;
 
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
@@ -157,9 +159,23 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         #endregion
 
         [HttpPost("v1/consultar")]
-        public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IActionResult> Consultar(PainelClassificacaoContabilModel filtro)
         {
-            var retorno = await _service.ConsultarClassificacaoContabil(filtro);
+            var retorno = await _service.ConsultarClassificacaoContabil(new FiltroPainelClassificacaoContabil()
+            {
+                IdClassificacaoContabil = filtro.IdClassificacaoContabil,
+                ClassificacaoContabil = filtro.ClassificacaoContabil,
+                FormatAcompanhamento = filtro.FormatAcompanhamento,
+                TipoAcumuladoOuAnual = filtro.TipoAcumuladoOuAnual,
+                IdGrupoPrograma = filtro.IdGrupoPrograma,
+                BaseOrcamento = filtro.BaseOrcamento,
+                IdPrograma = filtro.IdPrograma,
+                DataInicio = filtro.DataInicio,
+                IdEmpresa = filtro.IdEmpresa,
+                IdProjeto = filtro.IdProjeto,
+                IdGestor = filtro.IdGestor,
+                DataFim = filtro.DataFim,
+            });
             return Ok(retorno);
         }
 

@@ -56,5 +56,6 @@
         public int IdProjeto { get; set; }
         public int IdSeqFase { get; set; }
         public decimal TotalPrevisto { get; set; }
+        public decimal TotalTendencia { get; set; }
     }
 }
