@@ -5,24 +5,13 @@
         public int IdTipoClassificacao {  get; set; }
         public int IdClassifContabil { get; set; }
         public int IdClassificacaoEsg { get; set; }
-	    public decimal OrcadoAcumulado { get; set; }
-	    public decimal RealizadoAcumulado { get; set; }
-        public decimal ValorCiclo { get; set; }
-        public decimal ValorTendencia { get; set; }
-        public decimal ValorReplan {  get; set; }
-        public decimal ValorPrevisto {  get; set; }
-        public decimal ValorTotalRealizado
-        {
-            get 
-            { 
-                return RealizadoAcumulado + ValorCiclo + ValorTendencia;
-            }
-        }
-	    public decimal Variacao 
+        public decimal ValorBaseOrcamento { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
+        public decimal Variacao 
         { 
             get
             {
-                return OrcadoAcumulado - ValorTotalRealizado;
+                return ValorBaseOrcamento - ValorFormatoAcompanhamento;
             } 
             set
             {
@@ -33,7 +22,7 @@
         {
             get
             {
-                return OrcadoAcumulado == 0 ? 0 : Math.Round(Variacao / OrcadoAcumulado * 100, 2);
+                return ValorBaseOrcamento == 0 ? 0 : Math.Round(Variacao / ValorBaseOrcamento * 100, 2);
             }
             set
             {
@@ -41,32 +30,8 @@
             }
         }
 
-        public decimal VariacaoReplan
-        {
-            get
-            {
-                return OrcadoAcumulado - ValorTotalRealizado;
-            }
-            set
-            {
-                VariacaoReplan = value;
-            }
-        }
-        public decimal PercentualVariacaoReplan
-        {
-            get
-            {
-                return OrcadoAcumulado == 0 ? 0 : Math.Round(VariacaoReplan / OrcadoAcumulado * 100, 2);
-            }
-            set
-            {
-                PercentualVariacaoReplan = value;
-            }
-        }
-
         public string DescricaoLancSap { get; set; }
         public object NomeTipoClassificacao { get; internal set; }
-        public decimal ValorBaseOrcamento { get; set; }
-        public decimal ValorFormatoAcompanhamento { get; set; }
+        
     }
 }
