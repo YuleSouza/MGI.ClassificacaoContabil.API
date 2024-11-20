@@ -58,5 +58,6 @@
         public decimal TotalPrevisto { get; set; }
         public decimal TotalTendencia { get; set; }
         public decimal TotalBaseOrcamento { get; set; }
+        public decimal TotalFormatoAcompanhamento { get; internal set; }
     }
 }
