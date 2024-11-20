@@ -256,13 +256,13 @@ namespace Repository.PainelClassificacao
             return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"
                                 select * 
                                   from (select e.empcod as IdEmpresa
-                                      , e.empnom as NomeEmpresa
+                                      , trim(e.empnom) as NomeEmpresa
                                       , gru.pgmgrucod as IdGrupoPrograma
                                       , gru.pgmgrunom as GrupoDePrograma
                                       , pro.pgmcod as IdPrograma
                                       , pro.pgmnom as Programa
                                       , p.prjcod as IdProjeto
-                                      , p.prjnom as NomeProjeto      
+                                      , trim(p.prjnom) as NomeProjeto      
                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                                       , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
