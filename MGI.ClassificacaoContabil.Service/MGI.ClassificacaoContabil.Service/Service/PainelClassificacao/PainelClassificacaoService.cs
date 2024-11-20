@@ -155,6 +155,8 @@ namespace Service.PainelClassificacao
             
             Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto_Realizado = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
 
             Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoRealizado = _ => true;
             Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoPrevisto = _ => true;
@@ -227,17 +229,20 @@ namespace Service.PainelClassificacao
 
             predicateFasePrevisto = p => p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Previsto;
             predicateFasePrevisto_Realizado = p => (p.DtLancamentoProjeto.Year < DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Realizado);
+            predicateFaseReplan = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Replan);
+            predicateFaseOrcado = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Orcado);
 
             #endregion
             IEnumerable<ClassificacaoContabilItemDTO> lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
-            IEnumerable<LancamentoFaseContabilDTO> lancamentosFase = Enumerable.Empty<LancamentoFaseContabilDTO>();
-            lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
+            IEnumerable<LancamentoFaseContabilDTO> lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
             {
                 IdEmpresa = filtro.IdEmpresa,
                 IdGestor = filtro.IdGestor,
                 IdGrupoPrograma = filtro.IdGrupoPrograma,
                 IdPrograma = filtro.IdPrograma,
-                IdProjeto = filtro.IdProjeto
+                IdProjeto = filtro.IdProjeto,
+                DataInicio = filtro.DataInicio,
+                DataFim = filtro.DataFim
             });
             var classificacoesMgp = await _classificacaoContabilService.ConsultarClassificacaoContabilMGP();
 
@@ -326,7 +331,7 @@ namespace Service.PainelClassificacao
                                                                                                              Lancamentos = new LancamentoContabilDTO()
                                                                                                              {
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil,
-                                                                                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,predicateFasePrevisto, predicateFasePrevisto_Realizado),
+                                                                                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,predicateFasePrevisto, predicateFasePrevisto_Realizado, predicateFaseReplan, predicateFaseOrcado),
                                                                                                                     ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpFse, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcompFase_realizado, predicateFormatoAcompFase_tendencia, predicateFormatoAcompFase_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                                                             },
                                                                                                          }
@@ -437,20 +442,27 @@ namespace Service.PainelClassificacao
         private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoFaseContabilDTO> lancamentos
             , string tipoOrcamento
             , Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto
-            , Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado)
+            , Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado
+            , Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan
+            , Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado)
         {
+            decimal valor = 0;
             switch (tipoOrcamento)
             {
                 case ETipoOrcamento.Previsto:
-                    return lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorPrevisto) +
+                    valor = lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorPrevisto) +
                            lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
+                    break;
                 case ETipoOrcamento.Ciclo:
-                    return lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorReplan) +
+                    valor = lancamentos.Where(predicateFaseReplan).Sum(p => p.ValorReplan) +
                            lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
+                    break;
                 default:
-                    return lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorOrcado) +
+                    valor = lancamentos.Where(predicateFaseOrcado).Sum(p => p.ValorOrcado) +
                            lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
+                    break;
             }
+            return valor;
         }
 
         private decimal CalcularValorFormaAcompanhamento(IGrouping<object, ClassificacaoContabilItemDTO> lancamentos

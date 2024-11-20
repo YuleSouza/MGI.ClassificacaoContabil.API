@@ -4,7 +4,6 @@
     {
         public int IdTipoClassificacao {  get; set; }
         public int IdClassifContabil { get; set; }
-        public int IdClassificacaoEsg { get; set; }
         public decimal ValorBaseOrcamento { get; set; }
         public decimal ValorFormatoAcompanhamento { get; set; }
         public decimal Variacao 

@@ -311,29 +311,32 @@ namespace Repository.PainelClassificacao
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
+            parametros.AppendLine(" and sub.DtLancamentoProjeto between :dataInicio and :dataFim");
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
-                parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
+                parametros.AppendLine(" and sub.IdGrupoPrograma = :idGrupoPrograma ");
             }
             if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
             {
-                parametros.AppendLine(" and pro.pgmcod = :idPrograma ");
+                parametros.AppendLine(" and sub.IdPrograma = :idPrograma ");
             }
             if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
             {
-                parametros.AppendLine(" and p.prjcod = :idProjeto");
+                parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
             if (!string.IsNullOrEmpty(filtro.IdGestor) && filtro.IdGestor != "0")
             {
-                parametros.AppendLine(" and p.prjges = :idGestor");
+                parametros.AppendLine(" and sub.IdGestor = :idGestor");
             }
             if (filtro.IdEmpresa >= 0)
             {
-                parametros.AppendLine(" and e.empcod = :idEmpresa");
+                parametros.AppendLine(" and sub.IdEmpresa = :idEmpresa");
             }
             #endregion
             return await _session.Connection.QueryAsync<LancamentoFaseContabilDTO>($@"
-                                select e.empcod as IdEmpresa
+                                select sub.* 
+                                  from (
+                                select e.empcod                                           as IdEmpresa
                                        , gru.pgmgrucod                                    as IdGrupoPrograma
                                        , pro.pgmcod                                       as IdPrograma
                                        , p.prjcod                                         as IdProjeto
@@ -343,7 +346,7 @@ namespace Repository.PainelClassificacao
                                        , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                        , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
                                        , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
-                                       , to_char(orc.prjorctip)                            as TipoLancamentoProjeto
+                                       , to_char(orc.prjorctip)                            as TipoLancamento
                                        , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                        , p.prjges as IdGestor
                                        , nvl(fse.prjfsenom,'') as NomeFase
@@ -356,9 +359,9 @@ namespace Repository.PainelClassificacao
                                         inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','1','2','P') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
                                         left join prjfse fse on (fse.prjcod = orc.prjcod and fse.prjfseseq = orc.prjorcfse)
                                  where p.prjsit = 'A'
-                                   and orc.prjorcano > 2016
-                                       {parametros}
-                                 order by 1, fse.prjfseseq
+                                   and orc.prjorcano > 2016 ) sub
+                                   where 1 = 1    {parametros}
+                                 order by 1, sub.SeqFase
                                     ",
                 new
                 {
@@ -367,6 +370,8 @@ namespace Repository.PainelClassificacao
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor)  ? filtro.IdGestor : "0",
+                    dataInicio = filtro.DataInicio.AddYears(-2),
+                    dataFim = filtro.DataInicio.AddYears(2),
                 });
 
         }
