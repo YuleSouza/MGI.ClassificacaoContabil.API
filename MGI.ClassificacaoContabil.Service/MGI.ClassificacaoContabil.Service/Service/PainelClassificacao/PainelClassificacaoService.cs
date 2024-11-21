@@ -1,10 +1,8 @@
 ﻿using DTO.Payload;
-using Infra.Interface;
 using Service.DTO.Classificacao;
 using Service.DTO.Empresa;
 using Service.DTO.Filtros;
 using Service.DTO.PainelClassificacao;
-using Service.DTO.Parametrizacao;
 using Service.DTO.Projeto;
 using Service.Enum;
 using Service.Helper;
@@ -21,26 +19,21 @@ namespace Service.PainelClassificacao
         private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
         private IClassificacaoContabilService _classificacaoContabilService;
         public readonly IParametrizacaoCenarioService _parametrizacaoCenarioService;
-        public readonly IParametrizacaoEsgGeralService _parametrizacaoEsgGeralService;
-        private IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
+        public readonly IParametrizacaoEsgGeralService _parametrizacaoEsgGeralService;        
         private Dictionary<char, string> _tiposValores;
         private DateTime mesAnterior;
         private DateTime finalAno;
         private DateTime anoPosterior_inicio;
         private DateTime anoPosterior_fim;
-        private DateTime mesAtual;
-
-        private IUnitOfWork _unitOfWork;
+        private DateTime mesAtual;       
 
         public PainelClassificacaoService(
-            IPainelClassificacaoRepository PainelClassificacaoRepository, 
-            IUnitOfWork unitOfWork,
+            IPainelClassificacaoRepository PainelClassificacaoRepository,
             IParametrizacaoCenarioService parametrizacaoCenarioService,
             IParametrizacaoEsgGeralService parametrizacaoEsgGeralService,
             IClassificacaoContabilService classificacaoContabilService)
         {
             _PainelClassificacaoRepository = PainelClassificacaoRepository;
-            _unitOfWork = unitOfWork;                        
             _parametrizacaoCenarioService = parametrizacaoCenarioService;
             _classificacaoContabilService = classificacaoContabilService;
             _parametrizacaoEsgGeralService = parametrizacaoEsgGeralService;

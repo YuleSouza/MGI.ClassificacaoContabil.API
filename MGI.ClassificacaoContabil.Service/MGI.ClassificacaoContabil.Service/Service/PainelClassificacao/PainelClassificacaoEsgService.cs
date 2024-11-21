@@ -44,6 +44,16 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
             _parametrizacaoService = parametrizacaoService;
             _parametrizacaoCenarioService = parametrizacaoCenarioService;
             _parametrizacaoEsgGeralService = parametrizacaoEsgGeralService;
+            SetDatas();
+        }
+
+        private void SetDatas()
+        {
+            mesAnterior = DateTime.Now.AddMonths(-1);
+            finalAno = new DateTime(DateTime.Now.Year, 12, 31);
+            anoPosterior_inicio = new DateTime(DateTime.Now.Year + 1, 1, 1);
+            anoPosterior_fim = new DateTime(DateTime.Now.Year + 1, 12, 31);
+            mesAtual = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         }
         public async Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro)
         {
