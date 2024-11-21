@@ -438,11 +438,7 @@ namespace Repository.PainelClassificacao
             if (!string.IsNullOrEmpty(filtro.IdGestor) && filtro.IdGestor != "0")
             {
                 parametros.AppendLine(" and a.idGestor = :idGestor");
-            }
-            if (filtro.IdClassificacaoEsg > 0)
-            {
-                parametros.AppendLine(" and a.idClassificacaoEsg = :idClassificacaoEsg");
-            }
+            }           
             #endregion
             return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
                 new {

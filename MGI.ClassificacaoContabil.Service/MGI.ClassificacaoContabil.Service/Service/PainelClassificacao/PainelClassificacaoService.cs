@@ -429,7 +429,7 @@ namespace Service.PainelClassificacao
                 case ETipoOrcamento.Previsto:
                     return lancamentos.Where(predicatePrevisto).Sum(p => p.ValorPrevisto) +
                            lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
-                case ETipoOrcamento.Ciclo:
+                case ETipoOrcamento.Replan:
                     return lancamentos.Where(predicateReplan).Sum(p => p.ValorReplan) +
                            lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
                 default:
@@ -452,7 +452,7 @@ namespace Service.PainelClassificacao
                     valor = lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorPrevisto) +
                            lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
                     break;
-                case ETipoOrcamento.Ciclo:
+                case ETipoOrcamento.Replan:
                     valor = lancamentos.Where(predicateFaseReplan).Sum(p => p.ValorReplan) +
                            lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
                     break;
@@ -476,7 +476,7 @@ namespace Service.PainelClassificacao
                 case ETipoOrcamento.Previsto:
                     return lancamentos.Where(predicatePrevisto).Sum(p => p.ValorPrevisto) +
                            lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
-                case ETipoOrcamento.Ciclo:
+                case ETipoOrcamento.Replan:
                     return lancamentos.Where(predicateReplan).Sum(p => p.ValorReplan) +
                            lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
                 default:
