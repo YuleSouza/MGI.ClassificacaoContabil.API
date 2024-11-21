@@ -16,7 +16,6 @@
         public string? IdGestor { get; set; }
         public int? IdProjeto { get; set; }
         public int? SeqFase { get; set; }
-        public int IdClassificacaoContabil { get; set; }
         public DateTime DataInicio { get; set; }
         public DateTime DataFim { get; set; }
         public DateTime? DataRealizadoInicio { get; set; }
@@ -29,7 +28,7 @@
         public DateTime? DataOrcadoFim { get; set; }
         public DateTime? DataReplanInicio { get; set; }
         public DateTime? DataReplanFim { get; set; }
-        public char FormatAcompanhamento { get; set; }
-        public char BaseOrcamento { get; set; }
+        public string FormatAcompanhamento { get; set; }
+        public string BaseOrcamento { get; set; }
     }
 }

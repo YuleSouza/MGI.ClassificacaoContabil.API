@@ -16,6 +16,7 @@
         public decimal ValorTendencia { get; set; }
         public int IdTipoClassificacao { get; set; }
         public decimal ValorRealizadoSap { get; set; }
+        public decimal ValorPrevisto { get; set; }
         public int IdClassificacaoEsg { get; set; }
         public string IdGestor { get; set; }
         public string NomeGestor { get; set; }
@@ -26,5 +27,6 @@
         public int SeqFase { get; set; }
         public string NomeClassificacaoEsg { get; set; }
         public DateTime DtLancamentoProjeto { get; set; }
+        public string TipoLancamento {  get; set; }
     }
 }

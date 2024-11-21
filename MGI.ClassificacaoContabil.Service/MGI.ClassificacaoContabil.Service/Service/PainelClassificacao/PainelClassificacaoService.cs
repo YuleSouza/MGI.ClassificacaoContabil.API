@@ -16,7 +16,6 @@ using Service.Interface.PainelClassificacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.PainelClassificacao;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 
 namespace Service.PainelClassificacao
@@ -29,13 +28,11 @@ namespace Service.PainelClassificacao
         private IClassificacaoContabilService _classificacaoContabilService;
         private ICenarioService _cenarioService;
         private readonly IParametrizacaoService _parametrizacaoService;
-        private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
-        private IEnumerable<ParametrizacaoClassificacaoGeralDTO> _parametrizacaoGrupoDTOs;
-        public IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
         public readonly IParametrizacaoCenarioService _parametrizacaoCenarioService;
         public readonly IParametrizacaoEsgGeralService _parametrizacaoEsgGeralService;
-        public const int VALOR_ACUMULADO = 0;
-        public const int VALOR_ANUAL = 1;
+        private IEnumerable<ParametrizacaoCenarioDTO> _parametrizacaoCenarioDTOs;
+        private IEnumerable<ParametrizacaoClassificacaoGeralDTO> _parametrizacaoGrupoDTOs;
+        private IEnumerable<ParametrizacaoClassificacaoEsgFiltroDTO> _parametrizacaoExecoes;
         private Dictionary<char, string> _tiposValores;
         private DateTime mesAnterior;
         private DateTime finalAno;
@@ -44,6 +41,7 @@ namespace Service.PainelClassificacao
         private DateTime mesAtual;
 
         private IUnitOfWork _unitOfWork;
+
         public PainelClassificacaoService(
             IPainelClassificacaoRepository PainelClassificacaoRepository, 
             IUnitOfWork unitOfWork,
@@ -61,6 +59,7 @@ namespace Service.PainelClassificacao
             _cenarioService = cenarioService;
             _parametrizacaoCenarioService = parametrizacaoCenarioService;
             _classificacaoContabilService = classificacaoContabilService;
+            _parametrizacaoEsgGeralService = parametrizacaoEsgGeralService;
             tiposLancamento.Add(1, "Provisão de Manutenção");
             tiposLancamento.Add(2, "Intangível");
             tiposLancamento.Add(3, "Imobilizado");
@@ -152,16 +151,16 @@ namespace Service.PainelClassificacao
                 se a data inicial for maior que o mês atual -1, buscar somente valores de tendencia e ciclo
             */
             #region [ Predicados ]            
+            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoRealizado = _ => true;
+            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoPrevisto = _ => true;
+            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoReplan = _ => true;
+            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoOrcado = _ => true;
             
             Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto_Realizado = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
 
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoRealizado = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoPrevisto = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoReplan = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoOrcado = _ => true;
 
             Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_realizado = _ => true;
             Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_tendencia = _ => true;
@@ -465,6 +464,26 @@ namespace Service.PainelClassificacao
             return valor;
         }
 
+        private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoClassificacaoEsgDTO> lancamentos
+            , string tipoOrcamento
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicatePrevisto
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicateRealizado
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicateReplan
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoOrcado)
+        {
+            switch (tipoOrcamento)
+            {
+                case ETipoOrcamento.Previsto:
+                    return lancamentos.Where(predicatePrevisto).Sum(p => p.ValorPrevisto) +
+                           lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
+                case ETipoOrcamento.Ciclo:
+                    return lancamentos.Where(predicateReplan).Sum(p => p.ValorReplan) +
+                           lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
+                default:
+                    return lancamentos.Where(predicateBaseOrcamentoOrcado).Sum(p => p.ValorOrcado) +
+                           lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
+            }
+        }
         private decimal CalcularValorFormaAcompanhamento(IGrouping<object, ClassificacaoContabilItemDTO> lancamentos
             , string formatoAcompanhamento
             , Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_realizado
@@ -529,112 +548,103 @@ namespace Service.PainelClassificacao
             }
         }
 
+
         public async Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro)
         {
             return await _PainelClassificacaoRepository.ConsultarLancamentoSap(filtro);
         }
         public async Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
-            Func<LancamentoClassificacaoEsgDTO, bool> predicateTendencia = _ => true;
-            Func<LancamentoClassificacaoEsgDTO, bool> predicateRealizado = _ => true;
-            Func<LancamentoClassificacaoEsgDTO, bool> predicateCiclo = _ => true;
-            Func<LancamentoClassificacaoEsgDTO, bool> predicateOrcado = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoRealizado = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoPrevisto = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoReplan = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoOrcado = _ => true;
 
-            Func<LancamentoFaseContabilDTO, bool> predicateFaseTendencia = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFaseCiclo = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto_Realizado = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
 
-            if (filtro.FormatAcompanhamento == 'C')
+
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_realizado = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_tendencia = _ => true;
+            Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_ciclo = _ => true;
+
+            Func<LancamentoFaseContabilDTO, bool> predicateFormatoAcompFase_realizado = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFormatoAcompFase_tendencia = _ => true;
+            Func<LancamentoFaseContabilDTO, bool> predicateFormatoAcompFase_ciclo = _ => true;
+
+            if (filtro.FormatAcompanhamento == "C")
             {
-                if (filtro.DataFim > DateTime.Now.AddMonths(-1))
-                {
-                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 0, 0, 0);
-                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
-                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
-                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
-                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
-                    dataAux = DateTime.Now.AddMonths(-1);
-                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
-                    filtro.DataCicloInicio = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, 1, 0, 0, 0);
-                    filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1, 0, 0, 0);
-                }
-                else if (filtro.DataFim < DateTime.Now.AddMonths(-1))
-                {
-                    filtro.DataTendenciaInicio = new DateTime(1999, 1, 1, 0, 0, 0);
-                    filtro.DataTendenciaFim = new DateTime(1999, 1, 1, 0, 0, 0);
+                predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
+                predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto <= finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                predicateFormatoAcomp_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.TipoLancamento == ETipoOrcamento.Ciclo;
 
-                    DateTime dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
-                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
-                    dataAux = DateTime.Now.AddMonths(-1);
-                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1, 0, 0, 0);
+                predicateFormatoAcompFase_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
+                predicateFormatoAcompFase_tendencia = p => p.DtLancamentoProjeto <= finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                predicateFormatoAcompFase_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.TipoLancamento == ETipoOrcamento.Ciclo;
 
-                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
-                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
-                }
-                else if (filtro.DataInicio > DateTime.Now.AddMonths(-1))
+                if (filtro.DataFim > mesAnterior)
                 {
-                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
-                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
-                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
-                    filtro.DataRealizadoInicio = new DateTime(1999, 1, 1);
-                    filtro.DataRealizadoFim = new DateTime(1999, 1, 1);
-                    filtro.DataCicloInicio = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, 1);
-                    filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1);
+                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                    predicateFormatoAcomp_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.DtLancamentoProjeto <= anoPosterior_fim && p.TipoLancamento == ETipoOrcamento.Ciclo;
+
+                    predicateFormatoAcompFase_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                    predicateFormatoAcompFase_ciclo = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                }
+                else if (filtro.DataInicio > mesAnterior)
+                {
+                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                    predicateFormatoAcomp_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.DtLancamentoProjeto <= anoPosterior_fim && p.TipoLancamento == ETipoOrcamento.Ciclo;
+
+                    predicateFormatoAcompFase_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                    predicateFormatoAcompFase_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.DtLancamentoProjeto <= anoPosterior_fim && p.TipoLancamento == ETipoOrcamento.Ciclo;
+                }
+                else if (filtro.DataFim < mesAnterior)
+                {
+                    predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
+                    predicateFormatoAcompFase_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
                 }
             }
-            else if (filtro.FormatAcompanhamento == 'T')
+            else if (filtro.FormatAcompanhamento == "T")
             {
-                if (filtro.DataFim > DateTime.Now.AddMonths(-1))
-                {
-                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
-                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
-                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
-                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1);
-                    dataAux = DateTime.Now.AddMonths(-1);
-                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1);
-                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
-                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
-                }
-                else if (filtro.DataFim < DateTime.Now.AddMonths(-1))
-                {
-                    filtro.DataTendenciaInicio = new DateTime(1999, 1, 1);
-                    filtro.DataTendenciaFim = new DateTime(1999, 1, 1);
+                predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto < mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
+                predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto >= mesAtual && p.TipoLancamento == ETipoOrcamento.Tendencia;
 
-                    DateTime dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
-                    filtro.DataRealizadoInicio = new DateTime(dataAux.Year, dataAux.Month, 1);
-                    dataAux = DateTime.Now.AddMonths(-1);
-                    filtro.DataRealizadoFim = new DateTime(dataAux.Year, dataAux.Month, 1);
-
-                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
-                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
-                }
-                else if (filtro.DataInicio > DateTime.Now.AddMonths(-1))
+                if (filtro.DataFim > mesAnterior)
                 {
-                    filtro.DataTendenciaInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                    DateTime dataAux = DateTime.Now.AddMonths(12 - Convert.ToInt32(DateTime.Now.ToString("MM")));
-                    filtro.DataTendenciaFim = new DateTime(dataAux.Year, dataAux.Month, 1);
-                    dataAux = DateTime.Now.AddMonths(Convert.ToInt32(DateTime.Now.ToString("MM")) - 1);
-                    filtro.DataRealizadoInicio = new DateTime(1999, 1, 1);
-                    filtro.DataRealizadoFim = new DateTime(1999, 1, 1);
-                    filtro.DataCicloInicio = new DateTime(1999, 1, 1);
-                    filtro.DataCicloFim = new DateTime(1999, 1, 1);
+                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                }
+                else if (filtro.DataFim < mesAnterior)
+                {
+                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
+                }
+                else if (filtro.DataInicio > mesAnterior)
+                {
+                    predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
                 }
             }
-            predicateTendencia = p => p.DtLancamentoProjeto >= filtro.DataTendenciaInicio && p.DtLancamentoProjeto <= filtro.DataTendenciaFim;
-            predicateRealizado = p => p.DtLancamentoProjeto >= filtro.DataRealizadoInicio && p.DtLancamentoProjeto <= filtro.DataRealizadoFim;
-            predicateCiclo = p => p.DtLancamentoProjeto >= filtro.DataCicloInicio && p.DtLancamentoProjeto <= filtro.DataCicloFim;
+
+            predicateBaseOrcamentoRealizado = p => p.DtLancamentoProjeto.Year < DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Realizado;
+            predicateBaseOrcamentoPrevisto = p => p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Previsto;
+            predicateBaseOrcamentoReplan = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Replan);
+            predicateBaseOrcamentoOrcado = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Orcado);
+
+            predicateFasePrevisto = p => p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Previsto;
+            predicateFasePrevisto_Realizado = p => (p.DtLancamentoProjeto.Year < DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Realizado);
+            predicateFaseReplan = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Replan);
+            predicateFaseOrcado = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Orcado);
+
             var lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoEsg(filtro);
-            predicateOrcado = p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim;
             var lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
             {
                 IdEmpresa = filtro.IdEmpresa,
                 IdGestor = filtro.IdGestor,
                 IdGrupoPrograma = filtro.IdGrupoPrograma,
                 IdPrograma = filtro.IdPrograma,
-                IdProjeto = filtro.IdProjeto
+                IdProjeto = filtro.IdProjeto,
+                DataFim = filtro.DataFim,
+                DataInicio = filtro.DataInicio
             });
             await PopularParametrizacoes();
             (int,string) esgClassif = RetornarClassificacaoEsg(filtro);
@@ -663,7 +673,7 @@ namespace Service.PainelClassificacao
                 var retorno = new PainelClassificacaoEsg()
                               {
                                  Cabecalho = cabecalhoEsg, 
-                                 Empresas = from a in lancamentos.AsQueryable().Where(predicateOrcado)
+                                 Empresas = from a in lancamentos
                                             group a by new { a.IdEmpresa, a.IdClassificacaoEsg, a.NomeEmpresa } into grp
                                             select new EmpresaEsgDTO()
                                             {
@@ -672,10 +682,8 @@ namespace Service.PainelClassificacao
                                                 LancamentoESG = new LancamentoESG()
                                                 {
                                                     IdClassificacaoEsg = grp.Key.IdClassificacaoEsg,
-                                                    OrcadoAcumulado = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
-                                                    ValorReplan = grp.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
-                                                    ValorTendencia = grp.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
-                                                    RealizadoAcumulado = grp.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
+                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
+                                                    ValorFormatoAcompanhamento = 0m
                                                 },
                                                 GrupoPrograma = from c in lancamentos
                                                                 where c.IdEmpresa == grp.Key.IdEmpresa
@@ -687,10 +695,8 @@ namespace Service.PainelClassificacao
                                                                     LancamentoESG = new LancamentoESG()
                                                                                     {
                                                                                         IdClassificacaoEsg = grpGru.Key.IdClassificacaoEsg,
-                                                                                        OrcadoAcumulado = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
-                                                                                        ValorReplan = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
-                                                                                        ValorTendencia = lancamentos.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
-                                                                                        RealizadoAcumulado = lancamentos.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
+                                                                                        ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
+                                                                                        ValorFormatoAcompanhamento = 0m
                                                                                     },                                                                    
                                                                     Programas = from p in lancamentos
                                                                                 where p.IdEmpresa == grp.Key.IdEmpresa
@@ -704,10 +710,8 @@ namespace Service.PainelClassificacao
                                                                                     LancamentoESG = new LancamentoESG()
                                                                                                     {
                                                                                                         IdClassificacaoEsg = grpPro.Key.IdClassificacaoEsg,
-                                                                                                        OrcadoAcumulado = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
-                                                                                                        ValorReplan = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
-                                                                                                        ValorTendencia = lancamentos.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
-                                                                                                        RealizadoAcumulado = lancamentos.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
+                                                                                                        ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPro, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
+                                                                                                        ValorFormatoAcompanhamento = 0m
                                                                                                     },
                                                                                     Projetos = from p in lancamentos
                                                                                                where p.IdEmpresa == grp.Key.IdEmpresa
@@ -722,10 +726,8 @@ namespace Service.PainelClassificacao
                                                                                                    LancamentoESG = new LancamentoESG()
                                                                                                    {
                                                                                                        IdClassificacaoEsg = grpPrj.Key.IdClassificacaoEsg,
-                                                                                                       OrcadoAcumulado = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorOrcado),
-                                                                                                       ValorReplan = lancamentos.AsQueryable().Where(predicateOrcado).Sum(p => p.ValorReplan),
-                                                                                                       ValorTendencia = lancamentos.AsQueryable().Where(predicateTendencia).Sum(p => p.ValorTendencia),
-                                                                                                       RealizadoAcumulado = lancamentos.AsQueryable().Where(predicateRealizado).Sum(p => p.ValorRealizadoSap)
+                                                                                                       ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
+                                                                                                       ValorFormatoAcompanhamento = 0m
                                                                                                    },
                                                                                                    Fase = from fse in lancamentosFase
                                                                                                           where fse.IdProjeto == grpPrj.Key.IdProjeto 
@@ -740,11 +742,8 @@ namespace Service.PainelClassificacao
                                                                                                               Pep = grpFse.Key.Pep,
                                                                                                               LancamentoESG = new LancamentoESG()
                                                                                                               {
-                                                                                                                  OrcadoAcumulado = grpFse.Sum(p => p.ValorOrcado),
-                                                                                                                  RealizadoAcumulado = grpFse.Sum(p => p.ValorRealizado),
-                                                                                                                  ValorCiclo = grpFse.Sum(p => p.ValorCiclo),
-                                                                                                                  ValorTendencia = grpFse.Sum(p => p.ValorTendencia),
-                                                                                                                  ValorReplan = grpFse.Sum(p => p.ValorReplan)
+                                                                                                                  ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,predicateFasePrevisto, predicateFasePrevisto_Realizado, predicateFaseReplan, predicateFaseOrcado),
+                                                                                                                  ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpFse, filtro.FormatAcompanhamento,predicateFormatoAcompFase_realizado, predicateFormatoAcompFase_tendencia, predicateFormatoAcompFase_ciclo, filtro.DataInicio, filtro.DataFim)
                                                                                                               },
                                                                                                           }
 
@@ -782,7 +781,7 @@ namespace Service.PainelClassificacao
             string nome = string.Empty;
             if (_parametrizacaoCenarioDTOs.Any())
             {
-                var paramCenario = _parametrizacaoCenarioDTOs.Where(p => p.IdParametrizacaoCenario == filtro.IdCenario && p.IdClassificacaoContabil == filtro.IdClassificacaoContabil);
+                var paramCenario = _parametrizacaoCenarioDTOs.Where(p => p.IdParametrizacaoCenario == filtro.IdCenario && p.IdClassificacaoEsg == filtro.IdClassificacaoEsg);
                 if (paramCenario.Any())
                 {
                     idEsg = paramCenario.FirstOrDefault().IdClassificacaoEsg;
@@ -863,7 +862,7 @@ namespace Service.PainelClassificacao
             Func<LancamentoFaseContabilDTO, bool> predicateFaseCiclo = _ => true;
             Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
 
-            if (filtro.FormatAcompanhamento == 'C')
+            if (filtro.FormatAcompanhamento == "C")
             {
                 if (filtro.DataFim > DateTime.Now.AddMonths(-1))
                 {
@@ -902,7 +901,7 @@ namespace Service.PainelClassificacao
                     filtro.DataCicloFim = new DateTime(DateTime.Now.Year + 1, 12, 1);
                 }
             }
-            else if (filtro.FormatAcompanhamento == 'T')
+            else if (filtro.FormatAcompanhamento == "T")
             {
                 if (filtro.DataFim > DateTime.Now.AddMonths(-1))
                 {

@@ -79,5 +79,7 @@
         }
 
         public decimal ValorCiclo { get; internal set; }
+        public decimal ValorBaseOrcamento { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
     }
 }

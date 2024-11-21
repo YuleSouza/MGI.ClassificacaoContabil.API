@@ -439,6 +439,10 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and a.idGestor = :idGestor");
             }
+            if (filtro.IdClassificacaoEsg > 0)
+            {
+                parametros.AppendLine(" and a.idClassificacaoEsg = :idClassificacaoEsg");
+            }
             #endregion
             return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
                 new {
@@ -449,6 +453,7 @@ namespace Repository.PainelClassificacao
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2).ToString("dd/MM/yyyy"),
                     dataFim = filtro.DataFim.AddYears(2).ToString("dd/MM/yyyy"),
+                    idClassificacaoEsg = filtro.IdClassificacaoEsg
                 });
         }
 
