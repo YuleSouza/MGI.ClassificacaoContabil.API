@@ -117,99 +117,8 @@ namespace Service.PainelClassificacao
 
         public async Task<PainelClassificacaoContabilDTO> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
-            /*
-                Formato acompanhamento (Ciclo Orçamentário ou Tendência) – Se selecionado o Ciclo Orçamentário será 
-                considerado: Realizado até o mês anterior, Tendencia do mês atual até o último mês do ano vigente e ciclo a partir 
-                do ano seguinte. Se selecionado Tendência será considerado: Realizado até o mês anterior e a tendência a partir do 
-                mês atual.
-             */
-            /*
-                se a data final do range for maior que o mês atual - 1, buscar os valores de tendencia até o final do ano atual e ciclo do ano posterior
-                se a data final do range for menor que o mês atual - 1, buscar somente os valores realizado
-                se a data inicial for maior que o mês atual -1, buscar somente valores de tendencia e ciclo
-            */
-            #region [ Predicados ]            
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoRealizado = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoPrevisto = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoReplan = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoOrcado = _ => true;
-            
-            Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto_Realizado = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado = _ => true;
+            var p = new PredicateHelper(filtro.FormatAcompanhamento.ToString(), filtro.DataFim, filtro.DataInicio, "C");
 
-
-            Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_realizado = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_tendencia = _ => true;
-            Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_ciclo = _ => true;
-
-            Func<LancamentoFaseContabilDTO, bool> predicateFormatoAcompFase_realizado = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFormatoAcompFase_tendencia = _ => true;
-            Func<LancamentoFaseContabilDTO, bool> predicateFormatoAcompFase_ciclo = _ => true;
-
-            if (filtro.FormatAcompanhamento == 'C')
-            {
-                predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
-                predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto <= finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                predicateFormatoAcomp_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.TipoLancamento == ETipoOrcamento.Ciclo;
-
-                predicateFormatoAcompFase_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
-                predicateFormatoAcompFase_tendencia = p => p.DtLancamentoProjeto <= finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                predicateFormatoAcompFase_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.TipoLancamento == ETipoOrcamento.Ciclo;
-
-                if (filtro.DataFim > mesAnterior)
-                {
-                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                    predicateFormatoAcomp_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio  && p.DtLancamentoProjeto <= anoPosterior_fim && p.TipoLancamento == ETipoOrcamento.Ciclo;
-
-                    predicateFormatoAcompFase_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                    predicateFormatoAcompFase_ciclo = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                }
-                else if (filtro.DataInicio > mesAnterior)
-                {
-                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                    predicateFormatoAcomp_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.DtLancamentoProjeto <= anoPosterior_fim && p.TipoLancamento == ETipoOrcamento.Ciclo;
-
-                    predicateFormatoAcompFase_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                    predicateFormatoAcompFase_ciclo = p => p.DtLancamentoProjeto >= anoPosterior_inicio && p.DtLancamentoProjeto <= anoPosterior_fim && p.TipoLancamento == ETipoOrcamento.Ciclo;
-                }
-                else if (filtro.DataFim < mesAnterior)
-                {
-                    predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
-                    predicateFormatoAcompFase_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
-                }
-            }
-            else if (filtro.FormatAcompanhamento == 'T')
-            {
-                predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto < mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
-                predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto >= mesAtual && p.TipoLancamento == ETipoOrcamento.Tendencia;
-
-                if (filtro.DataFim > mesAnterior)
-                {
-                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                }
-                else if (filtro.DataFim < mesAnterior)
-                {
-                    predicateFormatoAcomp_tendencia = p => p.DtLancamentoProjeto < finalAno && p.TipoLancamento == ETipoOrcamento.Tendencia;
-                }
-                else if (filtro.DataInicio > mesAnterior)
-                {
-                    predicateFormatoAcomp_realizado = p => p.DtLancamentoProjeto <= mesAnterior && p.TipoLancamento == ETipoOrcamento.Realizado;
-                }
-            }
-
-            predicateBaseOrcamentoRealizado = p => p.DtLancamentoProjeto.Year < DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Realizado;
-            predicateBaseOrcamentoPrevisto = p => p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Previsto;
-            predicateBaseOrcamentoReplan = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Replan);
-            predicateBaseOrcamentoOrcado = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Orcado);
-
-            predicateFasePrevisto = p => p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Previsto;
-            predicateFasePrevisto_Realizado = p => (p.DtLancamentoProjeto.Year < DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Realizado);
-            predicateFaseReplan = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Replan);
-            predicateFaseOrcado = p => (p.DtLancamentoProjeto.Year >= DateTime.Now.Year && p.TipoLancamento == ETipoOrcamento.Orcado);
-
-            #endregion
             IEnumerable<ClassificacaoContabilItemDTO> lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
             IEnumerable<LancamentoFaseContabilDTO> lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
             {
@@ -239,8 +148,8 @@ namespace Service.PainelClassificacao
                                       #region [ Lancamentos ]
                                       Lancamentos = new LancamentoContabilDTO()
                                       {
-                                          ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                          ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grp, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                          ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                          ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grp, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
                                           IdClassifContabil = grp.Key.IdClassifContabil,
                                           NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                       },
@@ -255,8 +164,8 @@ namespace Service.PainelClassificacao
                                                           IdClassifContabil = grpGru.Key.IdClassifContabil,
                                                           Lancamentos = new LancamentoContabilDTO()
                                                           {
-                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGru, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGru, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                 IdClassifContabil = grp.Key.IdClassifContabil,
                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil,                                                                
                                                           },
@@ -272,8 +181,8 @@ namespace Service.PainelClassificacao
                                                                          IdClassifContabil = grp.Key.IdClassifContabil,
                                                                          Lancamentos = new LancamentoContabilDTO()
                                                                          {
-                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGruPro, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
-                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGruPro, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
+                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGruPro, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGruPro, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil,                                                                                
                                                                          },                                                                         
                                                                          Projetos = from prj in lancamentos
@@ -289,8 +198,8 @@ namespace Service.PainelClassificacao
                                                                                         IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                         Lancamentos = new LancamentoContabilDTO()
                                                                                         {
-                                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpPrj, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
-                                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento,predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
+                                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpPrj, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
                                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil,
                                                                                         },
                                                                                         Fase = from fse in lancamentosFase
@@ -308,8 +217,8 @@ namespace Service.PainelClassificacao
                                                                                                              Lancamentos = new LancamentoContabilDTO()
                                                                                                              {
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil,
-                                                                                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,predicateFasePrevisto, predicateFasePrevisto_Realizado, predicateFaseReplan, predicateFaseOrcado),
-                                                                                                                    ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpFse, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcompFase_realizado, predicateFormatoAcompFase_tendencia, predicateFormatoAcompFase_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,p.C_PredicateFasePrevisto, p.C_PredicateFasePrevisto_Realizado, p.C_PredicateFaseReplan, p.C_PredicateFaseOrcado),
+                                                                                                                    ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpFse, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcompFase_realizado, p.C_PredicateFormatoAcompFase_tendencia, p.C_PredicateFormatoAcompFase_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                                                             },
                                                                                                          }
                                                                                     }
@@ -333,8 +242,8 @@ namespace Service.PainelClassificacao
                                                 IdEmpresa = grpLan.Key.IdEmpresa,
                                                 TotalEmpresa = new LancamentoContabilTotalDTO()
                                                 {
-                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpLan, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpLan, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),                                                    
+                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpLan, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpLan, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),                                                    
                                                 },
                                                 TotalGrupoPrograma = from g in lancamentos
                                                                      where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -342,8 +251,8 @@ namespace Service.PainelClassificacao
                                                                      select new LancamentoContabilTotalDTO()
                                                                      {
                                                                          IdGrupoPrograma = grpTotGru.Key.IdGrupoPrograma,
-                                                                         TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotGru, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                         TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotGru, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                         TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotGru, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                         TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotGru, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                      },
                                                 TotalPrograma = from g in lancamentos
                                                                 where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -352,8 +261,8 @@ namespace Service.PainelClassificacao
                                                                 {
                                                                     IdGrupoPrograma = grpTotPrg.Key.IdGrupoPrograma,
                                                                     IdPrograma = grpTotPrg.Key.IdPrograma,
-                                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrg, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrg, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
+                                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrg, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrg, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                 },
                                                 TotalProjeto = from g in lancamentos
                                                                where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -363,8 +272,8 @@ namespace Service.PainelClassificacao
                                                                    IdGrupoPrograma = grpTotPrj.Key.IdGrupoPrograma,
                                                                    IdPrograma = grpTotPrj.Key.IdPrograma,
                                                                    IdProjeto = grpTotPrj.Key.IdProjeto,
-                                                                   TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrj, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                   TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrj, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)                                                                   
+                                                                   TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrj, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                   TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrj, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                },
                                                 TotalFase = from g in lancamentos
                                                             where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -376,8 +285,8 @@ namespace Service.PainelClassificacao
                                                                 IdPrograma = grpTotFse.Key.IdPrograma,
                                                                 IdProjeto = grpTotFse.Key.IdProjeto,
                                                                 IdSeqFase = grpTotFse.Key.SeqFase,
-                                                                TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotFse, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotFse, filtro.FormatAcompanhamento.ToString(), predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
+                                                                TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotFse, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotFse, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                             },
 
                                             }).ToList()
