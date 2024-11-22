@@ -28,5 +28,6 @@
         public string NomeClassificacaoEsg { get; set; }
         public DateTime DtLancamentoProjeto { get; set; }
         public string TipoLancamento {  get; set; }
+        public decimal ValorCiclo { get; internal set; }
     }
 }

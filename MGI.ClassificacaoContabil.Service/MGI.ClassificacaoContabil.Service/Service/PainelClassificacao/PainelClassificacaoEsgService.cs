@@ -196,7 +196,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                    {
                                        IdClassificacaoEsg = grp.Key.IdClassificacaoEsg,
                                        ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                       ValorFormatoAcompanhamento = 0m
+                                       ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grp, filtro.FormatAcompanhamento, predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                    },
                                    GrupoPrograma = from c in lancamentos
                                                    where c.IdEmpresa == grp.Key.IdEmpresa
@@ -209,7 +209,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                        {
                                                            IdClassificacaoEsg = grpGru.Key.IdClassificacaoEsg,
                                                            ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                           ValorFormatoAcompanhamento = 0m
+                                                           ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGru, filtro.FormatAcompanhamento, predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                        },
                                                        Programas = from p in lancamentos
                                                                    where p.IdEmpresa == grp.Key.IdEmpresa
@@ -224,7 +224,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                        {
                                                                            IdClassificacaoEsg = grpPro.Key.IdClassificacaoEsg,
                                                                            ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPro, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                           ValorFormatoAcompanhamento = 0m
+                                                                           ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpPro, filtro.FormatAcompanhamento, predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                        },
                                                                        Projetos = from p in lancamentos
                                                                                   where p.IdEmpresa == grp.Key.IdEmpresa
@@ -240,7 +240,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                                       {
                                                                                           IdClassificacaoEsg = grpPrj.Key.IdClassificacaoEsg,
                                                                                           ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento, predicateBaseOrcamentoPrevisto, predicateBaseOrcamentoRealizado, predicateBaseOrcamentoReplan, predicateBaseOrcamentoOrcado),
-                                                                                          ValorFormatoAcompanhamento = 0m
+                                                                                          ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpPrj, filtro.FormatAcompanhamento, predicateFormatoAcomp_realizado, predicateFormatoAcomp_tendencia, predicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                                       },
                                                                                       Fase = from fse in lancamentosFase
                                                                                              where fse.IdProjeto == grpPrj.Key.IdProjeto
@@ -348,6 +348,38 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                     break;
             }
             return valor;
+        }
+
+        private decimal CalcularValorFormaAcompanhamento(IGrouping<object, LancamentoClassificacaoEsgDTO> lancamentos
+            , string formatoAcompanhamento
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_realizado
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_tendencia
+            , Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_ciclo
+            , DateTime dataFim
+            , DateTime dataInicio)
+        {
+            switch (formatoAcompanhamento)
+            {
+                case "T":
+                    {
+                        if (dataInicio > mesAnterior)
+                        {
+                            return lancamentos.Where(predicateFormatoAcomp_realizado).Sum(p => p.ValorRealizado);
+                        }
+                        return lancamentos.Where(predicateFormatoAcomp_tendencia).Sum(p => p.ValorTendencia) +
+                                lancamentos.Where(predicateFormatoAcomp_realizado).Sum(p => p.ValorRealizado);
+                    }
+                default:
+                    {
+                        if (dataInicio > mesAnterior)
+                        {
+                            return lancamentos.Where(predicateFormatoAcomp_realizado).Sum(p => p.ValorRealizado);
+                        }
+                        return lancamentos.Where(predicateFormatoAcomp_tendencia).Sum(p => p.ValorTendencia) +
+                                lancamentos.Where(predicateFormatoAcomp_realizado).Sum(p => p.ValorRealizado) +
+                                lancamentos.Where(predicateFormatoAcomp_ciclo).Sum(p => p.ValorCiclo);
+                    }
+            }
         }
         public async Task<byte[]> GerarRelatorioEsg(FiltroPainelClassificacaoEsg filtro)
         {
