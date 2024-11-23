@@ -227,7 +227,7 @@ namespace Repository.PainelClassificacao
             });
         }
 
-        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IEnumerable<LancamentoClassificacaoDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
@@ -257,7 +257,7 @@ namespace Repository.PainelClassificacao
                 parametros.AppendLine(" and sub.IdClassifContabil = :idClassifContabil");
             }
             #endregion
-            return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoDTO>($@"
                                 select * 
                                   from (select e.empcod as IdEmpresa
                                       , trim(e.empnom) as NomeEmpresa
@@ -422,7 +422,7 @@ namespace Repository.PainelClassificacao
                 pep = filtro.Pep
             });
         }
-        public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
+        public async Task<IEnumerable<LancamentoClassificacaoDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
             StringBuilder parametros = new StringBuilder();
             parametros.AppendLine(" and 1 = 1");
@@ -445,7 +445,7 @@ namespace Repository.PainelClassificacao
                 parametros.AppendLine(" and a.idGestor = :idGestor");
             }           
             #endregion
-            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
                 new {
                     idEmpresa = filtro.IdEmpresa,
                     idGrupoPrograma = filtro.IdGrupoPrograma.HasValue  && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,

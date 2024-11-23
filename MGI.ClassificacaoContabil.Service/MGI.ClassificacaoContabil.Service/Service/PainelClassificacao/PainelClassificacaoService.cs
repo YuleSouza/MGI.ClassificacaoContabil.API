@@ -119,7 +119,7 @@ namespace Service.PainelClassificacao
         {
             var p = new PredicateHelper(filtro.FormatAcompanhamento.ToString(), filtro.DataFim, filtro.DataInicio, "C");
 
-            IEnumerable<ClassificacaoContabilItemDTO> lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
+            IEnumerable<LancamentoClassificacaoDTO> lancamentos = await _PainelClassificacaoRepository.ConsultarClassificacaoContabil(filtro);
             IEnumerable<LancamentoFaseContabilDTO> lancamentosFase = await _PainelClassificacaoRepository.ConsultarLancamentosDaFase(new FiltroLancamentoFase()
             {
                 IdEmpresa = filtro.IdEmpresa,
@@ -148,8 +148,8 @@ namespace Service.PainelClassificacao
                                       #region [ Lancamentos ]
                                       Lancamentos = new LancamentoContabilDTO()
                                       {
-                                          ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                          ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grp, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                          ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento,p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                          ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grp, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
                                           IdClassifContabil = grp.Key.IdClassifContabil,
                                           NomeTipoClassificacao = grp.Key.NomeClassifContabil
                                       },
@@ -164,8 +164,8 @@ namespace Service.PainelClassificacao
                                                           IdClassifContabil = grpGru.Key.IdClassifContabil,
                                                           Lancamentos = new LancamentoContabilDTO()
                                                           {
-                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGru, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGru, filtro.BaseOrcamento,p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGru, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                 IdClassifContabil = grp.Key.IdClassifContabil,
                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil,                                                                
                                                           },
@@ -181,8 +181,8 @@ namespace Service.PainelClassificacao
                                                                          IdClassifContabil = grp.Key.IdClassifContabil,
                                                                          Lancamentos = new LancamentoContabilDTO()
                                                                          {
-                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGruPro, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
-                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGruPro, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpGruPro, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpGruPro, filtro.BaseOrcamento,p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil,                                                                                
                                                                          },                                                                         
                                                                          Projetos = from prj in lancamentos
@@ -198,8 +198,8 @@ namespace Service.PainelClassificacao
                                                                                         IdClassifContabil = grp.Key.IdClassifContabil,
                                                                                         Lancamentos = new LancamentoContabilDTO()
                                                                                         {
-                                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpPrj, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
-                                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento,p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
+                                                                                                ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpPrj, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                                                ValorBaseOrcamento = CalcularValorBaseOrcamento(grpPrj, filtro.BaseOrcamento,p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
                                                                                                 NomeTipoClassificacao = grp.Key.NomeClassifContabil,
                                                                                         },
                                                                                         Fase = from fse in lancamentosFase
@@ -217,8 +217,8 @@ namespace Service.PainelClassificacao
                                                                                                              Lancamentos = new LancamentoContabilDTO()
                                                                                                              {
                                                                                                                     NomeTipoClassificacao = grp.Key.NomeClassifContabil,
-                                                                                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,p.C_PredicateFasePrevisto, p.C_PredicateFasePrevisto_Realizado, p.C_PredicateFaseReplan, p.C_PredicateFaseOrcado),
-                                                                                                                    ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpFse, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcompFase_realizado, p.C_PredicateFormatoAcompFase_tendencia, p.C_PredicateFormatoAcompFase_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                                                                    ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento,p.PredicateFasePrevisto, p.PredicateFasePrevisto_Realizado, p.PredicateFaseReplan, p.PredicateFaseOrcado),
+                                                                                                                    ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpFse, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcompFase_realizado, p.PredicateFormatoAcompFase_tendencia, p.PredicateFormatoAcompFase_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                                                             },
                                                                                                          }
                                                                                     }
@@ -242,8 +242,8 @@ namespace Service.PainelClassificacao
                                                 IdEmpresa = grpLan.Key.IdEmpresa,
                                                 TotalEmpresa = new LancamentoContabilTotalDTO()
                                                 {
-                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpLan, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpLan, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),                                                    
+                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpLan, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpLan, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),                                                    
                                                 },
                                                 TotalGrupoPrograma = from g in lancamentos
                                                                      where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -251,8 +251,8 @@ namespace Service.PainelClassificacao
                                                                      select new LancamentoContabilTotalDTO()
                                                                      {
                                                                          IdGrupoPrograma = grpTotGru.Key.IdGrupoPrograma,
-                                                                         TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotGru, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                                                         TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotGru, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
+                                                                         TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotGru, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                                                         TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotGru, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio),
                                                                      },
                                                 TotalPrograma = from g in lancamentos
                                                                 where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -261,8 +261,8 @@ namespace Service.PainelClassificacao
                                                                 {
                                                                     IdGrupoPrograma = grpTotPrg.Key.IdGrupoPrograma,
                                                                     IdPrograma = grpTotPrg.Key.IdPrograma,
-                                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrg, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrg, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
+                                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrg, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrg, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                 },
                                                 TotalProjeto = from g in lancamentos
                                                                where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -272,8 +272,8 @@ namespace Service.PainelClassificacao
                                                                    IdGrupoPrograma = grpTotPrj.Key.IdGrupoPrograma,
                                                                    IdPrograma = grpTotPrj.Key.IdPrograma,
                                                                    IdProjeto = grpTotPrj.Key.IdProjeto,
-                                                                   TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrj, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                                                   TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrj, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
+                                                                   TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrj, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                                                   TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrj, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                },
                                                 TotalFase = from g in lancamentos
                                                             where g.IdEmpresa == grpLan.Key.IdEmpresa
@@ -285,8 +285,8 @@ namespace Service.PainelClassificacao
                                                                 IdPrograma = grpTotFse.Key.IdPrograma,
                                                                 IdProjeto = grpTotFse.Key.IdProjeto,
                                                                 IdSeqFase = grpTotFse.Key.SeqFase,
-                                                                TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotFse, filtro.BaseOrcamento, p.C_PredicateBaseOrcamentoPrevisto, p.C_PredicateBaseOrcamentoRealizado, p.C_PredicateBaseOrcamentoReplan, p.C_PredicateBaseOrcamentoOrcado),
-                                                                TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotFse, filtro.FormatAcompanhamento.ToString(), p.C_PredicateFormatoAcomp_realizado, p.C_PredicateFormatoAcomp_tendencia, p.C_PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
+                                                                TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotFse, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
+                                                                TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotFse, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                             },
 
                                             }).ToList()
@@ -304,12 +304,12 @@ namespace Service.PainelClassificacao
             };
         }
 
-        private decimal CalcularValorBaseOrcamento(IGrouping<object, ClassificacaoContabilItemDTO> lancamentos
+        private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoClassificacaoDTO> lancamentos
             , string tipoOrcamento
-            , Func<ClassificacaoContabilItemDTO, bool> predicatePrevisto
-            , Func<ClassificacaoContabilItemDTO, bool> predicateRealizado
-            , Func<ClassificacaoContabilItemDTO, bool> predicateReplan
-            , Func<ClassificacaoContabilItemDTO, bool> predicateBaseOrcamentoOrcado)
+            , Func<LancamentoClassificacaoDTO, bool> predicatePrevisto
+            , Func<LancamentoClassificacaoDTO, bool> predicateRealizado
+            , Func<LancamentoClassificacaoDTO, bool> predicateReplan
+            , Func<LancamentoClassificacaoDTO, bool> predicateBaseOrcamentoOrcado)
         {
             switch (tipoOrcamento)
             {
@@ -351,11 +351,11 @@ namespace Service.PainelClassificacao
             return valor;
         }
         
-        private decimal CalcularValorFormaAcompanhamento(IGrouping<object, ClassificacaoContabilItemDTO> lancamentos
+        private decimal CalcularValorFormaAcompanhamento(IGrouping<object, LancamentoClassificacaoDTO> lancamentos
             , string formatoAcompanhamento
-            , Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_realizado
-            , Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_tendencia
-            , Func<ClassificacaoContabilItemDTO, bool> predicateFormatoAcomp_ciclo
+            , Func<LancamentoClassificacaoDTO, bool> predicateFormatoAcomp_realizado
+            , Func<LancamentoClassificacaoDTO, bool> predicateFormatoAcomp_tendencia
+            , Func<LancamentoClassificacaoDTO, bool> predicateFormatoAcomp_ciclo
             , DateTime dataFim
             , DateTime dataInicio)
         {

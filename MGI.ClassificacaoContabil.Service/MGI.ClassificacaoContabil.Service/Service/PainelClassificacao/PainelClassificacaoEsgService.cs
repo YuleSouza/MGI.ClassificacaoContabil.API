@@ -201,15 +201,40 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                 };
                 return retorno;
             }
-            return null;
+            return new PainelClassificacaoEsg();
         }
 
-        private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoClassificacaoEsgDTO> lancamentos
+        private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoFaseContabilDTO> lancamentos
             , string tipoOrcamento
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicatePrevisto
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicateRealizado
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicateReplan
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoOrcado)
+            , Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto
+            , Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado
+            , Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan
+            , Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado)
+        {
+            decimal valor = 0;
+            switch (tipoOrcamento)
+            {
+                case ETipoOrcamento.Previsto:
+                    valor = lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorPrevisto) +
+                           lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
+                    break;
+                case ETipoOrcamento.Replan:
+                    valor = lancamentos.Where(predicateFaseReplan).Sum(p => p.ValorReplan) +
+                           lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
+                    break;
+                default:
+                    valor = lancamentos.Where(predicateFaseOrcado).Sum(p => p.ValorOrcado) +
+                           lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
+                    break;
+            }
+            return valor;
+        }
+        private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoClassificacaoDTO> lancamentos
+            , string tipoOrcamento
+            , Func<LancamentoClassificacaoDTO, bool> predicatePrevisto
+            , Func<LancamentoClassificacaoDTO, bool> predicateRealizado
+            , Func<LancamentoClassificacaoDTO, bool> predicateReplan
+            , Func<LancamentoClassificacaoDTO, bool> predicateBaseOrcamentoOrcado)
         {
             switch (tipoOrcamento)
             {
@@ -257,37 +282,11 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
             }
         }
 
-        private decimal CalcularValorBaseOrcamento(IGrouping<object, LancamentoFaseContabilDTO> lancamentos
-            , string tipoOrcamento
-            , Func<LancamentoFaseContabilDTO, bool> predicateFasePrevisto
-            , Func<LancamentoFaseContabilDTO, bool> predicateFaseRealizado
-            , Func<LancamentoFaseContabilDTO, bool> predicateFaseReplan
-            , Func<LancamentoFaseContabilDTO, bool> predicateFaseOrcado)
-        {
-            decimal valor = 0;
-            switch (tipoOrcamento)
-            {
-                case ETipoOrcamento.Previsto:
-                    valor = lancamentos.Where(predicateFasePrevisto).Sum(p => p.ValorPrevisto) +
-                           lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
-                    break;
-                case ETipoOrcamento.Replan:
-                    valor = lancamentos.Where(predicateFaseReplan).Sum(p => p.ValorReplan) +
-                           lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
-                    break;
-                default:
-                    valor = lancamentos.Where(predicateFaseOrcado).Sum(p => p.ValorOrcado) +
-                           lancamentos.Where(predicateFaseRealizado).Sum(p => p.ValorRealizado);
-                    break;
-            }
-            return valor;
-        }
-
-        private decimal CalcularValorFormaAcompanhamento(IGrouping<object, LancamentoClassificacaoEsgDTO> lancamentos
+        private decimal CalcularValorFormaAcompanhamento(IGrouping<object, LancamentoClassificacaoDTO> lancamentos
             , string formatoAcompanhamento
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_realizado
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_tendencia
-            , Func<LancamentoClassificacaoEsgDTO, bool> predicateFormatoAcomp_ciclo
+            , Func<LancamentoClassificacaoDTO, bool> predicateFormatoAcomp_realizado
+            , Func<LancamentoClassificacaoDTO, bool> predicateFormatoAcomp_tendencia
+            , Func<LancamentoClassificacaoDTO, bool> predicateFormatoAcomp_ciclo
             , DateTime dataFim
             , DateTime dataInicio)
         {

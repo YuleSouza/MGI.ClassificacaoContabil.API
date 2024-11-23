@@ -23,10 +23,10 @@ namespace Service.Repository.PainelClassificacao
         #endregion
 
         #region [ Consulta ]
-        Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
+        Task<IEnumerable<LancamentoClassificacaoDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<RelatorioContabilDTO>> ConsultarDadosRelatorio(FiltroPainelClassificacaoContabil filtro);
         Task<IEnumerable<RelatorioEsgDTO>> ConsultarDadosRelatorio(FiltroPainelClassificacaoEsg filtro);
-        Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
+        Task<IEnumerable<LancamentoClassificacaoDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
         Task<IEnumerable<LancamentoFaseContabilDTO>> ConsultarLancamentosDaFase(FiltroLancamentoFase filtro);
         Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro);
         Task<LancamentoClassificacaoEsgDTO> ConsultarClassifEsgPorProjeto(int idProjeto, int seqFase, int idEmpresa);
