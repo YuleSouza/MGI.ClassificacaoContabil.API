@@ -356,7 +356,12 @@ namespace Repository.PainelClassificacao
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
                                         left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
-                                        inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','1','2','P') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
+                                        inner join prjorc orc on (p.prjcod = orc.prjcod 
+                                                                and orc.prjorcfse > 0 
+                                                                and orc.prjorcver = 0 
+                                                                and orc.prjorctip in ('O','J','R','1','2','P') 
+                                                                and orc.prjorcmes > 0 
+                                                                and orc.prjorcano > 0)
                                         left join prjfse fse on (fse.prjcod = orc.prjcod and fse.prjfseseq = orc.prjorcfse)
                                  where p.prjsit = 'A'
                                    and orc.prjorcano > 2016 ) sub
