@@ -189,8 +189,8 @@ namespace Service.PainelClassificacao
                                                                                     where prj.IdEmpresa == grpGruPro.Key.IdEmpresa
                                                                                        && prj.IdGrupoPrograma == grpGruPro.Key.IdGrupoPrograma
                                                                                        && prj.IdPrograma == grpGruPro.Key.IdPrograma
-                                                                                       //&& prj.IdClassifContabil == grpGruPro.Key.IdClassifContabil
-                                                                                    group prj by new { prj.IdEmpresa, prj.IdGrupoPrograma, prj.IdPrograma, prj.IdProjeto, prj.NomeProjeto, prj.IdClassifContabil, prj.SeqFase } into grpPrj
+                                                                                       && prj.TipoLancamento == filtro.BaseOrcamento
+                                                                                    group prj by new { prj.IdEmpresa, prj.IdGrupoPrograma, prj.IdPrograma, prj.IdProjeto, prj.NomeProjeto, prj.IdClassifContabil } into grpPrj
                                                                                     select new ProjetoDTO()
                                                                                     {
                                                                                         CodProjeto = grpPrj.Key.IdProjeto,
@@ -205,7 +205,7 @@ namespace Service.PainelClassificacao
                                                                                         Fase = from fse in lancamentosFase
                                                                                                          where fse.IdProjeto == grpPrj.Key.IdProjeto
                                                                                                              && fse.IdEmpresa == grpPrj.Key.IdEmpresa
-                                                                                                             && fse.SeqFase == grpPrj.Key.SeqFase
+                                                                                                             && fse.TipoLancamento == filtro.BaseOrcamento
                                                                                                          group  fse by new { fse.IdEmpresa, fse.IdProjeto, fse.SeqFase, fse.NomeFase, fse.Pep } into grpFse
                                                                                                          select new FaseContabilDTO
                                                                                                          {
