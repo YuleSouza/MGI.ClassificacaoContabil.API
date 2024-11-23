@@ -6,7 +6,7 @@ namespace Service.Helper
     public class PredicateHelper
     {
 
-        #region Contabil
+        #region [Esg]
         #region [ Base Orcamento ] 
         private Func<LancamentoClassificacaoEsgDTO, bool> predicateBaseOrcamentoRealizado = _ => true;
         private Func<LancamentoClassificacaoEsgDTO, bool>  predicateBaseOrcamentoPrevisto = _ => true;

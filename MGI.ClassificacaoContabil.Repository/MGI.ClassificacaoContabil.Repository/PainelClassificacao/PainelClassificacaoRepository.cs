@@ -371,7 +371,7 @@ namespace Repository.PainelClassificacao
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor)  ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2),
-                    dataFim = filtro.DataInicio.AddYears(2),
+                    dataFim = filtro.DataFim.AddYears(2),
                 });
 
         }

@@ -186,6 +186,10 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [HttpPost("v1/consultar/esg")]
         public async Task<IActionResult> ConsultarEsg(FiltroPainelClassificacaoEsg filtro) 
         {
+            if (filtro.BaseOrcamento == "R")
+            {
+                filtro.BaseOrcamento = "2";
+            }
             var retorno = await _serviceEsg.ConsultarClassificacaoEsg(filtro);
             return Ok(retorno);
         }

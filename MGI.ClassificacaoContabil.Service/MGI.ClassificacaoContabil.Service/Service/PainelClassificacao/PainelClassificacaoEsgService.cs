@@ -163,7 +163,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                                   && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
                                                                                   && p.IdPrograma == grpPro.Key.IdPrograma
                                                                                   && p.IdClassificacaoEsg == grp.Key.IdClassificacaoEsg
-                                                                                  group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.IdClassificacaoEsg, p.IdProjeto, p.NomeProjeto, p.SeqFase } into grpPrj
+                                                                                  group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.IdClassificacaoEsg, p.IdProjeto, p.NomeProjeto } into grpPrj
                                                                                   select new ProjetoEsgDTO()
                                                                                   {
                                                                                       IdProjeto = grpPrj.Key.IdProjeto,
@@ -177,7 +177,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                                       Fase = from fse in lancamentosFase
                                                                                              where fse.IdProjeto == grpPrj.Key.IdProjeto
                                                                                                 && fse.IdEmpresa == grpPrj.Key.IdEmpresa
-                                                                                                && fse.SeqFase == grpPrj.Key.SeqFase
+                                                                                                //&& fse.SeqFase == grpPrj.Key.SeqFase
                                                                                              group fse by new { fse.IdEmpresa, fse.IdProjeto, fse.SeqFase, fse.NomeFase, fse.Pep } into grpFse
                                                                                              select new FaseEsgDTO
                                                                                              {
