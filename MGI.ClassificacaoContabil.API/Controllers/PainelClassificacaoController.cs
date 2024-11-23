@@ -165,6 +165,10 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [HttpPost("v1/consultar")]
         public async Task<IActionResult> Consultar(PainelClassificacaoContabilModel filtro)
         {
+            if (filtro.BaseOrcamento == "R")
+            {
+                filtro.BaseOrcamento = "2";
+            }
             var retorno = await _service.ConsultarClassificacaoContabil(new FiltroPainelClassificacaoContabil()
             {
                 IdClassificacaoContabil = filtro.IdClassificacaoContabil,
