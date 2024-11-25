@@ -275,7 +275,7 @@ namespace Service.PainelClassificacao
                                                                    TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotPrj, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
                                                                    TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotPrj, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                                                },
-                                                TotalFase = from g in lancamentos
+                                                TotalFase = from g in lancamentosFase
                                                             where g.IdEmpresa == grpLan.Key.IdEmpresa
                                                             group g by new { g.IdEmpresa, g.IdGrupoPrograma, g.IdPrograma, g.IdProjeto, g.SeqFase } into grpTotFse
                                                             orderby grpTotFse.Key.SeqFase
@@ -285,8 +285,8 @@ namespace Service.PainelClassificacao
                                                                 IdPrograma = grpTotFse.Key.IdPrograma,
                                                                 IdProjeto = grpTotFse.Key.IdProjeto,
                                                                 IdSeqFase = grpTotFse.Key.SeqFase,
-                                                                TotalBaseOrcamento = CalcularValorBaseOrcamento(grpTotFse, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
-                                                                TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grpTotFse, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
+                                                                TotalBaseOrcamento = CalcularValorFaseBaseOrcamento(grpTotFse, filtro.BaseOrcamento, p.PredicateFasePrevisto, p.PredicateFasePrevisto_Realizado, p.PredicateFaseReplan, p.PredicateFaseOrcado),
+                                                                TotalFormatoAcompanhamento = CalcularValorFormaAcompanhamentoFase(grpTotFse, filtro.FormatAcompanhamento.ToString(), p.PredicateFormatoAcompFase_realizado, p.PredicateFormatoAcompFase_tendencia, p.PredicateFormatoAcompFase_ciclo, filtro.DataFim, filtro.DataInicio),
                                                             },
 
                                             }).ToList()
@@ -310,6 +310,27 @@ namespace Service.PainelClassificacao
             , Func<LancamentoClassificacaoDTO, bool> predicateRealizado
             , Func<LancamentoClassificacaoDTO, bool> predicateReplan
             , Func<LancamentoClassificacaoDTO, bool> predicateBaseOrcamentoOrcado)
+        {
+            switch (tipoOrcamento)
+            {
+                case ETipoOrcamento.Previsto:
+                    return lancamentos.Where(predicatePrevisto).Sum(p => p.ValorPrevisto) +
+                           lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
+                case ETipoOrcamento.Replan:
+                    return lancamentos.Where(predicateReplan).Sum(p => p.ValorReplan) +
+                           lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
+                default:
+                    return lancamentos.Where(predicateBaseOrcamentoOrcado).Sum(p => p.ValorOrcado) +
+                           lancamentos.Where(predicateRealizado).Sum(p => p.ValorRealizado);
+            }
+        }
+
+        private decimal CalcularValorFaseBaseOrcamento(IGrouping<object, LancamentoFaseContabilDTO> lancamentos
+            , string tipoOrcamento
+            , Func<LancamentoFaseContabilDTO, bool> predicatePrevisto
+            , Func<LancamentoFaseContabilDTO, bool> predicateRealizado
+            , Func<LancamentoFaseContabilDTO, bool> predicateReplan
+            , Func<LancamentoFaseContabilDTO, bool> predicateBaseOrcamentoOrcado)
         {
             switch (tipoOrcamento)
             {
