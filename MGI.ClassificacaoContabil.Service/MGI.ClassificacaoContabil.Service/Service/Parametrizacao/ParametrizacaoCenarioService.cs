@@ -40,7 +40,7 @@ namespace Service.Parametrizacao
         {
             if (parametrizacao.IdCenario == 0 || parametrizacao.IdClassificacaoContabil == 0 || parametrizacao.IdClassificacaoEsg == 0)
             {
-                return new PayloadDTO("Campos de Cenário, Classificação Contábil e Classificação ESG são obrigatórios", false);
+                return new PayloadDTO("Obrigatório Cenário, Classificação Contábil e Classificação ESG são obrigatórios", false);
             }
             PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
             var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
