@@ -18,17 +18,31 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
-            var resultado = await _service.ConsultarProjetosEsg(filtro);
+            var resultado = await _service.ConsultarProjetos(filtro);
+            return Ok(resultado);
+        }
+        
+        [HttpPost("v1/consultar/classif-investimento")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConsultarClassifInvestimento()
+        {
+            var resultado = await _service.ConsultarCalssifInvestimento();
+            return Ok(resultado);
+        }
+        
+        [HttpGet("v1/projeto/status")]
+        public async Task<IActionResult> ConsultarStatusProjeto()
+        {
+            var resultado = await _service.ConsultarStatusProjeto();
             return Ok(resultado);
         }
 
-        //api/esg/consultar/classif-investimento
-        [HttpPost("v1/consultar/classif-investimento")]
-        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        public async Task<IActionResult> ConsultarClassifInvestimento(FiltroProjetoEsg filtro)
+        [HttpPost("v1/projeto")]
+        public async Task<IActionResult> ConsultarProjetosEsg(FiltroProjeto filtro)
         {
-            var resultado = await _service.ConsultarProjetosEsg(filtro);
-            return Ok(resultado);
+            filtro.ProjetoEsg = true;
+            var resulto = await _service.ConsultarProjetosEsg(filtro);
+            return Ok(resulto);
         }
     }
 }

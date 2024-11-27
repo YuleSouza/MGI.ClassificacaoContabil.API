@@ -2,6 +2,7 @@
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
 using Service.DTO.Filtros;
+using Service.DTO.Projeto;
 
 namespace Service.Esg
 {
@@ -13,13 +14,22 @@ namespace Service.Esg
             _painelEsgRepository = painelEsgRepository;
         }
 
-        public Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
+        public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
         {
-            throw new NotImplementedException();
+            return await _painelEsgRepository.ConsultarCalssifInvestimento();
         }
 
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
-        {            
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
+        {
+            return await _painelEsgRepository.ConsultarProjetos(filtro);
+        }
+
+        public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
+        {
+            return await _painelEsgRepository.ConsultarStatusProjeto();
+        }
+        public async Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro)
+        {
             return await _painelEsgRepository.ConsultarProjetosEsg(filtro);
         }
     }

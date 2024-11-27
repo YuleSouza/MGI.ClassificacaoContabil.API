@@ -2,6 +2,7 @@
 using Infra.Data;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
+using Service.DTO.Projeto;
 using Service.Repository.Esg;
 using System.Text;
 
@@ -21,7 +22,7 @@ namespace Repository.PainelEsg
             return await _session.Connection.QueryAsync< CLassifInvestimentoDTO>(@$"select pgmtipcod as Id, pgmtipnom from PGMTIP");
         }
 
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
         {
             StringBuilder parametros = new StringBuilder();
             if (filtro.IdEmpresa >= 0)
@@ -35,11 +36,7 @@ namespace Repository.PainelEsg
             if (!string.IsNullOrEmpty(filtro.IdGerencia))
             {
                 parametros.Append(" and sub.IdGerencia = :idgerencia ");
-            }
-            if (!string.IsNullOrEmpty(filtro.IdGestor))
-            {
-                parametros.Append(" and TRIM(sub.IdGestor) = :idgestor ");
-            }
+            }            
             if (!string.IsNullOrEmpty(filtro.IdDiretoria))
             {
                 parametros.Append(" and TRIM(sub.IdDiretoria) = :iddiretoria ");
@@ -59,7 +56,7 @@ namespace Repository.PainelEsg
                 // TO-DO - não sei o que é
                 parametros.Append(" AND 2 = 2");
             }
-            return await _session.Connection.QueryAsync<ProjetoEsgDTO>($@"
+            return await _session.Connection.QueryAsync<Service.DTO.Esg.ProjetoEsgDTO>($@"
                 select  sub.IdProjeto
                         , sub.Nomeprojeto
                         , sub.IdEmpresa
@@ -109,11 +106,39 @@ namespace Repository.PainelEsg
                 idEmpresa = filtro.IdEmpresa,
                 idGrupoPrograma = filtro.IdGrupoPrograma,
                 iddiretoria = filtro.IdDiretoria,
-                idGestor = filtro.IdGestor,
+                idGerencia = filtro.IdGerencia,
                 datainicial = filtro.MesAnoInicio.ToString("01/MM/yyyy"),
                 datafinal = filtro.MesAnoFim.ToString("01/MM/yyyy"),
                 TipoValorProjeto = filtro.TipoValorProjeto
             });
+        }
+
+        public async Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro)
+        {
+            return await _session.Connection.QueryAsync<ProjetoEsg>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) Nome,
+                                                                            prjcod Id
+                                                                       FROM servdesk.projeto p, servdesk.pgmass a
+                                                                      WHERE p.prjsit = 'A'
+                                                                        AND a.pgmassver = 0
+                                                                        AND p.prjstg > 0
+                                                                        AND a.pgmasscod = p.pgmasscod
+                                                                        AND p.prjempcus IN :codEmpresa
+                                                                        AND (EXISTS (SELECT 1
+                                                                                       FROM servdesk.geradm g
+                                                                                      WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
+                                                                        AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
+                                                                        AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))
+                                                                        AND prjstg > 0",
+            new
+            {
+                codEmpresa = filtro.IdEmpresa,
+                usuario = filtro.Usuario?.ToUpper()
+            });
+        }
+
+        public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
+        {
+            return await _session.Connection.QueryAsync<StatusProjetoDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
         }
     }
 }
