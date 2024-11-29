@@ -22,7 +22,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
         
-        [HttpPost("v1/consultar/classif-investimento")]
+        [HttpGet("v1/consultar/classif-investimento")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> ConsultarClassifInvestimento()
         {

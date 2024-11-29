@@ -19,11 +19,12 @@ namespace Repository.PainelEsg
 
         public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
         {
-            return await _session.Connection.QueryAsync< CLassifInvestimentoDTO>(@$"select pgmtipcod as Id, pgmtipnom from PGMTIP");
+            return await _session.Connection.QueryAsync<CLassifInvestimentoDTO>(@$"select pgmtipcod as IdClassifInvestimento, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
         }
 
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
         {
+            #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
             if (filtro.IdEmpresa >= 0)
             {
@@ -56,6 +57,7 @@ namespace Repository.PainelEsg
                 // TO-DO - não sei o que é
                 parametros.Append(" AND 2 = 2");
             }
+            #endregion
             return await _session.Connection.QueryAsync<Service.DTO.Esg.ProjetoEsgDTO>($@"
                 select  sub.IdProjeto
                         , sub.Nomeprojeto
@@ -93,6 +95,7 @@ namespace Repository.PainelEsg
                 where p.prjsit = 'A'
                    and orc.prjorcano > 2016
                    and p.prjcod = 24814
+                   and p.prjesg is not null
                 ) sub
                 where 1 = 1 {parametros.ToString()}
                group by  sub.IdProjeto
@@ -116,19 +119,19 @@ namespace Repository.PainelEsg
         public async Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro)
         {
             return await _session.Connection.QueryAsync<ProjetoEsg>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) Nome,
-                                                                            prjcod Id
-                                                                       FROM servdesk.projeto p, servdesk.pgmass a
-                                                                      WHERE p.prjsit = 'A'
-                                                                        AND a.pgmassver = 0
-                                                                        AND p.prjstg > 0
-                                                                        AND a.pgmasscod = p.pgmasscod
-                                                                        AND p.prjempcus IN :codEmpresa
-                                                                        AND (EXISTS (SELECT 1
-                                                                                       FROM servdesk.geradm g
-                                                                                      WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
-                                                                        AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
-                                                                        AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))
-                                                                        AND prjstg > 0",
+                                                                              prjcod Id
+                                                                         FROM servdesk.projeto p, servdesk.pgmass a
+                                                                        WHERE p.prjsit = 'A'
+                                                                          AND a.pgmassver = 0
+                                                                          AND p.prjstg > 0
+                                                                          AND a.pgmasscod = p.pgmasscod
+                                                                          AND p.prjempcus IN :codEmpresa
+                                                                          AND (EXISTS (SELECT 1
+                                                                                         FROM servdesk.geradm g
+                                                                                        WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
+                                                                          AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
+                                                                          AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))
+                                                                          AND p.prjesg is not null",
             new
             {
                 codEmpresa = filtro.IdEmpresa,
