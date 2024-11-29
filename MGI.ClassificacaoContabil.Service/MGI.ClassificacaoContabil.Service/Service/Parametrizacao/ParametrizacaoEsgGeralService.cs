@@ -39,9 +39,9 @@ namespace Service.Parametrizacao
         private async Task<PayloadDTO> Validar(ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
-            if (parametrizacao.IdGrupoPrograma == 0)
+            if (parametrizacao.IdGrupoPrograma == 0 || parametrizacao.IdClassificacaoEsg == 0)
             {
-                payloadDTO = new PayloadDTO("Obrigatório o envio do grupo de programa", false);
+                payloadDTO = new PayloadDTO("Obrigatório o envio do Grupo de Programa e Classificação ESG", false);
             }
             var parametrosEsgGEral = await _repository.ConsultarParametrizacaoClassificacaoGeral();
             bool registroExistente = parametrosEsgGEral.Any(p => p.IdGrupoPrograma == parametrizacao.IdGrupoPrograma && p.IdClassificacaoEsg == parametrizacao.IdClassificacaoEsg);

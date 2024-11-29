@@ -2,6 +2,8 @@
 using Service.Interface.PainelClassificacao;
 
 using Microsoft.AspNetCore.Mvc;
+using MGI.ClassificacaoContabil.API.Model;
+using Service.Enum;
 
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
@@ -10,11 +12,15 @@ namespace MGI.ClassificacaoContabil.API.Controllers
     public class PainelClassificacaoController : ControllerBase
     {
         private readonly IPainelClassificacaoService _service;
+        private readonly IPainelClassificacaoEsgService _serviceEsg;
         private readonly ILogger<PainelClassificacaoController> _logger;
 
-        public PainelClassificacaoController(IPainelClassificacaoService service, ILogger<PainelClassificacaoController> logger)
+        public PainelClassificacaoController(IPainelClassificacaoService service, 
+            ILogger<PainelClassificacaoController> logger,
+            IPainelClassificacaoEsgService serviceEsg)
         {
             _service = service;
+            _serviceEsg = serviceEsg;
             _logger = logger;
         }
 
@@ -157,25 +163,46 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         #endregion
 
         [HttpPost("v1/consultar")]
-        public async Task<IActionResult> Consultar(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IActionResult> Consultar(PainelClassificacaoContabilModel filtro)
         {
-            var retorno = await _service.ConsultarClassificacaoContabil(filtro);
+            if (filtro.BaseOrcamento == "R")
+            {
+                filtro.BaseOrcamento = "2";
+            }
+            var retorno = await _service.ConsultarClassificacaoContabil(new FiltroPainelClassificacaoContabil()
+            {
+                IdClassificacaoContabil = filtro.IdClassificacaoContabil,
+                ClassificacaoContabil = filtro.ClassificacaoContabil,
+                FormatAcompanhamento = filtro.FormatAcompanhamento,
+                TipoAcumuladoOuAnual = filtro.TipoAcumuladoOuAnual,
+                IdGrupoPrograma = filtro.IdGrupoPrograma,
+                BaseOrcamento = filtro.BaseOrcamento,
+                IdPrograma = filtro.IdPrograma,
+                DataInicio = filtro.DataInicio,
+                IdEmpresa = filtro.IdEmpresa,
+                IdProjeto = filtro.IdProjeto,
+                IdGestor = filtro.IdGestor,
+                DataFim = filtro.DataFim,
+            });
             return Ok(retorno);
         }
 
         [HttpPost("v1/consultar/esg")]
         public async Task<IActionResult> ConsultarEsg(FiltroPainelClassificacaoEsg filtro) 
         {
-            var retorno = await _service.ConsultarClassificacaoEsg(filtro);
+            if (filtro.BaseOrcamento == "R")
+            {
+                filtro.BaseOrcamento = "2";
+            }
+            var retorno = await _serviceEsg.ConsultarClassificacaoEsg(filtro);
             return Ok(retorno);
         }
-
         
 
         [HttpGet("v1/consultar/classifesg/{idprojeto}/{idcenario}/{seqfase}")]
         public async Task<IActionResult> ConsultarClassifEsg([FromRoute]int idprojeto, int idcenario, int seqfase)
         {
-            var retorno = await _service.ConsultarClassifEsgPorCenario(new FiltroPainelClassificacaoEsg() 
+            var retorno = await _serviceEsg.ConsultarClassifEsgPorCenario(new FiltroPainelClassificacaoEsg() 
             { 
                 IdCenario = idcenario,
                 IdProjeto = idprojeto,
@@ -195,7 +222,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [HttpPost("v1/relatorio/esg")]
         public async Task<IActionResult> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
         {
-            var retorno = await _service.GerarRelatorioEsg(filtro);
+            var retorno = await _serviceEsg.GerarRelatorioEsg(filtro);
             if (retorno == null)
             {
                 return BadRequest("Erro ao gerar relatório");

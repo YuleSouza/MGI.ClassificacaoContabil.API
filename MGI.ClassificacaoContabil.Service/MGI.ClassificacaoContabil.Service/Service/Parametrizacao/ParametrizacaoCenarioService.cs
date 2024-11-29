@@ -38,6 +38,10 @@ namespace Service.Parametrizacao
         }
         private async Task<PayloadDTO> Validar(ParametrizacaoCenarioDTO parametrizacao)
         {
+            if (parametrizacao.IdCenario == 0 || parametrizacao.IdClassificacaoContabil == 0 || parametrizacao.IdClassificacaoEsg == 0)
+            {
+                return new PayloadDTO("Obrigatório Cenário, Classificação Contábil e Classificação ESG são obrigatórios", false);
+            }
             PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
             var parametrizacaoCenarios = await _repository.ConsultarParametrizacaoCenario();
             bool registroExistente = parametrizacaoCenarios.Any(p => p.IdCenario == parametrizacao.IdCenario

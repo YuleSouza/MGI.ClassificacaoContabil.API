@@ -1,4 +1,6 @@
-﻿namespace Service.DTO.Filtros
+﻿using Service.Enum;
+
+namespace Service.DTO.Filtros
 {
     public class FiltroPainelClassificacaoContabil
     {
@@ -35,7 +37,7 @@
         /// 0 - Orcado
         /// 1 - Replan
         /// </summary>
-        public char BaseOrcamento { get; set; }
+        public string BaseOrcamento { get; set; }
         public int ClassificacaoContabil {  get; set; }
         /// <summary>
         /// 0 - ORcado
@@ -44,6 +46,6 @@
         /// C - Ciclo
         /// T - Tendencia
         /// </summary>
-        public string? ValorInvestimento { get; set; }
+        public char? ValorInvestimento { get; set; }
     }
 }

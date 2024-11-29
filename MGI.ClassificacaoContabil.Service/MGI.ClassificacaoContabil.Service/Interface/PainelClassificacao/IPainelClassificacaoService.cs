@@ -25,14 +25,5 @@ namespace Service.Interface.PainelClassificacao
         Task<IEnumerable<LancamentoSAP>> ConsultarLancamentoSap(FiltroLancamentoSap filtro);
         Task<byte[]> GerarRelatorioContabil(FiltroPainelClassificacaoContabil filtro);
         #endregion
-
-        #region [ESG]
-
-        Task<PainelClassificacaoEsg> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro);
-        byte[] GerarExcel<T>(IEnumerable<T> data);
-
-        Task<int> ConsultarClassifEsgPorCenario(FiltroPainelClassificacaoEsg filtro);
-        Task<byte[]> GerarRelatorioEsg(FiltroPainelClassificacaoEsg filtro);
-        #endregion
     }
 }

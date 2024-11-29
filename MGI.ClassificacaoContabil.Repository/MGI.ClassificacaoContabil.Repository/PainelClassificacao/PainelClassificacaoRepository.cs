@@ -227,7 +227,7 @@ namespace Repository.PainelClassificacao
             });
         }
 
-        public async Task<IEnumerable<ClassificacaoContabilItemDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
+        public async Task<IEnumerable<LancamentoClassificacaoDTO>> ConsultarClassificacaoContabil(FiltroPainelClassificacaoContabil filtro)
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
@@ -252,22 +252,27 @@ namespace Repository.PainelClassificacao
             {
                 parametros.AppendLine(" and sub.IdEmpresa = :idEmpresa");
             }
+            if (filtro.IdClassificacaoContabil > 0)
+            {
+                parametros.AppendLine(" and sub.IdClassifContabil = :idClassifContabil");
+            }
             #endregion
-            return await _session.Connection.QueryAsync<ClassificacaoContabilItemDTO>($@"
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoDTO>($@"
                                 select * 
                                   from (select e.empcod as IdEmpresa
-                                      , e.empnom as NomeEmpresa
+                                      , trim(e.empnom) as NomeEmpresa
                                       , gru.pgmgrucod as IdGrupoPrograma
                                       , gru.pgmgrunom as GrupoDePrograma
                                       , pro.pgmcod as IdPrograma
                                       , pro.pgmnom as Programa
                                       , p.prjcod as IdProjeto
-                                      , p.prjnom as NomeProjeto      
+                                      , trim(p.prjnom) as NomeProjeto      
                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                                       , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
                                       , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
                                       , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                       , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                      , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
                                       , orc.prjorctip as TipoLancamento
                                       , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                       , p.prjges as IdGestor      
@@ -279,7 +284,11 @@ namespace Repository.PainelClassificacao
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         inner join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
                                         inner join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
-                                        inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','2','1') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
+                                        inner join prjorc orc on (p.prjcod = orc.prjcod 
+                                                                    and orc.prjorcfse > 0 
+                                                                    and orc.prjorcver = 0 
+                                                                    and orc.prjorctip in ('O','J','R','2','1','P') 
+                                                                    and orc.prjorcmes > 0 and orc.prjorcano > 0)
                                         left join prjfse fse on (orc.prjcod = fse.prjcod and orc.prjorcfse = fse.prjfseseq)
                                         inner join clacon cl on (fse.ccocod = cl.ccocod)
                                  where p.prjsit = 'A'
@@ -294,6 +303,7 @@ namespace Repository.PainelClassificacao
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2),
                     dataFim = filtro.DataInicio.AddYears(2),
+                    idClassifContabil = filtro.IdClassificacaoContabil
                 });
         }
 
@@ -301,37 +311,42 @@ namespace Repository.PainelClassificacao
         {
             StringBuilder parametros = new StringBuilder();
             #region [ filtros ]
+            parametros.AppendLine(" and sub.DtLancamentoProjeto between :dataInicio and :dataFim");
             if (filtro.IdGrupoPrograma.HasValue && filtro.IdGrupoPrograma.Value > 0)
             {
-                parametros.AppendLine(" and gru.pgmgrucod = :idGrupoPrograma ");
+                parametros.AppendLine(" and sub.IdGrupoPrograma = :idGrupoPrograma ");
             }
             if (filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0)
             {
-                parametros.AppendLine(" and pro.pgmcod = :idPrograma ");
+                parametros.AppendLine(" and sub.IdPrograma = :idPrograma ");
             }
             if (filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0)
             {
-                parametros.AppendLine(" and p.prjcod = :idProjeto");
+                parametros.AppendLine(" and sub.IdProjeto = :idProjeto");
             }
             if (!string.IsNullOrEmpty(filtro.IdGestor) && filtro.IdGestor != "0")
             {
-                parametros.AppendLine(" and p.prjges = :idGestor");
+                parametros.AppendLine(" and sub.IdGestor = :idGestor");
             }
             if (filtro.IdEmpresa >= 0)
             {
-                parametros.AppendLine(" and e.empcod = :idEmpresa");
+                parametros.AppendLine(" and sub.IdEmpresa = :idEmpresa");
             }
             #endregion
             return await _session.Connection.QueryAsync<LancamentoFaseContabilDTO>($@"
-                                select e.empcod as IdEmpresa
-                                       , gru.pgmgrucod as IdGrupoPrograma
-                                       , pro.pgmcod as IdPrograma
-                                       , p.prjcod as IdProjeto
+                                select sub.* 
+                                  from (
+                                select e.empcod                                           as IdEmpresa
+                                       , gru.pgmgrucod                                    as IdGrupoPrograma
+                                       , pro.pgmcod                                       as IdPrograma
+                                       , p.prjcod                                         as IdProjeto
                                        , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                                        , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
                                        , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
                                        , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
                                        , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
+                                       , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
+                                       , to_char(orc.prjorctip)                            as TipoLancamento
                                        , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                                        , p.prjges as IdGestor
                                        , nvl(fse.prjfsenom,'') as NomeFase
@@ -341,12 +356,17 @@ namespace Repository.PainelClassificacao
                                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                                         left join pgmgru gru on (gru.pgmgrucod = p.prjpgmgru)
                                         left join pgmpro pro on (pro.pgmcod = p.prjpgmcod)
-                                        inner join prjorc orc on (p.prjcod = orc.prjcod and orc.prjorcfse > 0 and orc.prjorcver = 0 and orc.prjorctip in ('O','J','R','1','2') AND orc.prjorcmes > 0 and orc.prjorcano > 0)
+                                        inner join prjorc orc on (p.prjcod = orc.prjcod 
+                                                                and orc.prjorcfse > 0 
+                                                                and orc.prjorcver = 0 
+                                                                and orc.prjorctip in ('O','J','R','1','2','P') 
+                                                                and orc.prjorcmes > 0 
+                                                                and orc.prjorcano > 0)
                                         left join prjfse fse on (fse.prjcod = orc.prjcod and fse.prjfseseq = orc.prjorcfse)
                                  where p.prjsit = 'A'
-                                   and orc.prjorcano > 2016
-                                       {parametros}
-                                 order by 1, fse.prjfseseq
+                                   and orc.prjorcano > 2016 ) sub
+                                   where 1 = 1    {parametros}
+                                 order by 1, sub.SeqFase
                                     ",
                 new
                 {
@@ -355,6 +375,8 @@ namespace Repository.PainelClassificacao
                     idPrograma = filtro.IdPrograma.HasValue && filtro.IdPrograma.Value > 0 ? filtro.IdPrograma : 0,
                     idProjeto = filtro.IdProjeto.HasValue && filtro.IdProjeto.Value > 0 ? filtro.IdProjeto : 0,
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor)  ? filtro.IdGestor : "0",
+                    dataInicio = filtro.DataInicio.AddYears(-2),
+                    dataFim = filtro.DataFim.AddYears(2),
                 });
 
         }
@@ -400,7 +422,7 @@ namespace Repository.PainelClassificacao
                 pep = filtro.Pep
             });
         }
-        public async Task<IEnumerable<LancamentoClassificacaoEsgDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
+        public async Task<IEnumerable<LancamentoClassificacaoDTO>> ConsultarClassificacaoEsg(FiltroPainelClassificacaoEsg filtro)
         {
             StringBuilder parametros = new StringBuilder();
             parametros.AppendLine(" and 1 = 1");
@@ -421,9 +443,9 @@ namespace Repository.PainelClassificacao
             if (!string.IsNullOrEmpty(filtro.IdGestor) && filtro.IdGestor != "0")
             {
                 parametros.AppendLine(" and a.idGestor = :idGestor");
-            }
+            }           
             #endregion
-            return await _session.Connection.QueryAsync<LancamentoClassificacaoEsgDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
+            return await _session.Connection.QueryAsync<LancamentoClassificacaoDTO>($@"select * from v_lanc_classif_esg a where a.idEmpresa = :idEmpresa {parametros.ToString()}", 
                 new {
                     idEmpresa = filtro.IdEmpresa,
                     idGrupoPrograma = filtro.IdGrupoPrograma.HasValue  && filtro.IdGrupoPrograma.Value > 0 ? filtro.IdGrupoPrograma : 0,
@@ -432,6 +454,7 @@ namespace Repository.PainelClassificacao
                     idGestor = !string.IsNullOrEmpty(filtro.IdGestor) ? filtro.IdGestor : "0",
                     dataInicio = filtro.DataInicio.AddYears(-2).ToString("dd/MM/yyyy"),
                     dataFim = filtro.DataFim.AddYears(2).ToString("dd/MM/yyyy"),
+                    idClassificacaoEsg = filtro.IdClassificacaoEsg
                 });
         }
 
