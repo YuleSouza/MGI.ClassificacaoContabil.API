@@ -3,6 +3,7 @@ using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
+using Service.Helper;
 
 namespace Service.Esg
 {
@@ -21,6 +22,7 @@ namespace Service.Esg
 
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
         {
+            var p = new PredicateHelper(filtro.FormatoAcompanhamento, filtro.DataFim, filtro.DataInicio, "E");
             return await _painelEsgRepository.ConsultarProjetos(filtro);
         }
 

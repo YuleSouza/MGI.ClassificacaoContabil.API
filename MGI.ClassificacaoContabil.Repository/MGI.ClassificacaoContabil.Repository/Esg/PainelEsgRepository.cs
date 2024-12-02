@@ -94,8 +94,7 @@ namespace Repository.PainelEsg
                         inner join corpora.usuari u on (u.USULOG = p.PRJGES)
                 where p.prjsit = 'A'
                    and orc.prjorcano > 2016
-                   and p.prjcod = 24814
-                   and p.prjesg is not null
+                   and p.prjesg = 'S'
                 ) sub
                 where 1 = 1 {parametros.ToString()}
                group by  sub.IdProjeto
