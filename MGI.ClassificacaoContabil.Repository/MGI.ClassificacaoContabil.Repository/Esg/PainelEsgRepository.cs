@@ -64,13 +64,13 @@ namespace Repository.PainelEsg
                         , sub.IdEmpresa
                         , sub.NomeEmpresa
                         , sub.IdGestor
-                        , sum(sub.ValorReplan) as TotalReplan
-                        , sum(sub.ValorTendencia) as TotalTendencia
-                        ,nvl(case when :TipoValorProjeto = 'O' then sum(sub.ValorOrcado)
-                            when :TipoValorProjeto = 'J' then sum(sub.ValorTendencia)
-                            when :TipoValorProjeto = '1' then sum(sub.ValorCiclo)
-                            when :TipoValorProjeto = '2' then sum(sub.ValorReplan)
-                            when :TipoValorProjeto = 'P' then sum(sub.ValorPrevisto) end,0) as ValorProjeto 
+                        , case when :BaseOrcamento = 'O' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.OrcadoPartirAnoAtual,0))
+                            when :BaseOrcamento = 'P' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.PrevistoPartirAnoAtual,0))
+                            when :BaseOrcamento = '2' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.ReplanPartirAnoAtual,0)) 
+                            else 0 end as ValorBaseOrcamento
+                        , case when :FormatoAcompanhamento = '1' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TedenciaMesAtualAteAnoVigente,0)) + sum(nvl(sub.CicloPartirAnoSeguinte,0))
+                               when :FormatoAcompanhamento = 'J' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TendenciaPartirMesAtual,0))
+                               else 0 end as ValorFormatoAcompanhamento
                 from (
                 select p.prjcod                                            as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -78,15 +78,64 @@ namespace Repository.PainelEsg
                         , trim(e.empnomfan)                                as NomeEmpresa        
                         , LTRIM(RTRIM(U.USUNOM))                           as IdGestor
                         , ''                                               as Patrocinador
-                        , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
-                        , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
-                        , decode(orc.prjorctip,'R',nvl(orc.prjorcval,0),0) as ValorRealizado
-                        , decode(orc.prjorctip,'2',nvl(orc.prjorcval,0),0) as ValorReplan
-                        , decode(orc.prjorctip,'1',nvl(orc.prjorcval,0),0) as ValorCiclo
-                        , decode(orc.prjorctip,'P',nvl(orc.prjorcval,0),0) as ValorPrevisto
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = 'R' 
+                              and orc2.prjorcmes > 0
+                              and orc2.prjorcano < to_char(sysdate,'YYYY')) as RealizadoAnoAnterior
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = 'O' 
+                              and orc2.prjorcmes > 0
+                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as OrcadoPartirAnoAtual
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = 'P' 
+                              and orc2.prjorcmes > 0
+                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as PrevistoPartirAnoAtual
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = '2' 
+                              and orc2.prjorcmes > 0
+                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as ReplanPartirAnoAtual
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = 'J' and orc2.prjorcmes > 0
+                              and orc2.prjorcmes between to_char(sysdate,'MM') and 12 
+                              and orc2.prjorcano = to_char(sysdate,'YYYY')) as TedenciaMesAtualAteAnoVigente
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = '1' and orc2.prjorcmes > 0
+                              and orc2.prjorcano > to_char(sysdate,'YYYY')) as CicloPartirAnoSeguinte
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = '1' and orc2.prjorcmes > 0
+                              and orc2.prjorcano > 0 
+                              and orc2.prjorcmes > to_char(sysdate,'MM')) as TendenciaPartirMesAtual
                   from projeto p
                         inner join prjorc orc on (p.prjcod = orc.prjcod 
-                                                and orc.prjorcfse > 0 
+                                                and orc.prjorcfse = 0
                                                 and orc.prjorcver = 0 
                                                 and orc.prjorctip in ('O','J','R','2','1') 
                                                 and orc.prjorcmes > 0 and orc.prjorcano > 0)

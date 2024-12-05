@@ -7,10 +7,8 @@
         public int IdEmpresa { get; set; }
         public string NomeEmpresa { get; set; }
         public string IdGestor {  get; set; }
-        public decimal TotalOrcado { get; set; }
-        public decimal TotalReplan {  get; set; }
-        public decimal TotalTendencia { get; set; }
-        public decimal ValorProjeto { get; set; }
+        public decimal ValorFormatoAcompanhamento { get; set; }
+        public decimal ValorBaseOrcamento { get; set; }
 
 
     }
