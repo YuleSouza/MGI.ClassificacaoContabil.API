@@ -9,7 +9,8 @@
         public string IdGestor {  get; set; }
         public decimal ValorFormatoAcompanhamento { get; set; }
         public decimal ValorBaseOrcamento { get; set; }
-
-
+        public string IdStatusProjeto { get; set; }
+        public string DescricaoStatusProjeto { get; set; }
+        public string StatusAprovacao { get; set; }
     }
 }

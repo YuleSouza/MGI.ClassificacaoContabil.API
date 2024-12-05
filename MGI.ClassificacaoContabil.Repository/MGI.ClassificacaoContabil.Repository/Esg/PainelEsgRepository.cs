@@ -30,6 +30,10 @@ namespace Repository.PainelEsg
             {
                 parametros.Append(" and sub.IdEmpresa = :IdEmpresa");
             }
+            if (filtro.IdProjeto > 0)
+            {
+                parametros.Append(" and sub.IdProjeto = :idProjeto");
+            }
             if (!string.IsNullOrEmpty(filtro.IdGrupoPrograma))
             {
                 parametros.Append(" and sub.IdGrupoPrograma = :idgrupoprogrma ");
@@ -64,6 +68,8 @@ namespace Repository.PainelEsg
                         , sub.IdEmpresa
                         , sub.NomeEmpresa
                         , sub.IdGestor
+                        , sub.IdStatusProjeto
+                        , sub.DescricaoStatusProjeto
                         , case when :BaseOrcamento = 'O' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.OrcadoPartirAnoAtual,0))
                             when :BaseOrcamento = 'P' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.PrevistoPartirAnoAtual,0))
                             when :BaseOrcamento = '2' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.ReplanPartirAnoAtual,0)) 
@@ -78,6 +84,8 @@ namespace Repository.PainelEsg
                         , trim(e.empnomfan)                                as NomeEmpresa        
                         , LTRIM(RTRIM(U.USUNOM))                           as IdGestor
                         , ''                                               as Patrocinador
+                        , st.prjstacod                                     as IdStatusProjeto
+                        , trim(st.prjstades)                               as DescricaoStatusProjeto
                         , (select sum(prjorcval) 
                              from prjorc orc2 
                             where orc2.prjcod = orc.prjcod 
@@ -141,9 +149,10 @@ namespace Repository.PainelEsg
                                                 and orc.prjorcmes > 0 and orc.prjorcano > 0)
                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                         inner join corpora.usuari u on (u.USULOG = p.PRJGES)
+                        inner join prjsta st on (st.prjstacod = p.prjsta and prjstasit = 'A')
                 where p.prjsit = 'A'
                    and orc.prjorcano > 2016
-                   and p.prjesg = 'S'
+                   or p.prjesg = 'S'
                 ) sub
                 where 1 = 1 {parametros.ToString()}
                group by  sub.IdProjeto
@@ -152,15 +161,19 @@ namespace Repository.PainelEsg
                         , sub.nomeprojeto
                         , sub.NomeEmpresa
                         , sub.IdGestor
+                        , sub.IdStatusProjeto
+                        , sub.DescricaoStatusProjeto
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
                 idGrupoPrograma = filtro.IdGrupoPrograma,
                 iddiretoria = filtro.IdDiretoria,
                 idGerencia = filtro.IdGerencia,
-                datainicial = filtro.MesAnoInicio.ToString("01/MM/yyyy"),
-                datafinal = filtro.MesAnoFim.ToString("01/MM/yyyy"),
-                TipoValorProjeto = filtro.TipoValorProjeto
+                datainicial = filtro.DataInicio.ToString("01/MM/yyyy"),
+                datafinal = filtro.DataFim.ToString("01/MM/yyyy"),
+                BaseOrcamento = filtro.BaseOrcamento,
+                FormatoAcompanhamento = filtro.FormatoAcompanhamento,
+                idProjeto = filtro.IdProjeto,
             });
         }
 
