@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Infra.Data;
+using OfficeOpenXml.ThreadedComments;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
@@ -62,7 +63,7 @@ namespace Repository.PainelEsg
                 parametros.Append(" AND 2 = 2");
             }
             #endregion
-            return await _session.Connection.QueryAsync<Service.DTO.Esg.ProjetoEsgDTO>($@"
+            return await _session.Connection.QueryAsync<ProjetoEsgDTO>($@"
                 select  sub.IdProjeto
                         , sub.Nomeprojeto
                         , sub.IdEmpresa
@@ -176,7 +177,6 @@ namespace Repository.PainelEsg
                 idProjeto = filtro.IdProjeto,
             });
         }
-
         public async Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro)
         {
             return await _session.Connection.QueryAsync<ProjetoEsg>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) Nome,
@@ -199,10 +199,97 @@ namespace Repository.PainelEsg
                 usuario = filtro.Usuario?.ToUpper()
             });
         }
-
         public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
         {
             return await _session.Connection.QueryAsync<StatusProjetoDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
+        }
+        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarCategoriaEsg()
+        {
+            return await _session.Connection.QueryAsync<CategoriaEsgDTO>(@$"select clecod as IdCategoria, clenom as Descricao from CLAESG where clesit = 'A'");
+        }
+        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria)
+        {
+            return await _session.Connection.QueryAsync<SubCategoriaEsgDTO>(@$"select clemetcod as IdSubCategoria
+                                                                                      , clemetnom as Descricao 
+                                                                                 from CLAESGMET 
+                                                                                where clemetsit = 'A' 
+                                                                                  and clecod = :clecod",
+                new
+                {
+                    clecod = idCategoria
+                });
+        }
+
+        public async Task<bool> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"insert into justif_classif_esg (
+                                                                        empcod, 
+                                                                        dat_anomes,
+                                                                        prjcod, 
+                                                                        id_cat_classif, 
+                                                                        id_sub_cat_classif, 
+                                                                        justificativa, 
+                                                                        uscriacao) 
+                                                                        values ( 
+                                                                        :empcod, 
+                                                                        :datanomes, 
+                                                                        :prjcod, 
+                                                                        :idcatclassif, 
+                                                                        :idsubcatclassif, 
+                                                                        :justificativa, 
+                                                                        :uscriacao)",
+            new
+            {
+                empcod = justificativa.IdEmpresa,
+                datanomes = justificativa.DataClassif.ToString("dd/MM/yyyy"),
+                prjcod = justificativa.IdProjeto,
+                idcatclassif = justificativa.IdCatClassif,
+                idsubcatclassif = justificativa.IdSubCatClassif,
+                justificativa = justificativa.Justificativa,
+                uscriacao = justificativa.UsCriacao,
+            });
+
+            return result == 1;
+        }
+        public async Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg 
+                                                                     set justificativa = :justificativa, 
+                                                                         usalteracao = :usalteracao,
+                                                                         dtalteracao = sysdate
+                                                                   where id_justif_classif_esg = :id_justif_classif_esg",
+            new
+            {
+    
+                justificativa = justificativa.Justificativa,
+                usalteracao = justificativa.UsAlteracao,
+            });
+            return result == 1;
+        }
+        public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
+        {
+            return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
+                                                                                        id_justif_classif_esg as IdJustifClassifEsg
+                                                                                        , empcod              as IdEmpresa
+                                                                                        , dat_anomes          as DataClassif
+                                                                                        , prjcod              as IdProjeto
+                                                                                        , id_cat_classif      as IdCatClassif
+                                                                                        , c.clenom            as DescricaoCategoria
+                                                                                        , id_sub_cat_classif  as IdSubCatClassif
+                                                                                        , m.clemetnom         as DescricaoSubCategoria
+                                                                                        , justificativa
+                                                                                        from justif_classif_esg j 
+                                                                                                inner join claesg c on (j.id_cat_classif = c.clecod)
+                                                                                                inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
+                                                                                        where j.prjcod = :idprojeto 
+                                                                                          and j.empcod = :idempresa
+                                                                                          and j.dat_anomes = :datClassif ",
+                                                                                          new
+                                                                                          {
+                                                                                              idprojeto = filtro.IdProjeto,
+                                                                                              idempresa = filtro.IdEmpresa,
+                                                                                              datClassif = filtro.DataClassif.ToString("dd/MM/yyyy")
+                                                                                          });
         }
     }
 }

@@ -12,5 +12,27 @@
         public string IdStatusProjeto { get; set; }
         public string DescricaoStatusProjeto { get; set; }
         public string StatusAprovacao { get; set; }
+        public decimal Variacao
+        {
+            get
+            {
+                return ValorBaseOrcamento - ValorFormatoAcompanhamento;
+            }
+            set
+            {
+                Variacao = value;
+            }
+        }
+        public decimal PercentualVariacao
+        {
+            get
+            {
+                return ValorBaseOrcamento == 0 ? 0 : Math.Round(Variacao / ValorBaseOrcamento * 100, 2);
+            }
+            set
+            {
+                PercentualVariacao = value;
+            }
+        }
     }
 }
