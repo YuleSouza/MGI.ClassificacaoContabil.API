@@ -5,5 +5,6 @@
         public int IdJustifClassifEsg { get; set; }
         public string Justificativa { get; set; }
         public string UsAlteracao { get; set; }
+        public char? StatusAprovacao { get; set; }
     }
 }

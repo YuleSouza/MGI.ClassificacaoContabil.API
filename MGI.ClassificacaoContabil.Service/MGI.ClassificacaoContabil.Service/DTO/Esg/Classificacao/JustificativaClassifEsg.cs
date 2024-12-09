@@ -9,7 +9,6 @@
         public int IdSubCatClassif { get; set; }
         public string Justificativa { get; set; }        
         public string UsCriacao { get; set; }
-        public DateTime? DtAlteracao { get; set; }
-        public string UsAlteracao { get; set; }
+        public char StatusAprovacao { get; set; }
     }
 }

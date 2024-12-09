@@ -16,5 +16,6 @@ namespace Service.Interface.PainelEsg
         Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);
+        Task<PayloadDTO> InserirAprovacao(int idClassifEsg, char aprovacao, string usuarioAprovacao);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Infra.Data;
-using OfficeOpenXml.ThreadedComments;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
@@ -22,7 +21,6 @@ namespace Repository.PainelEsg
         {
             return await _session.Connection.QueryAsync<CLassifInvestimentoDTO>(@$"select pgmtipcod as IdClassifInvestimento, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
         }
-
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
         {
             #region [ Filtros ]
@@ -219,27 +217,32 @@ namespace Repository.PainelEsg
                     clecod = idCategoria
                 });
         }
-
-        public async Task<bool> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
+        public async Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
         {
+            int id = await _session.Connection.QueryFirstOrDefaultAsync<int>(@"select SERVDESK.SEQ_JUSTIF_CLASSIF_ESG.NEXTVAL from dual ");
             int result = await _session.Connection.ExecuteAsync(@"insert into justif_classif_esg (
+                                                                        id_justif_classif_esg,
                                                                         empcod, 
                                                                         dat_anomes,
                                                                         prjcod, 
                                                                         id_cat_classif, 
                                                                         id_sub_cat_classif, 
                                                                         justificativa, 
-                                                                        uscriacao) 
+                                                                        uscriacao,
+                                                                        status_aprovacao) 
                                                                         values ( 
+                                                                        :id_justif_classif_esg,
                                                                         :empcod, 
                                                                         :datanomes, 
                                                                         :prjcod, 
                                                                         :idcatclassif, 
                                                                         :idsubcatclassif, 
                                                                         :justificativa, 
-                                                                        :uscriacao)",
+                                                                        :uscriacao,
+                                                                        :status_aprovacao)",
             new
             {
+                id_justif_classif_esg = id,
                 empcod = justificativa.IdEmpresa,
                 datanomes = justificativa.DataClassif.ToString("dd/MM/yyyy"),
                 prjcod = justificativa.IdProjeto,
@@ -247,9 +250,9 @@ namespace Repository.PainelEsg
                 idsubcatclassif = justificativa.IdSubCatClassif,
                 justificativa = justificativa.Justificativa,
                 uscriacao = justificativa.UsCriacao,
+                status_aprovacao = justificativa.StatusAprovacao
             });
-
-            return result == 1;
+            return id;
         }
         public async Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {
@@ -263,6 +266,18 @@ namespace Repository.PainelEsg
     
                 justificativa = justificativa.Justificativa,
                 usalteracao = justificativa.UsAlteracao,
+            });
+            return result == 1;
+        }
+        public async Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg
+                                                                     set status_aprovacao = :status_aprovacao
+                                                                   where id_justif_classif_esg = :id_justif_classif_esg",
+            new
+            {
+                status_aprovacao = justificativa.StatusAprovacao,
+                id_justif_classif_esg = justificativa.IdJustifClassifEsg
             });
             return result == 1;
         }
@@ -289,6 +304,49 @@ namespace Repository.PainelEsg
                                                                                               idprojeto = filtro.IdProjeto,
                                                                                               idempresa = filtro.IdEmpresa,
                                                                                               datClassif = filtro.DataClassif.ToString("dd/MM/yyyy")
+                                                                                          });
+        }
+        public async Task<bool> InserirAprovacao(AprovacaoClassifEsg aprovacaoClassifEsg)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"
+                                    insert into aprovacao_justif_classif_esg (
+                                        id_justif_classif_esg,
+                                        aprovacao,
+                                        uscriacao
+                                    ) values (
+                                        :id_justif_classif_esg,
+                                        :aprovacao,                                        
+                                        :uscriacao
+                                    );
+                                ", new
+            {                
+                id_justif_classif_esg = aprovacaoClassifEsg.IdJustifClassifEsg,
+                aprovacao = aprovacaoClassifEsg.Aprovacao,                
+                uscriacao = aprovacaoClassifEsg.UsCriacao
+            });
+
+            return result > 0;
+        }
+
+        public async Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id)
+        {
+            return await _session.Connection.QueryFirstOrDefaultAsync<JustificativaClassifEsgDTO>(@$"select 
+                                                                                            id_justif_classif_esg as IdJustifClassifEsg
+                                                                                            , empcod              as IdEmpresa
+                                                                                            , dat_anomes          as DataClassif
+                                                                                            , prjcod              as IdProjeto
+                                                                                            , id_cat_classif      as IdCatClassif
+                                                                                            , c.clenom            as DescricaoCategoria
+                                                                                            , id_sub_cat_classif  as IdSubCatClassif
+                                                                                            , m.clemetnom         as DescricaoSubCategoria
+                                                                                            , justificativa
+                                                                                        from justif_classif_esg j 
+                                                                                                inner join claesg c on (j.id_cat_classif = c.clecod)
+                                                                                                inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
+                                                                                        where j.id_justif_classif_esg = :id_justif_classif_esg",
+                                                                                          new
+                                                                                          {
+                                                                                              id_justif_classif_esg = id
                                                                                           });
         }
     }

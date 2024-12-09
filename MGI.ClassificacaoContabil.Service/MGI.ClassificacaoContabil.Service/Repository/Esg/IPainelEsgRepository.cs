@@ -12,8 +12,11 @@ namespace Service.Repository.Esg
         Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro);
         Task<IEnumerable<CategoriaEsgDTO>> ConsultarCategoriaEsg();
         Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria);
-        Task<bool> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
+        Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
+        Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);
+        Task<bool> InserirAprovacao(AprovacaoClassifEsg aprovacaoClassifEsg);
+        Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id);
     }
 }
