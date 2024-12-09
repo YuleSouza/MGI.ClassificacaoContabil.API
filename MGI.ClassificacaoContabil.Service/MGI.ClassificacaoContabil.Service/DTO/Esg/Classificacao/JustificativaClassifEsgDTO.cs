@@ -8,6 +8,8 @@
         public int IdSubCatClassif { get; set; }
         public string DescricaoSubCategoria { get; set; }
         public string Justificativa { get; set; }
+        public string StatusAprovacao { get; set; }
+        public string DescricaoStatusAprovacao { get; set; }
         // To-do - lista de logs
 
     }

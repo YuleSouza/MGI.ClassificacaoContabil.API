@@ -289,10 +289,12 @@ namespace Repository.PainelEsg
                                                                                         , dat_anomes          as DataClassif
                                                                                         , prjcod              as IdProjeto
                                                                                         , id_cat_classif      as IdCatClassif
-                                                                                        , c.clenom            as DescricaoCategoria
+                                                                                        , trim(c.clenom)            as DescricaoCategoria
                                                                                         , id_sub_cat_classif  as IdSubCatClassif
-                                                                                        , m.clemetnom         as DescricaoSubCategoria
-                                                                                        , justificativa
+                                                                                        , trim(m.clemetnom)         as DescricaoSubCategoria
+                                                                                        , justificativa       as Justificativa
+                                                                                        , j.status_aprovacao  as StatusAprovacao
+                                                                                        , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','Reprovado')  as DescricaoStatusAprovacao
                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_cat_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
@@ -356,7 +358,6 @@ namespace Repository.PainelEsg
                                                                                               id_justif_classif_esg = id
                                                                                           });
         }
-
         public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarAprovacoesPorId(int id)
         {
             return await _session.Connection.QueryAsync<AprovacaoClassifEsg>("select aprovacao as Aprovacao from aprovacao_justif_classif_esg where id_justif_classif_esg = :id_justf_classif_esg"
