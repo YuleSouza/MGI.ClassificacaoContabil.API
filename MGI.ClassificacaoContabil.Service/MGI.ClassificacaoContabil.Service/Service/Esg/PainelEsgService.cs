@@ -25,7 +25,7 @@ namespace Service.Esg
             return await _painelEsgRepository.ConsultarCategoriaEsg();
         }
         public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria)
-        {
+        {            
             return await _painelEsgRepository.ConsultarSubCategoriaEsg(idCategoria);
         }
 
@@ -77,28 +77,48 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> InserirAprovacao(int idClassifEsg, char aprovacao, string usuarioAprovacao)
         {
-            if (!_aprovacoes.Contains(aprovacao)) 
-            {
-                return new PayloadDTO("Tipo de aprovações permitidas A,P ou R", false);
-            }
+            var validacao = await ValidarAprovacao(idClassifEsg, aprovacao);
+            if (!validacao.Sucesso) return validacao;
             await _transactionHelper.ExecuteInTransactionAsync(
                 async () =>
                 {
-                    var classifEsg = await _painelEsgRepository.ConsultarJustificativaEsgPorId(idClassifEsg);
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
                     {
-                        IdJustifClassifEsg = classifEsg.IdJustifClassifEsg,
+                        IdJustifClassifEsg = idClassifEsg,
                         Aprovacao = aprovacao,
                         UsCriacao = usuarioAprovacao
                     });
                     await _painelEsgRepository.AlterarStatusJustificativaEsg(new AlteracaoJustificativaClassifEsg()
                     {
-                        IdJustifClassifEsg = classifEsg.IdJustifClassifEsg,
+                        IdJustifClassifEsg = idClassifEsg,
                         StatusAprovacao = aprovacao
                     });
                     return true;
                 }, "");
+            // enviar e-mail para o gestores
             return new PayloadDTO("Classificação aprovada com sucesso", true);
+        }
+
+        private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, char aprovacao)
+        {
+            var classificacao = await _painelEsgRepository.ConsultarAprovacoesPorId(idClassifEsg);
+            if (!classificacao.Any())
+            {
+                return new PayloadDTO("Classificação não existe!", false);
+            }
+            if (!_aprovacoes.Contains(aprovacao))
+            {
+                return new PayloadDTO("Tipo de aprovações permitidas A,P ou R", false);
+            }
+            var logsAprovacao = await _painelEsgRepository.ConsultarAprovacoesPorId(idClassifEsg);
+            var pendentes = logsAprovacao.Where(p => p.Aprovacao == 'P');
+            var aprovados = logsAprovacao.Where(p => p.Aprovacao == 'A');
+            var reprovados = logsAprovacao.Where(p => p.Aprovacao == 'R');
+            if (pendentes.Any() && (aprovados.Any() || reprovados.Any()))
+            {
+                return new PayloadDTO("Classificação não pode ser aprovada ou reprovada.", false);
+            }
+            return new PayloadDTO(string.Empty, true);
         }
     }
 }

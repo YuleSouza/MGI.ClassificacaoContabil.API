@@ -151,7 +151,7 @@ namespace Repository.PainelEsg
                         inner join prjsta st on (st.prjstacod = p.prjsta and prjstasit = 'A')
                 where p.prjsit = 'A'
                    and orc.prjorcano > 2016
-                   or p.prjesg = 'S'
+                   and p.prjesg = 'S'
                 ) sub
                 where 1 = 1 {parametros.ToString()}
                group by  sub.IdProjeto
@@ -190,7 +190,7 @@ namespace Repository.PainelEsg
                                                                                         WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
                                                                           AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
                                                                           AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))
-                                                                          AND p.prjesg is not null",
+                                                                          AND p.prjesg = 'S'",
             new
             {
                 codEmpresa = filtro.IdEmpresa,
@@ -308,7 +308,9 @@ namespace Repository.PainelEsg
         }
         public async Task<bool> InserirAprovacao(AprovacaoClassifEsg aprovacaoClassifEsg)
         {
-            int result = await _session.Connection.ExecuteAsync(@"
+            try
+            {
+                int result = await _session.Connection.ExecuteAsync(@"
                                     insert into aprovacao_justif_classif_esg (
                                         id_justif_classif_esg,
                                         aprovacao,
@@ -317,17 +319,22 @@ namespace Repository.PainelEsg
                                         :id_justif_classif_esg,
                                         :aprovacao,                                        
                                         :uscriacao
-                                    );
+                                    )
                                 ", new
-            {                
-                id_justif_classif_esg = aprovacaoClassifEsg.IdJustifClassifEsg,
-                aprovacao = aprovacaoClassifEsg.Aprovacao,                
-                uscriacao = aprovacaoClassifEsg.UsCriacao
-            });
+                {
+                    id_justif_classif_esg = aprovacaoClassifEsg.IdJustifClassifEsg,
+                    aprovacao = aprovacaoClassifEsg.Aprovacao,
+                    uscriacao = aprovacaoClassifEsg.UsCriacao
+                });
+                return result > 0;
+            }
+            catch (Exception ex) 
+            {
 
-            return result > 0;
+                throw ex;
+            }
+
         }
-
         public async Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id)
         {
             return await _session.Connection.QueryFirstOrDefaultAsync<JustificativaClassifEsgDTO>(@$"select 
@@ -348,6 +355,15 @@ namespace Repository.PainelEsg
                                                                                           {
                                                                                               id_justif_classif_esg = id
                                                                                           });
+        }
+
+        public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarAprovacoesPorId(int id)
+        {
+            return await _session.Connection.QueryAsync<AprovacaoClassifEsg>("select aprovacao as Aprovacao from aprovacao_justif_classif_esg where id_justif_classif_esg = :id_justf_classif_esg"
+                , new
+                {
+                    id_justf_classif_esg = id
+                });
         }
     }
 }
