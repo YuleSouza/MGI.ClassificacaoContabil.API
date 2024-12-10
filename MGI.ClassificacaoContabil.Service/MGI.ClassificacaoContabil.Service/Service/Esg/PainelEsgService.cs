@@ -68,12 +68,19 @@ namespace Service.Esg
         {
             return await _transactionHelper.ExecuteInTransactionAsync(
                 async () => await _painelEsgRepository.AlterarJustificativaEsg(justificativa)                    
-                , "Classificacao alterada com sucesso"
+                , "Classificacao alterada com sucesso!"
             );
         }
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
-            return await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
+            var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
+            foreach (var item in retorno)
+            {
+                var aprovacoes = await _painelEsgRepository.ConsultarAprovacoesPorId(item.IdJustifClassifEsg);
+                item.Logs = new List<AprovacaoClassifEsg>();
+                item.Logs.AddRange(aprovacoes);
+            }
+            return retorno;
         }
         public async Task<PayloadDTO> InserirAprovacao(int idClassifEsg, char aprovacao, string usuarioAprovacao)
         {
@@ -98,7 +105,6 @@ namespace Service.Esg
             // enviar e-mail para o gestores
             return new PayloadDTO("Classificação aprovada com sucesso", true);
         }
-
         private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, char aprovacao)
         {
             var classificacao = await _painelEsgRepository.ConsultarAprovacoesPorId(idClassifEsg);
@@ -119,6 +125,22 @@ namespace Service.Esg
                 return new PayloadDTO("Classificação não pode ser aprovada ou reprovada.", false);
             }
             return new PayloadDTO(string.Empty, true);
+        }
+        public async Task<PayloadDTO> ExcluirClassificacao(int id, string usuarioExclusao)
+        {
+            return await _transactionHelper.ExecuteInTransactionAsync(
+                async () => {
+                    await _painelEsgRepository.ExcluirClassificacao(id);
+                    await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
+                    {
+                        Aprovacao = 'E',
+                        IdJustifClassifEsg = id,
+                        UsCriacao = usuarioExclusao
+                    });
+                    return true;    
+                }
+                , "Classificação excluida com sucesso!"
+                );
         }
     }
 }

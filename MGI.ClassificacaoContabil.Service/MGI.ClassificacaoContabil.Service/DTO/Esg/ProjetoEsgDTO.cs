@@ -12,6 +12,7 @@
         public string IdStatusProjeto { get; set; }
         public string DescricaoStatusProjeto { get; set; }
         public string StatusAprovacao { get; set; }
+        public string NomePatrocinador { get; set; }
         public decimal Variacao
         {
             get

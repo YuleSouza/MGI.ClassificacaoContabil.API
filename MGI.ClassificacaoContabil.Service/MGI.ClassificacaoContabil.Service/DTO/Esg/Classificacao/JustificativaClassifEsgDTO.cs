@@ -10,7 +10,7 @@
         public string Justificativa { get; set; }
         public string StatusAprovacao { get; set; }
         public string DescricaoStatusAprovacao { get; set; }
-        // To-do - lista de logs
-
+        public bool ClassificacaoBloqueada { get; set; }
+        public List<AprovacaoClassifEsg> Logs { get; set; }
     }
 }

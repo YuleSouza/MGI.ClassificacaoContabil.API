@@ -69,6 +69,7 @@ namespace Repository.PainelEsg
                         , sub.IdGestor
                         , sub.IdStatusProjeto
                         , sub.DescricaoStatusProjeto
+                        , '' as NomePatrocinador
                         , case when :BaseOrcamento = 'O' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.OrcadoPartirAnoAtual,0))
                             when :BaseOrcamento = 'P' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.PrevistoPartirAnoAtual,0))
                             when :BaseOrcamento = '2' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.ReplanPartirAnoAtual,0)) 
@@ -76,6 +77,9 @@ namespace Repository.PainelEsg
                         , case when :FormatoAcompanhamento = '1' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TedenciaMesAtualAteAnoVigente,0)) + sum(nvl(sub.CicloPartirAnoSeguinte,0))
                                when :FormatoAcompanhamento = 'J' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TendenciaPartirMesAtual,0))
                                else 0 end as ValorFormatoAcompanhamento
+                        , (sub.Aprovados / sub.classificacoes) * 100 as PercentualAprovados
+                        , (sub.Pendentes / sub.classificacoes) * 100 as PercentualPendentes
+                        , (sub.Reprovados / sub.classificacoes) * 100 as PercentualReprovados
                 from (
                 select p.prjcod                                            as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -140,6 +144,10 @@ namespace Repository.PainelEsg
                               and orc2.prjorctip = '1' and orc2.prjorcmes > 0
                               and orc2.prjorcano > 0 
                               and orc2.prjorcmes > to_char(sysdate,'MM')) as TendenciaPartirMesAtual
+                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod) as classificacoes
+                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'A') as aprovados
+                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'P') as pendentes
+                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'R') as reprovados
                   from projeto p
                         inner join prjorc orc on (p.prjcod = orc.prjcod 
                                                 and orc.prjorcfse = 0
@@ -244,7 +252,7 @@ namespace Repository.PainelEsg
             {
                 id_justif_classif_esg = id,
                 empcod = justificativa.IdEmpresa,
-                datanomes = justificativa.DataClassif.ToString("dd/MM/yyyy"),
+                datanomes = justificativa.DataClassif.ToString("01/MM/yyyy"),
                 prjcod = justificativa.IdProjeto,
                 idcatclassif = justificativa.IdCatClassif,
                 idsubcatclassif = justificativa.IdSubCatClassif,
@@ -283,6 +291,17 @@ namespace Repository.PainelEsg
         }
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
+            #region [ Filtros ]
+            StringBuilder parametros = new StringBuilder();
+            if (filtro.ExibirClassificaoExcluida)
+            {
+                parametros.Append(" and j.status_aprovacao = 'E'");
+            }
+            else
+            {
+                parametros.Append(" and j.status_aprovacao != 'E'");
+            }
+            #endregion
             return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
                                                                                         id_justif_classif_esg as IdJustifClassifEsg
                                                                                         , empcod              as IdEmpresa
@@ -294,13 +313,14 @@ namespace Repository.PainelEsg
                                                                                         , trim(m.clemetnom)         as DescricaoSubCategoria
                                                                                         , justificativa       as Justificativa
                                                                                         , j.status_aprovacao  as StatusAprovacao
-                                                                                        , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','Reprovado')  as DescricaoStatusAprovacao
+                                                                                        , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
+                                                                                        , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_cat_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
                                                                                         where j.prjcod = :idprojeto 
                                                                                           and j.empcod = :idempresa
-                                                                                          and j.dat_anomes = :datClassif ",
+                                                                                          and j.dat_anomes = :datClassif {parametros}",
                                                                                           new
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,
@@ -352,7 +372,7 @@ namespace Repository.PainelEsg
                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_cat_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
-                                                                                        where j.id_justif_classif_esg = :id_justif_classif_esg",
+                                                                                        where j.id_justif_classif_esg = :id_justif_classif_esg ",
                                                                                           new
                                                                                           {
                                                                                               id_justif_classif_esg = id
@@ -360,11 +380,28 @@ namespace Repository.PainelEsg
         }
         public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarAprovacoesPorId(int id)
         {
-            return await _session.Connection.QueryAsync<AprovacaoClassifEsg>("select aprovacao as Aprovacao from aprovacao_justif_classif_esg where id_justif_classif_esg = :id_justf_classif_esg"
+            return await _session.Connection.QueryAsync<AprovacaoClassifEsg>(@"select aprovacao             as Aprovacao
+                                                                                    , uscriacao             as UsCriacao
+                                                                                    , dtcriacao             as DtCriacao
+                                                                                    , id_aprovacao          as IdAprovacao 
+                                                                                    , id_justif_classif_esg as IdJustifClassifEsg
+                                                                                 from aprovacao_justif_classif_esg 
+                                                                                where id_justif_classif_esg = :id_justf_classif_esg"
                 , new
                 {
                     id_justf_classif_esg = id
                 });
+        }
+        public async Task<bool> ExcluirClassificacao(int id)
+        {
+            int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg
+                                                                     set status_aprovacao = 'E'
+                                                                   where id_justif_classif_esg = :id_justif_classif_esg",
+            new
+            {
+                id_justif_classif_esg = id
+            });
+            return result == 1;
         }
     }
 }

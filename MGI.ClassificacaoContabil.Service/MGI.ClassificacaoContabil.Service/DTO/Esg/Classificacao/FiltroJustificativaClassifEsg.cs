@@ -5,5 +5,6 @@
         public int IdProjeto { get; set; }
         public int IdEmpresa { get; set; }
         public DateTime DataClassif { get; set; }
+        public bool ExibirClassificaoExcluida { get; set; } = false;        
     }
 }

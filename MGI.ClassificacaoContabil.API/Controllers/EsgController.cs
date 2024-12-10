@@ -51,8 +51,16 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("v1/categoria")]
+        [ActionDescription("Consultar todas Categorias Esg")]
+        public async Task<IActionResult> ConsultarCategoriaEsg()
+        {
+            var resultado = await _service.ConsultarCategoriaEsg();
+            return Ok(resultado);
+        }
+
         [HttpGet("v1/subcategoria/{idCategoria}")]
-        [ActionDescription("Consultar Sub Categorias Esg")]
+        [ActionDescription("Consultar Sub Categorias Esg por id de Categoria")]
         public async Task<IActionResult> ConsultarSubCategoriaEsg([FromRoute] int idCategoria)
         {
             var resultado = await _service.ConsultarSubCategoriaEsg(idCategoria);
@@ -79,7 +87,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         [HttpPost("v1/classificacao/consultar")]
         [ActionDescription("Consultar Classificação e Justificativa Painel Esg")]
-        public async Task<IActionResult> AlterarJustificativa([FromBody] FiltroJustificativaClassifEsg justificativaClassifEsg)
+        public async Task<IActionResult> ConsultarJustificativa([FromBody] FiltroJustificativaClassifEsg justificativaClassifEsg)
         {
             var resultado = await _service.ConsultarJustificativaEsg(justificativaClassifEsg);
             return Ok(resultado);
@@ -90,6 +98,15 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, char aprovacao, string usuarioAprovacao)
         {
             var resultado = await _service.InserirAprovacao(idClassifEsg, aprovacao, usuarioAprovacao);
+            if (resultado != null) return BadRequest(resultado);
+            return Ok(resultado);
+        }
+
+        [HttpDelete("v1/classificacao/excluir/{idClassifEsg}/{usuarioExclusao}")]
+        [ActionDescription("Exclusão da classificação Esg")]
+        public async Task<IActionResult> Excluir([FromRoute] int idClassifEsg, string usuarioExclusao) 
+        {
+            var resultado = await _service. ExcluirClassificacao(idClassifEsg, usuarioExclusao);
             if (resultado != null) return BadRequest(resultado);
             return Ok(resultado);
         }
