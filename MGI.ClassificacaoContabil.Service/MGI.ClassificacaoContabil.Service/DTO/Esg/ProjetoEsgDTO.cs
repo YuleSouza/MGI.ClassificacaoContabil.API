@@ -11,8 +11,10 @@
         public decimal ValorBaseOrcamento { get; set; }
         public string IdStatusProjeto { get; set; }
         public string DescricaoStatusProjeto { get; set; }
-        public string StatusAprovacao { get; set; }
         public string NomePatrocinador { get; set; }
+        public decimal PercentualAprovados { get; set; }
+        public decimal PercentualPendentes { get; set; }
+        public decimal PercentualReprovados { get; set; }
         public decimal Variacao
         {
             get

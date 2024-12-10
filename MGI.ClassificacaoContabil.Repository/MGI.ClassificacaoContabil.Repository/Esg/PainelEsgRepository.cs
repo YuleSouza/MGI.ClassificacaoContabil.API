@@ -163,13 +163,17 @@ namespace Repository.PainelEsg
                 ) sub
                 where 1 = 1 {parametros.ToString()}
                group by  sub.IdProjeto
-                        , sub.IdEmpresa
-                        , sub.IdProjeto
-                        , sub.nomeprojeto
-                        , sub.NomeEmpresa
-                        , sub.IdGestor
-                        , sub.IdStatusProjeto
-                        , sub.DescricaoStatusProjeto
+                         , sub.IdEmpresa
+                         , sub.IdProjeto
+                         , sub.nomeprojeto
+                         , sub.NomeEmpresa
+                         , sub.IdGestor
+                         , sub.IdStatusProjeto
+                         , sub.DescricaoStatusProjeto
+                         , sub.Aprovados
+                         , sub.classificacoes
+                         , sub.Pendentes
+                         , sub.Reprovados
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
