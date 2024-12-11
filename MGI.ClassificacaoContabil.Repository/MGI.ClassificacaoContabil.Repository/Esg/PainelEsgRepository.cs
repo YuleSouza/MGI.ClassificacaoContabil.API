@@ -69,7 +69,7 @@ namespace Repository.PainelEsg
                         , sub.IdGestor
                         , sub.IdStatusProjeto
                         , sub.DescricaoStatusProjeto
-                        , '' as NomePatrocinador
+                        , sub.Patrocinador as NomePatrocinador
                         , case when :BaseOrcamento = 'O' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.OrcadoPartirAnoAtual,0))
                             when :BaseOrcamento = 'P' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.PrevistoPartirAnoAtual,0))
                             when :BaseOrcamento = '2' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.ReplanPartirAnoAtual,0)) 
@@ -86,7 +86,7 @@ namespace Repository.PainelEsg
                         , e.empcod                                         as IdEmpresa
                         , trim(e.empnomfan)                                as NomeEmpresa        
                         , LTRIM(RTRIM(U.USUNOM))                           as IdGestor
-                        , ''                                               as Patrocinador
+                        , usu.usunom                                       as Patrocinador
                         , st.prjstacod                                     as IdStatusProjeto
                         , trim(st.prjstades)                               as DescricaoStatusProjeto
                         , (select sum(prjorcval) 
@@ -157,6 +157,7 @@ namespace Repository.PainelEsg
                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                         inner join corpora.usuari u on (u.USULOG = p.PRJGES)
                         inner join prjsta st on (st.prjstacod = p.prjsta and prjstasit = 'A')
+                        inner join corpora.usuari usu on (p.prjreq = usu.usulog)
                 where p.prjsit = 'A'
                    and orc.prjorcano > 2016
                    and p.prjesg = 'S'
@@ -174,6 +175,8 @@ namespace Repository.PainelEsg
                          , sub.classificacoes
                          , sub.Pendentes
                          , sub.Reprovados
+                         , sub.Patrocinador
+               order by sub.IdProjeto
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
@@ -364,23 +367,23 @@ namespace Repository.PainelEsg
         public async Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id)
         {
             return await _session.Connection.QueryFirstOrDefaultAsync<JustificativaClassifEsgDTO>(@$"select 
-                                                                                            id_justif_classif_esg as IdJustifClassifEsg
-                                                                                            , empcod              as IdEmpresa
-                                                                                            , dat_anomes          as DataClassif
-                                                                                            , prjcod              as IdProjeto
-                                                                                            , id_cat_classif      as IdCatClassif
-                                                                                            , c.clenom            as DescricaoCategoria
-                                                                                            , id_sub_cat_classif  as IdSubCatClassif
-                                                                                            , m.clemetnom         as DescricaoSubCategoria
-                                                                                            , justificativa
-                                                                                        from justif_classif_esg j 
-                                                                                                inner join claesg c on (j.id_cat_classif = c.clecod)
-                                                                                                inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
-                                                                                        where j.id_justif_classif_esg = :id_justif_classif_esg ",
-                                                                                          new
-                                                                                          {
-                                                                                              id_justif_classif_esg = id
-                                                                                          });
+                                                                                                        id_justif_classif_esg as IdJustifClassifEsg
+                                                                                                        , empcod              as IdEmpresa
+                                                                                                        , dat_anomes          as DataClassif
+                                                                                                        , prjcod              as IdProjeto
+                                                                                                        , id_cat_classif      as IdCatClassif
+                                                                                                        , c.clenom            as DescricaoCategoria
+                                                                                                        , id_sub_cat_classif  as IdSubCatClassif
+                                                                                                        , m.clemetnom         as DescricaoSubCategoria
+                                                                                                        , justificativa
+                                                                                                    from justif_classif_esg j 
+                                                                                                            inner join claesg c on (j.id_cat_classif = c.clecod)
+                                                                                                            inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
+                                                                                                    where j.id_justif_classif_esg = :id_justif_classif_esg ",
+                                                                                                    new
+                                                                                                    {
+                                                                                                        id_justif_classif_esg = id
+                                                                                                    });
         }
         public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarAprovacoesPorId(int id)
         {
