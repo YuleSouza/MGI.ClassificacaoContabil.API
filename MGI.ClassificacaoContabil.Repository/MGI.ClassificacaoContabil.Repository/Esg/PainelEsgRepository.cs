@@ -25,6 +25,10 @@ namespace Repository.PainelEsg
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
+            //if (filtro.DataInicio != null)
+            //{
+            //    parametros.Append(" and sub.IdEmpresa = :IdEmpresa");
+            //}
             if (filtro.IdEmpresa >= 0)
             {
                 parametros.Append(" and sub.IdEmpresa = :IdEmpresa");
@@ -76,10 +80,7 @@ namespace Repository.PainelEsg
                             else 0 end as ValorBaseOrcamento
                         , case when :FormatoAcompanhamento = '1' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TedenciaMesAtualAteAnoVigente,0)) + sum(nvl(sub.CicloPartirAnoSeguinte,0))
                                when :FormatoAcompanhamento = 'J' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TendenciaPartirMesAtual,0))
-                               else 0 end as ValorFormatoAcompanhamento
-                        , (sub.Aprovados / sub.classificacoes) * 100 as PercentualAprovados
-                        , (sub.Pendentes / sub.classificacoes) * 100 as PercentualPendentes
-                        , (sub.Reprovados / sub.classificacoes) * 100 as PercentualReprovados
+                               else 0 end as ValorFormatoAcompanhamento                        
                 from (
                 select p.prjcod                                            as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
