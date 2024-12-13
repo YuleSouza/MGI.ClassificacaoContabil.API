@@ -46,7 +46,6 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Consultar Projetos Painel Esg")]
         public async Task<IActionResult> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
-            filtro.ProjetoEsg = true;
             var resultado = await _service.ConsultarComboProjetosEsg(filtro);
             return Ok(resultado);
         }

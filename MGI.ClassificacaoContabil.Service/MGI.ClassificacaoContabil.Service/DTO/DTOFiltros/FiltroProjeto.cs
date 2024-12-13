@@ -4,6 +4,5 @@
     {
         public string? IdEmpresa { get; set; }
         public string? Usuario { get; set; }
-        public bool? ProjetoEsg { get; set; } = false;
     }
 }
