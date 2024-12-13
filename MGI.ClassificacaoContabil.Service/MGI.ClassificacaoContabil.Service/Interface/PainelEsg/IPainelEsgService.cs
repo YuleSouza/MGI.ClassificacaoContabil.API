@@ -7,12 +7,12 @@ namespace Service.Interface.PainelEsg
 {
     public interface IPainelEsgService
     {
-        Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro);
+        Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro);
         Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
         Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto();
-        Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro);
-        Task<IEnumerable<CategoriaEsgDTO>> ConsultarCategoriaEsg();
-        Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria);
+        Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro);
+        Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg();
+        Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria);
         Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);

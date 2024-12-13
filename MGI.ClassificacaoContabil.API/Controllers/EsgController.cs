@@ -19,9 +19,9 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [HttpPost("v1/consultar")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Consultar Projetos Esg")]
-        public async Task<IActionResult> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
+        public async Task<IActionResult> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
         {
-            var resultado = await _service.ConsultarProjetos(filtro);
+            var resultado = await _service.ConsultarProjetosPainelEsg(filtro);
             return Ok(resultado);
         }
         
@@ -44,10 +44,10 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         [HttpPost("v1/projeto")]
         [ActionDescription("Consultar Projetos Painel Esg")]
-        public async Task<IActionResult> ConsultarProjetosEsg(FiltroProjeto filtro)
+        public async Task<IActionResult> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
             filtro.ProjetoEsg = true;
-            var resultado = await _service.ConsultarProjetosEsg(filtro);
+            var resultado = await _service.ConsultarComboProjetosEsg(filtro);
             return Ok(resultado);
         }
 
@@ -55,7 +55,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Consultar todas Categorias Esg")]
         public async Task<IActionResult> ConsultarCategoriaEsg()
         {
-            var resultado = await _service.ConsultarCategoriaEsg();
+            var resultado = await _service.ConsultarClassificacaoEsg();
             return Ok(resultado);
         }
 
@@ -63,7 +63,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Consultar Sub Categorias Esg por id de Categoria")]
         public async Task<IActionResult> ConsultarSubCategoriaEsg([FromRoute] int idCategoria)
         {
-            var resultado = await _service.ConsultarSubCategoriaEsg(idCategoria);
+            var resultado = await _service.ConsultarSubClassificacaoEsg(idCategoria);
             return Ok(resultado);
         }
 

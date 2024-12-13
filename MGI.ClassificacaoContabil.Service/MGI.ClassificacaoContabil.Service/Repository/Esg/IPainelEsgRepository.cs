@@ -6,12 +6,12 @@ namespace Service.Repository.Esg
 {
     public interface IPainelEsgRepository
     {
-        Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro);
+        Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro);
         Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
         Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto();
-        Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro);
-        Task<IEnumerable<CategoriaEsgDTO>> ConsultarCategoriaEsg();
-        Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria);
+        Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro);
+        Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg();
+        Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria);
         Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);

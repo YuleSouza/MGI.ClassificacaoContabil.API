@@ -21,7 +21,7 @@ namespace Repository.PainelEsg
         {
             return await _session.Connection.QueryAsync<CLassifInvestimentoDTO>(@$"select pgmtipcod as IdClassifInvestimento, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
         }
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
@@ -190,14 +190,13 @@ namespace Repository.PainelEsg
                 idProjeto = filtro.IdProjeto,
             });
         }
-        public async Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro)
+        public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
             return await _session.Connection.QueryAsync<ProjetoEsg>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) Nome,
                                                                               prjcod Id
                                                                          FROM servdesk.projeto p, servdesk.pgmass a
                                                                         WHERE p.prjsit = 'A'
                                                                           AND a.pgmassver = 0
-                                                                          AND p.prjstg > 0
                                                                           AND a.pgmasscod = p.pgmasscod
                                                                           AND p.prjempcus IN :codEmpresa
                                                                           AND (EXISTS (SELECT 1
@@ -216,11 +215,11 @@ namespace Repository.PainelEsg
         {
             return await _session.Connection.QueryAsync<StatusProjetoDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
         }
-        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarCategoriaEsg()
+        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg()
         {
             return await _session.Connection.QueryAsync<CategoriaEsgDTO>(@$"select clecod as IdCategoria, clenom as Descricao from CLAESG where clesit = 'A'");
         }
-        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria)
+        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria)
         {
             return await _session.Connection.QueryAsync<SubCategoriaEsgDTO>(@$"select clemetcod as IdSubCategoria
                                                                                       , clemetnom as Descricao 
@@ -315,9 +314,9 @@ namespace Repository.PainelEsg
                                                                                         , dat_anomes          as DataClassif
                                                                                         , prjcod              as IdProjeto
                                                                                         , id_cat_classif      as IdCatClassif
-                                                                                        , trim(c.clenom)            as DescricaoCategoria
+                                                                                        , trim(c.clenom)      as DescricaoCategoria
                                                                                         , id_sub_cat_classif  as IdSubCatClassif
-                                                                                        , trim(m.clemetnom)         as DescricaoSubCategoria
+                                                                                        , trim(m.clemetnom)   as DescricaoSubCategoria
                                                                                         , justificativa       as Justificativa
                                                                                         , j.status_aprovacao  as StatusAprovacao
                                                                                         , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
@@ -325,9 +324,38 @@ namespace Repository.PainelEsg
                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_cat_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
-                                                                                        where j.prjcod = :idprojeto 
-                                                                                          and j.empcod = :idempresa
-                                                                                          and j.dat_anomes = :datClassif {parametros}",
+                                                                                        where j.prjcod     = :idprojeto 
+                                                                                          and j.empcod     = :idempresa
+                                                                                          and j.dat_anomes = :datClassif {parametros}
+                                                                                    union
+                                                                                    select 0 as idjustifclassifesg
+                                                                                          , p.prjempcus as IdEmpresa
+                                                                                          , sysdate as DataClassif
+                                                                                          , p.prjcod as IdProjeto
+                                                                                          , c1.clecod as IdCatClassif
+                                                                                          , trim(c1.clenom)      as DescricaoCategoria
+                                                                                          , c2.clemetcod  as IdSubCatClassif
+                                                                                          , trim(c2.clemetnom)         as DescricaoSubCategoria
+                                                                                          , ''       as Justificativa
+                                                                                          , 'P'  as StatusAprovacao
+                                                                                          , 'Pendente' as DescricaoStatusAprovacao
+                                                                                          , 0 as ClassificacaoBloqueada
+                                                                                    from projeto p, prjmet m, claesg c1, claesgmet c2
+                                                                                    where c1.clecod = m.clecod 
+                                                                                      and c2.clecod = m.clecod 
+                                                                                      and c2.clemetcod = m.clemetcod 
+                                                                                      and m.prjcod = p.prjcod
+                                                                                      and p.prjcod = :idprojeto
+                                                                                      and p.prjempcus = :idempresa
+                                                                                      and prjmetesg  = 'S'
+                                                                                      and not exists (select 1 
+                                                                                                        from justif_classif_esg j
+                                                                                                       where j.prjcod     = p.prjcod 
+                                                                                                         and j.empcod     = p.prjempcus 
+                                                                                                         and c2.clemetcod = j.id_sub_cat_classif
+                                                                                                         and j.prjcod     = :idprojeto
+                                                                                                         and j.empcod     = :idempresa
+                                                                                                         and j.dat_anomes = :datClassif)",
                                                                                           new
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,

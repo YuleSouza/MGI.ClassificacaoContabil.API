@@ -20,34 +20,35 @@ namespace Service.Esg
         }
 
         #region [ Categoria Esg]
-        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarCategoriaEsg()
+        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg()
         {
-            return await _painelEsgRepository.ConsultarCategoriaEsg();
+            return await _painelEsgRepository.ConsultarClassificacaoEsg();
         }
-        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubCategoriaEsg(int idCategoria)
+        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria)
         {            
-            return await _painelEsgRepository.ConsultarSubCategoriaEsg(idCategoria);
+            return await _painelEsgRepository.ConsultarSubClassificacaoEsg(idCategoria);
         }
 
         #endregion
+        public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
+        {
+            return await _painelEsgRepository.ConsultarComboProjetosEsg(filtro);
+        }
         public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
         {
             return await _painelEsgRepository.ConsultarCalssifInvestimento();
         }
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetos(FiltroProjetoEsg filtro)
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
         {
-            return await _painelEsgRepository.ConsultarProjetos(filtro);
+            return await _painelEsgRepository.ConsultarProjetosPainelEsg(filtro);
         }
         public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
         {
             return await _painelEsgRepository.ConsultarStatusProjeto();
         }
-        public async Task<IEnumerable<ProjetoEsg>> ConsultarProjetosEsg(FiltroProjeto filtro)
-        {
-            return await _painelEsgRepository.ConsultarProjetosEsg(filtro);
-        }
         public async Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
         {
+            // to-do validar se não tem no MGP
             return await _transactionHelper.ExecuteInTransactionAsync(
                 async () =>
                 {
