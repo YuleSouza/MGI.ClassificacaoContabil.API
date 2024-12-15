@@ -19,14 +19,14 @@ namespace Service.Esg
             _transactionHelper = transactionHelper;
         }
 
-        #region [ Categoria Esg]
-        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg()
+        #region [ Classificação Esg]
+        public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
         {
             return await _painelEsgRepository.ConsultarClassificacaoEsg();
         }
-        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria)
+        public async Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
         {            
-            return await _painelEsgRepository.ConsultarSubClassificacaoEsg(idCategoria);
+            return await _painelEsgRepository.ConsultarSubClassificacaoEsg(idClassificacao);
         }
 
         #endregion
@@ -75,6 +75,22 @@ namespace Service.Esg
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
             var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
+            var classifMgp = retorno.Where(p => p.IdSubClassif == 0);
+            if (classifMgp.Any()) 
+            { 
+                foreach (var p in classifMgp)
+                {
+                    await InserirJustificativaEsg(new JustificativaClassifEsg()
+                    {
+                        IdEmpresa = p.IdEmpresa,
+                        IdProjeto = p.IdProjeto,
+                        DataClassif = DateTime.Now,
+                        IdClassif = p.IdClassif,
+                        IdSubClassif = p.IdSubClassif,
+                        UsCriacao = p.Usuario,
+                    });
+                }
+            }
             foreach (var item in retorno)
             {
                 var aprovacoes = await _painelEsgRepository.ConsultarAprovacoesPorId(item.IdJustifClassifEsg);

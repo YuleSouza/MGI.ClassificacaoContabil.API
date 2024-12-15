@@ -216,20 +216,20 @@ namespace Repository.PainelEsg
         {
             return await _session.Connection.QueryAsync<StatusProjetoDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
         }
-        public async Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg()
+        public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
         {
-            return await _session.Connection.QueryAsync<CategoriaEsgDTO>(@$"select clecod as IdCategoria, clenom as Descricao from CLAESG where clesit = 'A'");
+            return await _session.Connection.QueryAsync<ClassificacaoEsgDTO>(@$"select clecod as IdClassif, clenom as Descricao from CLAESG where clesit = 'A'");
         }
-        public async Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria)
+        public async Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
         {
-            return await _session.Connection.QueryAsync<SubCategoriaEsgDTO>(@$"select clemetcod as IdSubCategoria
+            return await _session.Connection.QueryAsync<SubClassificacaoEsgDTO>(@$"select clemetcod as IdSubClassif
                                                                                       , clemetnom as Descricao 
                                                                                  from CLAESGMET 
                                                                                 where clemetsit = 'A' 
                                                                                   and clecod = :clecod",
                 new
                 {
-                    clecod = idCategoria
+                    clecod = idClassificacao
                 });
         }
         public async Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
@@ -240,8 +240,8 @@ namespace Repository.PainelEsg
                                                                         empcod, 
                                                                         dat_anomes,
                                                                         prjcod, 
-                                                                        id_cat_classif, 
-                                                                        id_sub_cat_classif, 
+                                                                        id_classif, 
+                                                                        id_sub_classif, 
                                                                         justificativa, 
                                                                         uscriacao,
                                                                         status_aprovacao) 
@@ -250,8 +250,8 @@ namespace Repository.PainelEsg
                                                                         :empcod, 
                                                                         :datanomes, 
                                                                         :prjcod, 
-                                                                        :idcatclassif, 
-                                                                        :idsubcatclassif, 
+                                                                        :idclassif, 
+                                                                        :idsubclassif, 
                                                                         :justificativa, 
                                                                         :uscriacao,
                                                                         :status_aprovacao)",
@@ -261,8 +261,8 @@ namespace Repository.PainelEsg
                 empcod = justificativa.IdEmpresa,
                 datanomes = justificativa.DataClassif.ToString("01/MM/yyyy"),
                 prjcod = justificativa.IdProjeto,
-                idcatclassif = justificativa.IdCatClassif,
-                idsubcatclassif = justificativa.IdSubCatClassif,
+                idclassif = justificativa.IdClassif,
+                idsubclassif = justificativa.IdSubClassif,
                 justificativa = justificativa.Justificativa,
                 uscriacao = justificativa.UsCriacao,
                 status_aprovacao = justificativa.StatusAprovacao
@@ -314,33 +314,35 @@ namespace Repository.PainelEsg
                                                                                         , empcod              as IdEmpresa
                                                                                         , dat_anomes          as DataClassif
                                                                                         , prjcod              as IdProjeto
-                                                                                        , id_cat_classif      as IdCatClassif
-                                                                                        , trim(c.clenom)      as DescricaoCategoria
-                                                                                        , id_sub_cat_classif  as IdSubCatClassif
-                                                                                        , trim(m.clemetnom)   as DescricaoSubCategoria
+                                                                                        , id_classif          as IdClassif
+                                                                                        , trim(c.clenom)      as DescricaoClassif
+                                                                                        , id_sub_classif      as IdSubClassif
+                                                                                        , trim(m.clemetnom)   as DescricaoSubClassif
                                                                                         , justificativa       as Justificativa
                                                                                         , j.status_aprovacao  as StatusAprovacao
                                                                                         , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
                                                                                         , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
+                                                                                        , j.uscriacao         as Usuario
                                                                                         from justif_classif_esg j 
-                                                                                                inner join claesg c on (j.id_cat_classif = c.clecod)
-                                                                                                inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
+                                                                                                inner join claesg c on (j.id_classif = c.clecod)
+                                                                                                inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                         where j.prjcod     = :idprojeto 
                                                                                           and j.empcod     = :idempresa
                                                                                           and j.dat_anomes = :datClassif {parametros}
                                                                                     union
-                                                                                    select 0 as idjustifclassifesg
-                                                                                          , p.prjempcus as IdEmpresa
-                                                                                          , sysdate as DataClassif
-                                                                                          , p.prjcod as IdProjeto
-                                                                                          , c1.clecod as IdCatClassif
-                                                                                          , trim(c1.clenom)      as DescricaoCategoria
-                                                                                          , c2.clemetcod  as IdSubCatClassif
-                                                                                          , trim(c2.clemetnom)         as DescricaoSubCategoria
-                                                                                          , ''       as Justificativa
-                                                                                          , 'P'  as StatusAprovacao
-                                                                                          , 'Pendente' as DescricaoStatusAprovacao
-                                                                                          , 0 as ClassificacaoBloqueada
+                                                                                    select 0                   as idjustifclassifesg
+                                                                                          , p.prjempcus        as IdEmpresa
+                                                                                          , sysdate            as DataClassif
+                                                                                          , p.prjcod           as IdProjeto
+                                                                                          , c1.clecod          as IdClassif
+                                                                                          , trim(c1.clenom)    as DescricaoClassif
+                                                                                          , c2.clemetcod       as IdSubClassif
+                                                                                          , trim(c2.clemetnom) as DescricaoSubClassif
+                                                                                          , ''                 as Justificativa
+                                                                                          , 'P'                as StatusAprovacao
+                                                                                          , 'Pendente'         as DescricaoStatusAprovacao
+                                                                                          , 0                  as ClassificacaoBloqueada
+                                                                                          , trim(p.prjreq)     as Usuario
                                                                                     from projeto p, prjmet m, claesg c1, claesgmet c2
                                                                                     where c1.clecod = m.clecod 
                                                                                       and c2.clecod = m.clecod 
@@ -353,7 +355,7 @@ namespace Repository.PainelEsg
                                                                                                         from justif_classif_esg j
                                                                                                        where j.prjcod     = p.prjcod 
                                                                                                          and j.empcod     = p.prjempcus 
-                                                                                                         and c2.clemetcod = j.id_sub_cat_classif
+                                                                                                         and c2.clemetcod = j.id_sub_classif
                                                                                                          and j.prjcod     = :idprojeto
                                                                                                          and j.empcod     = :idempresa
                                                                                                          and j.dat_anomes = :datClassif)",
@@ -366,32 +368,23 @@ namespace Repository.PainelEsg
         }
         public async Task<bool> InserirAprovacao(AprovacaoClassifEsg aprovacaoClassifEsg)
         {
-            try
+            int result = await _session.Connection.ExecuteAsync(@"
+                                insert into aprovacao_justif_classif_esg (
+                                    id_justif_classif_esg,
+                                    aprovacao,
+                                    uscriacao
+                                ) values (
+                                    :id_justif_classif_esg,
+                                    :aprovacao,                                        
+                                    :uscriacao
+                                )
+                            ", new
             {
-                int result = await _session.Connection.ExecuteAsync(@"
-                                    insert into aprovacao_justif_classif_esg (
-                                        id_justif_classif_esg,
-                                        aprovacao,
-                                        uscriacao
-                                    ) values (
-                                        :id_justif_classif_esg,
-                                        :aprovacao,                                        
-                                        :uscriacao
-                                    )
-                                ", new
-                {
-                    id_justif_classif_esg = aprovacaoClassifEsg.IdJustifClassifEsg,
-                    aprovacao = aprovacaoClassifEsg.Aprovacao,
-                    uscriacao = aprovacaoClassifEsg.UsCriacao
-                });
-                return result > 0;
-            }
-            catch (Exception ex) 
-            {
-
-                throw ex;
-            }
-
+                id_justif_classif_esg = aprovacaoClassifEsg.IdJustifClassifEsg,
+                aprovacao = aprovacaoClassifEsg.Aprovacao,
+                uscriacao = aprovacaoClassifEsg.UsCriacao
+            });
+            return result > 0;
         }
         public async Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id)
         {
@@ -400,14 +393,14 @@ namespace Repository.PainelEsg
                                                                                                         , empcod              as IdEmpresa
                                                                                                         , dat_anomes          as DataClassif
                                                                                                         , prjcod              as IdProjeto
-                                                                                                        , id_cat_classif      as IdCatClassif
-                                                                                                        , c.clenom            as DescricaoCategoria
-                                                                                                        , id_sub_cat_classif  as IdSubCatClassif
-                                                                                                        , m.clemetnom         as DescricaoSubCategoria
+                                                                                                        , id_classif          as IdClassif
+                                                                                                        , c.clenom            as DescricaoClassif
+                                                                                                        , id_sub_classif      as IdSubClassif
+                                                                                                        , m.clemetnom         as DescricaoSubClassif
                                                                                                         , justificativa
                                                                                                     from justif_classif_esg j 
                                                                                                             inner join claesg c on (j.id_cat_classif = c.clecod)
-                                                                                                            inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_cat_classif)
+                                                                                                            inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                                     where j.id_justif_classif_esg = :id_justif_classif_esg ",
                                                                                                     new
                                                                                                     {

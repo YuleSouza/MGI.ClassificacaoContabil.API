@@ -50,19 +50,19 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
-        [HttpGet("v1/categoria")]
-        [ActionDescription("Consultar todas Categorias Esg")]
-        public async Task<IActionResult> ConsultarCategoriaEsg()
+        [HttpGet("v1/classificacao")]
+        [ActionDescription("Consultar todas Classificação Esg")]
+        public async Task<IActionResult> ConsultarClassificacaoEsg()
         {
             var resultado = await _service.ConsultarClassificacaoEsg();
             return Ok(resultado);
         }
 
-        [HttpGet("v1/subcategoria/{idCategoria}")]
-        [ActionDescription("Consultar Sub Categorias Esg por id de Categoria")]
-        public async Task<IActionResult> ConsultarSubCategoriaEsg([FromRoute] int idCategoria)
+        [HttpGet("v1/subclassificacao/{idClassificacao}")]
+        [ActionDescription("Consultar Sub Classificação Esg por id")]
+        public async Task<IActionResult> ConsultarSubClassificacaoEsg([FromRoute] int idClassificacao)
         {
-            var resultado = await _service.ConsultarSubClassificacaoEsg(idCategoria);
+            var resultado = await _service.ConsultarSubClassificacaoEsg(idClassificacao);
             return Ok(resultado);
         }
 

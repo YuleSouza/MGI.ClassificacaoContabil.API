@@ -10,8 +10,8 @@ namespace Service.Repository.Esg
         Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
         Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto();
         Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro);
-        Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg();
-        Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria);
+        Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg();
+        Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao);
         Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);

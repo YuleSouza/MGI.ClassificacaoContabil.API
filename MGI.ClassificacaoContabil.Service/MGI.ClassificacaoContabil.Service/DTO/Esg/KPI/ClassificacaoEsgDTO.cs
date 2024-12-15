@@ -1,8 +1,8 @@
 ﻿namespace Service.DTO.Esg
 {
-    public class SubCategoriaEsgDTO
+    public class ClassificacaoEsgDTO
     {
-        public int IdSubCategoria { get; set; }
+        public int IdClassif { get; set; }
         public string Descricao { get; set; }
     }
 }

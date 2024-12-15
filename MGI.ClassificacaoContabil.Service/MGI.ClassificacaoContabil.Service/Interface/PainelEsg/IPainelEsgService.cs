@@ -11,8 +11,8 @@ namespace Service.Interface.PainelEsg
         Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
         Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto();
         Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro);
-        Task<IEnumerable<CategoriaEsgDTO>> ConsultarClassificacaoEsg();
-        Task<IEnumerable<SubCategoriaEsgDTO>> ConsultarSubClassificacaoEsg(int idCategoria);
+        Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg();
+        Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao);
         Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);
