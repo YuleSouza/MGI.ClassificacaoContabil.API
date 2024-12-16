@@ -37,5 +37,6 @@
                 PercentualVariacao = value;
             }
         }
+        public DateTime DtLancamentoProjeto { get; set; }
     }
 }

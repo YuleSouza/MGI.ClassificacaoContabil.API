@@ -33,7 +33,7 @@ namespace Service.Esg
         public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
             return await _painelEsgRepository.ConsultarComboProjetosEsg(filtro);
-        }
+        }        
         public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
         {
             return await _painelEsgRepository.ConsultarCalssifInvestimento();
@@ -75,8 +75,8 @@ namespace Service.Esg
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
             var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
-            var classifMgp = retorno.Where(p => p.IdSubClassif == 0);
-            if (classifMgp.Any()) 
+            var classifMgp = retorno.Where(p => p.IdJustifClassifEsg == 0);
+            if (classifMgp.Any())
             { 
                 foreach (var p in classifMgp)
                 {
@@ -87,9 +87,10 @@ namespace Service.Esg
                         DataClassif = DateTime.Now,
                         IdClassif = p.IdClassif,
                         IdSubClassif = p.IdSubClassif,
-                        UsCriacao = p.Usuario,
+                        UsCriacao = p.Usuario
                     });
                 }
+                retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
             }
             foreach (var item in retorno)
             {

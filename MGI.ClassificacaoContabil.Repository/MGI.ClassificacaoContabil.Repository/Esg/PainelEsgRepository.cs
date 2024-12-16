@@ -51,8 +51,7 @@ namespace Repository.PainelEsg
             }
             if (!string.IsNullOrEmpty(filtro.StatusProjeto))
             {
-                // TO-DO - definir regra
-                parametros.Append(" and 2 = 2");
+                parametros.Append(" and sub.IdStatusProjeto = :idstatusprojeto");
             }
             if (!string.IsNullOrEmpty(filtro.StatusAprovacao))
             {
@@ -61,8 +60,7 @@ namespace Repository.PainelEsg
             }
             if (!string.IsNullOrEmpty(filtro.ClassificacaoInvestimento))
             {
-                // TO-DO - não sei o que é
-                parametros.Append(" AND 2 = 2");
+                parametros.Append(" and sub.ClassifInvestimento = :classifinvestimento");
             }
             #endregion
             return await _session.Connection.QueryAsync<ProjetoEsgDTO>($@"
@@ -73,14 +71,15 @@ namespace Repository.PainelEsg
                         , sub.IdGestor
                         , sub.IdStatusProjeto
                         , sub.DescricaoStatusProjeto
-                        , sub.Patrocinador as NomePatrocinador
+                        , trim(sub.Patrocinador) as NomePatrocinador
+                        , sub.ClassifInvestimento as ClassifInvestimento
                         , case when :BaseOrcamento = 'O' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.OrcadoPartirAnoAtual,0))
                             when :BaseOrcamento = 'P' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.PrevistoPartirAnoAtual,0))
                             when :BaseOrcamento = '2' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.ReplanPartirAnoAtual,0)) 
                             else 0 end as ValorBaseOrcamento
                         , case when :FormatoAcompanhamento = '1' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TedenciaMesAtualAteAnoVigente,0)) + sum(nvl(sub.CicloPartirAnoSeguinte,0))
                                when :FormatoAcompanhamento = 'J' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TendenciaPartirMesAtual,0))
-                               else 0 end as ValorFormatoAcompanhamento                        
+                               else 0 end as ValorFormatoAcompanhamento
                 from (
                 select p.prjcod                                            as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -90,6 +89,7 @@ namespace Repository.PainelEsg
                         , usu.usunom                                       as Patrocinador
                         , st.prjstacod                                     as IdStatusProjeto
                         , trim(st.prjstades)                               as DescricaoStatusProjeto
+                        , p.prjpgmtip                                      as ClassifInvestimento
                         , (select sum(prjorcval) 
                              from prjorc orc2 
                             where orc2.prjcod = orc.prjcod 
@@ -149,6 +149,7 @@ namespace Repository.PainelEsg
                         , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'A') as aprovados
                         , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'P') as pendentes
                         , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'R') as reprovados
+                        , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                   from projeto p
                         inner join prjorc orc on (p.prjcod = orc.prjcod 
                                                 and orc.prjorcfse = 0
@@ -177,6 +178,7 @@ namespace Repository.PainelEsg
                          , sub.Pendentes
                          , sub.Reprovados
                          , sub.Patrocinador
+                         , sub.ClassifInvestimento
                order by sub.IdProjeto
             ", new
             {
@@ -189,6 +191,8 @@ namespace Repository.PainelEsg
                 BaseOrcamento = filtro.BaseOrcamento,
                 FormatoAcompanhamento = filtro.FormatoAcompanhamento,
                 idProjeto = filtro.IdProjeto,
+                idstatusprojeto = filtro.StatusProjeto,
+                classifinvestimento = filtro.ClassificacaoInvestimento
             });
         }
         public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
@@ -310,7 +314,7 @@ namespace Repository.PainelEsg
             }
             #endregion
             return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
-                                                                                        id_justif_classif_esg as IdJustifClassifEsg
+                                                                                        j.id_justif_classif_esg as IdJustifClassifEsg
                                                                                         , empcod              as IdEmpresa
                                                                                         , dat_anomes          as DataClassif
                                                                                         , prjcod              as IdProjeto
@@ -363,7 +367,7 @@ namespace Repository.PainelEsg
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,
                                                                                               idempresa = filtro.IdEmpresa,
-                                                                                              datClassif = filtro.DataClassif.ToString("dd/MM/yyyy")
+                                                                                              datClassif = filtro.DataClassif.ToString("01/MM/yyyy")
                                                                                           });
         }
         public async Task<bool> InserirAprovacao(AprovacaoClassifEsg aprovacaoClassifEsg)

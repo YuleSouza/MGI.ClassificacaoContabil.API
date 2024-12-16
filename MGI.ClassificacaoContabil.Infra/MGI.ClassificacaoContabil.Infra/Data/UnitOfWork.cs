@@ -23,8 +23,7 @@ namespace Infra.Data
 
         public void BeginTransaction()
         {
-            bool naoExisteTransacaoAberta = _session.Transaction == null;
-            if (naoExisteTransacaoAberta) _session.Transaction = CreateTransaction();
+            _session.Transaction = CreateTransaction();
         }
 
         public void Commit()
