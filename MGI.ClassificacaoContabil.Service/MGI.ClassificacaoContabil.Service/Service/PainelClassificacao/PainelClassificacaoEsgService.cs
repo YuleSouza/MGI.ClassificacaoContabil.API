@@ -99,11 +99,6 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                 filtro.IdPrograma = item.IdPrograma;
                 filtro.IdGrupoPrograma = Convert.ToInt32(item.IdGrupoPrograma);
                 esgClassif = RetornarClassificacaoEsg(filtro);
-                //if (esgClassif.Item1 == filtro.IdCenario)
-                //{
-                //    item.IdClassificacaoEsg = esgClassif.Item1;
-                //    item.NomeClassificacaoEsg = esgClassif.Item2;
-                //}
                 item.IdClassificacaoEsg = esgClassif.Item1;
                 item.NomeClassificacaoEsg = esgClassif.Item2;
             }
@@ -121,7 +116,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                 {
                     Cabecalho = cabecalhoEsg,
                     Empresas = from a in lancamentos
-                               group a by new { a.IdEmpresa, a.IdClassificacaoEsg, a.NomeEmpresa } into grp
+                               group a by new { a.IdEmpresa, a.IdClassificacaoEsg, a.NomeEmpresa, a.NomeClassificacaoEsg } into grp
                                select new EmpresaEsgDTO()
                                {
                                    IdEmpresa = grp.Key.IdEmpresa,
@@ -129,16 +124,18 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                    LancamentoESG = new LancamentoESG()
                                    {
                                        IdClassificacaoEsg = grp.Key.IdClassificacaoEsg,
+                                       NomeClassificacaoEsg = grp.Key.NomeClassificacaoEsg,
                                        ValorBaseOrcamento = CalcularValorBaseOrcamento(grp, filtro.BaseOrcamento, p.PredicateBaseOrcamentoPrevisto, p.PredicateBaseOrcamentoRealizado, p.PredicateBaseOrcamentoReplan, p.PredicateBaseOrcamentoOrcado),
                                        ValorFormatoAcompanhamento = CalcularValorFormaAcompanhamento(grp, filtro.FormatAcompanhamento, p.PredicateFormatoAcomp_realizado, p.PredicateFormatoAcomp_tendencia, p.PredicateFormatoAcomp_ciclo, filtro.DataFim, filtro.DataInicio)
                                    },
                                    GrupoPrograma = from c in lancamentos
                                                    where c.IdEmpresa == grp.Key.IdEmpresa
-                                                   group c by new { c.IdEmpresa, c.IdGrupoPrograma, c.GrupoDePrograma, c.IdClassificacaoEsg } into grpGru
+                                                   group c by new { c.IdEmpresa, c.IdGrupoPrograma, c.GrupoDePrograma, c.IdClassificacaoEsg, c.NomeClassificacaoEsg } into grpGru
                                                    select new GrupoProgramaEsgDTO()
                                                    {
                                                        IdGrupoPrograma = grpGru.Key.IdGrupoPrograma,
                                                        Nome = grpGru.Key.GrupoDePrograma.Trim(),
+                                                       NomeClassificacaoEsg = grpGru.Key.NomeClassificacaoEsg,
                                                        LancamentoESG = new LancamentoESG()
                                                        {
                                                            IdClassificacaoEsg = grpGru.Key.IdClassificacaoEsg,
@@ -149,11 +146,12 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                    where p.IdEmpresa == grp.Key.IdEmpresa
                                                                    && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
                                                                    && p.IdClassificacaoEsg == grpGru.Key.IdClassificacaoEsg
-                                                                   group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.Programa, p.IdClassificacaoEsg } into grpPro
+                                                                   group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.Programa, p.IdClassificacaoEsg, p.NomeClassificacaoEsg } into grpPro
                                                                    select new ProgramaEsgDTO()
                                                                    {
                                                                        IdPrograma = grpPro.Key.IdPrograma,
                                                                        Nome = grpPro.Key.Programa.Trim(),
+                                                                       NomeClassificacaoEsg = grpPro.Key.NomeClassificacaoEsg,
                                                                        LancamentoESG = new LancamentoESG()
                                                                        {
                                                                            IdClassificacaoEsg = grpPro.Key.IdClassificacaoEsg,
