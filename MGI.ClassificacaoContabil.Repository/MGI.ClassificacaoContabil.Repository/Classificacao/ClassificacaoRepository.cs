@@ -444,11 +444,6 @@ namespace Repository.Classificacao
             {
                 parametros += " and upper(nome) like upper(:nome)";
             }
-            if (!string.IsNullOrEmpty(filtro.Status))
-            {
-                parametros += $" and status = :status";
-            }
-
             var resultado = await _session.Connection.QueryAsync<ClassificacaoEsgDTO>($@"
                                            select 
                                                 id_classificacao_esg  as IdClassificacaoEsg,
@@ -459,7 +454,8 @@ namespace Repository.Classificacao
                                                 dtalteracao         as DataModificacao,
                                                 usalteracao         as UsuarioModificacao
                                             from classificacao_esg
-                                            where 1 = 1
+                                            where 1 = 1 
+                                              and status = 'A'
                                            {parametros}
                                         ", new
             {

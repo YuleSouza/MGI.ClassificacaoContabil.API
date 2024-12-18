@@ -130,12 +130,11 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                    },
                                    GrupoPrograma = from c in lancamentos
                                                    where c.IdEmpresa == grp.Key.IdEmpresa
-                                                   group c by new { c.IdEmpresa, c.IdGrupoPrograma, c.GrupoDePrograma, c.IdClassificacaoEsg, c.NomeClassificacaoEsg } into grpGru
+                                                   group c by new { c.IdEmpresa, c.IdGrupoPrograma, c.GrupoDePrograma, c.IdClassificacaoEsg } into grpGru
                                                    select new GrupoProgramaEsgDTO()
                                                    {
                                                        IdGrupoPrograma = grpGru.Key.IdGrupoPrograma,
-                                                       Nome = grpGru.Key.GrupoDePrograma.Trim(),
-                                                       NomeClassificacaoEsg = grpGru.Key.NomeClassificacaoEsg,
+                                                       Nome = grpGru.Key.GrupoDePrograma.Trim(),                                                       
                                                        LancamentoESG = new LancamentoESG()
                                                        {
                                                            IdClassificacaoEsg = grpGru.Key.IdClassificacaoEsg,
@@ -146,12 +145,11 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                    where p.IdEmpresa == grp.Key.IdEmpresa
                                                                    && p.IdGrupoPrograma == grpGru.Key.IdGrupoPrograma
                                                                    && p.IdClassificacaoEsg == grpGru.Key.IdClassificacaoEsg
-                                                                   group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.Programa, p.IdClassificacaoEsg, p.NomeClassificacaoEsg } into grpPro
+                                                                   group p by new { p.IdEmpresa, p.IdGrupoPrograma, p.IdPrograma, p.Programa, p.IdClassificacaoEsg } into grpPro
                                                                    select new ProgramaEsgDTO()
                                                                    {
                                                                        IdPrograma = grpPro.Key.IdPrograma,
-                                                                       Nome = grpPro.Key.Programa.Trim(),
-                                                                       NomeClassificacaoEsg = grpPro.Key.NomeClassificacaoEsg,
+                                                                       Nome = grpPro.Key.Programa.Trim(),                                                                       
                                                                        LancamentoESG = new LancamentoESG()
                                                                        {
                                                                            IdClassificacaoEsg = grpPro.Key.IdClassificacaoEsg,

@@ -10,6 +10,5 @@ namespace Service.DTO.PainelClassificacao
         public LancamentoESG LancamentoESG { get; set; }
         public LancamentoTotalESG Total { get; set; }
         public IEnumerable<ProgramaEsgDTO>? Programas { get; set; }
-        public string NomeClassificacaoEsg { get; set; }
     }
 }

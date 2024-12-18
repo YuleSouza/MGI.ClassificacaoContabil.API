@@ -74,7 +74,7 @@ namespace Repository.Parametrizacao
                                                 p.Status                          as Status
                                             from parametrizacao_cenario p
                                                     inner join cenario_classif_contabil c on p.id_cenario = c.id_cenario
-                                                    inner join classificacao_esg e on (p.id_classificacao_esg = e.id_classificacao_esg)
+                                                    inner join classificacao_esg e on (p.id_classificacao_esg = e.id_classificacao_esg and e.status = 'A')
                                                     left join clacon c on (p.id_classificacao_contabil = c.ccocod)
                                             where 1 = 1
                                             order by p.status, c.nome");
@@ -129,7 +129,7 @@ namespace Repository.Parametrizacao
                                                   pg.usalteracao                 as UsuarioModificacao
                                              from parametrizacao_esg_geral pg
                                                     join servdesk.pgmgru gp on pg.id_grupo_programa = gp.pgmgrucod
-                                                    join servdesk.classificacao_esg ces on pg.id_classificacao_esg = ces.id_classificacao_esg
+                                                    join servdesk.classificacao_esg ces on (pg.id_classificacao_esg = ces.id_classificacao_esg and ces.status = 'A')
                                             where 1 = 1
                                               and gp.pgmgrusit = 'A'
                                             order by ces.nome, gp.pgmgrunom");
@@ -208,7 +208,7 @@ namespace Repository.Parametrizacao
                                                     left join servdesk.pgmass pgp on pgp.pgmgrucod = gp.pgmgrucod 
                                                     left join servdesk.pgmpro p on p.pgmcod = pe.id_programa
                                                     left join servdesk.cenario_classif_contabil c on pe.id_cenario = c.id_cenario
-                                                    inner join servdesk.classificacao_esg ces on pe.id_classificacao_esg = ces.id_classificacao_esg
+                                                    inner join servdesk.classificacao_esg ces on (pe.id_classificacao_esg = ces.id_classificacao_esg and ces.status = 'A')
                                                     left join servdesk.projeto prj on pe.id_projeto = prj.prjcod
                                             where 1 = 1
                                             order by ltrim(rtrim(e.empnomfan)), gp.pgmgrunom, p.pgmnom ");

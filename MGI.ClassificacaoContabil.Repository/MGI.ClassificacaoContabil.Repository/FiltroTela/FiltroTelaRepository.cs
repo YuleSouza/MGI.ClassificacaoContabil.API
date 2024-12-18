@@ -157,8 +157,8 @@ namespace Repository.FiltroTela
                               prg.pgmcod codPrograma, 
                               ltrim(rtrim(pgmnom)) Nome
                         from servdesk.pgmpro prg
-                        join servdesk.pgmass pgp on pgp.pgmcod = prg.pgmcod
-                        join servdesk.pgmgru gp on  gp.pgmgrucod = pgp.pgmgrucod
+                            join servdesk.pgmass pgp on pgp.pgmcod = prg.pgmcod
+                            join servdesk.pgmgru gp on  gp.pgmgrucod = pgp.pgmgrucod
                         where pgp.pgmgrucod = :codGrupoPrograma
                         order by 2, 1", new
                     {
@@ -200,7 +200,8 @@ namespace Repository.FiltroTela
                                                 dtalteracao         as DataModificacao,
                                                 usalteracao         as UsuarioModificacao
                                             from cenario_classif_contabil
-                                            where 1 = 1");
+                                            where 1 = 1
+                                              and status = 'A'");
             return resultado;
         }
     }
