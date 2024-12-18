@@ -25,10 +25,7 @@ namespace Repository.PainelEsg
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
-            //if (filtro.DataInicio != null)
-            //{
-            //    parametros.Append(" and sub.IdEmpresa = :IdEmpresa");
-            //}
+            parametros.Append(" and sub.DtLancamentoProjeto between :datainicial and :datafinal");
             if (filtro.IdEmpresa >= 0)
             {
                 parametros.Append(" and sub.IdEmpresa = :IdEmpresa");
