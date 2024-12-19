@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using MGI.ClassificacaoContabil.Service.DTO.Esg.Classificacao;
 using MGI.ClassificacaoContabil.Service.Helper;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
@@ -48,8 +49,18 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
         {
-            // to-do validar se não tem no MGP
-            PayloadDTO percentualValido = await ValidarPercentualKpi(justificativa.IdEmpresa, justificativa.IdProjeto, justificativa.DataClassif, justificativa.PercentualKpi);
+            // to-do 
+            /*
+                validar percentual
+                validar se não existe na tabela a mesma classificação e subclassificação
+             */
+            PayloadDTO percentualValido = await ValidarPercentualKpi(new ValidacaoJustificativaClassif()
+            {
+                IdEmpresa = justificativa.IdEmpresa,
+                DataClassif = justificativa.DataClassif,
+                IdProjeto = justificativa.IdProjeto,
+                Percentual = justificativa.PercentualKpi
+            });
             if (!percentualValido.Sucesso) return percentualValido;
             return await _transactionHelper.ExecuteInTransactionAsync(
                 async () =>
@@ -68,15 +79,15 @@ namespace Service.Esg
             );
         }
 
-        private async Task<PayloadDTO> ValidarPercentualKpi(int idEmpresa, int idProjeto, DateTime dataClassif, decimal percentual)
+        private async Task<PayloadDTO> ValidarPercentualKpi(ValidacaoJustificativaClassif validacao)
         {
             var justificativas = await _painelEsgRepository.ConsultarJustificativaEsg(new FiltroJustificativaClassifEsg()
             {
-                IdEmpresa = idEmpresa,
-                IdProjeto = idProjeto,
-                DataClassif = dataClassif,
+                IdEmpresa = validacao.IdEmpresa,
+                IdProjeto = validacao.IdProjeto,
+                DataClassif = validacao.DataClassif,
             });
-            decimal totalPercentual = justificativas.Any() ? justificativas.Sum(p => p.PercentualKpi + percentual) : 0m;
+            decimal totalPercentual = justificativas.Any() ? justificativas.Sum(p => p.PercentualKpi + validacao.Percentual) : 0m;
             return new PayloadDTO(string.Empty, totalPercentual <= 100,"Total dos percentuais de KPI passou dos 100%, favor ajustar!");
         }
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)

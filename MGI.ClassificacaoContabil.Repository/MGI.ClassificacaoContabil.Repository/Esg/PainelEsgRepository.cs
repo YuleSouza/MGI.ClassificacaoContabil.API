@@ -304,6 +304,7 @@ namespace Repository.PainelEsg
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
+            StringBuilder parametrosMgp = new StringBuilder();
             if (filtro.ExibirClassificaoExcluida)
             {
                 parametros.Append(" and j.status_aprovacao = 'E'");
@@ -311,6 +312,16 @@ namespace Repository.PainelEsg
             else
             {
                 parametros.Append(" and j.status_aprovacao != 'E'");
+            }
+            if (filtro.IdClassif > 0)
+            {
+                parametros.Append(" and j.id_classis = :idclassif");
+                parametrosMgp.Append(" and c1 = :idclassif");
+            }
+            if (filtro.IdSubClassif > 0) 
+            {
+                parametros.Append(" and j.id_sub_classis = :idsubclassif");
+                parametrosMgp.Append(" and c2.clemetcod = :idsubclassif");
             }
             #endregion
             return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
@@ -364,12 +375,14 @@ namespace Repository.PainelEsg
                                                                                                          and c2.clemetcod = j.id_sub_classif
                                                                                                          and j.prjcod     = :idprojeto
                                                                                                          and j.empcod     = :idempresa
-                                                                                                         and j.dat_anomes = :datClassif)",
+                                                                                                         and j.dat_anomes = :datClassif) {parametrosMgp}",
                                                                                           new
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,
                                                                                               idempresa = filtro.IdEmpresa,
-                                                                                              datClassif = filtro.DataClassif.ToString("01/MM/yyyy")
+                                                                                              datClassif = filtro.DataClassif.ToString("01/MM/yyyy"),
+                                                                                              idclassif = filtro.IdClassif,
+                                                                                              idsubclassif = filtro.IdSubClassif
                                                                                           });
         }
         public async Task<bool> InserirAprovacao(AprovacaoClassifEsg aprovacaoClassifEsg)
