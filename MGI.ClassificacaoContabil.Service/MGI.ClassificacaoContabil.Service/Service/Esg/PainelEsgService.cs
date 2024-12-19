@@ -49,6 +49,8 @@ namespace Service.Esg
         public async Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
         {
             // to-do validar se não tem no MGP
+            PayloadDTO percentualValido = await ValidarPercentualKpi(justificativa.IdEmpresa, justificativa.IdProjeto, justificativa.DataClassif, justificativa.PercentualKpi);
+            if (!percentualValido.Sucesso) return percentualValido;
             return await _transactionHelper.ExecuteInTransactionAsync(
                 async () =>
                 {
@@ -58,12 +60,24 @@ namespace Service.Esg
                     {
                         IdJustifClassifEsg = id_classif_esg,
                         Aprovacao = 'P', // Pendente
-                        UsCriacao = justificativa.UsCriacao
+                        UsCriacao = justificativa.UsCriacao                        
                     });
                     // to-do enviar aprovacao pro email
                     return true;
                 }, "Classificacao Inserido com sucesso"
             );
+        }
+
+        private async Task<PayloadDTO> ValidarPercentualKpi(int idEmpresa, int idProjeto, DateTime dataClassif, decimal percentual)
+        {
+            var justificativas = await _painelEsgRepository.ConsultarJustificativaEsg(new FiltroJustificativaClassifEsg()
+            {
+                IdEmpresa = idEmpresa,
+                IdProjeto = idProjeto,
+                DataClassif = dataClassif,
+            });
+            decimal totalPercentual = justificativas.Any() ? justificativas.Sum(p => p.PercentualKpi + percentual) : 0m;
+            return new PayloadDTO(string.Empty, totalPercentual <= 100,"Total dos percentuais de KPI passou dos 100%, favor ajustar!");
         }
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {

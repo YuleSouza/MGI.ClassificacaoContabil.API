@@ -15,5 +15,6 @@
         public bool ClassificacaoBloqueada { get; set; }
         public List<AprovacaoClassifEsg> Logs { get; set; }
         public string Usuario { get; set; }
+        public decimal PercentualKpi { get; set; }
     }
 }

@@ -10,5 +10,6 @@
         public string Justificativa { get; set; }        
         public string UsCriacao { get; set; }
         public char StatusAprovacao { get; set; }
+        public decimal PercentualKpi { get; set; }
     }
 }

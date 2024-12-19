@@ -245,7 +245,8 @@ namespace Repository.PainelEsg
                                                                         id_sub_classif, 
                                                                         justificativa, 
                                                                         uscriacao,
-                                                                        status_aprovacao) 
+                                                                        status_aprovacao,
+                                                                        perc_kpi) 
                                                                         values ( 
                                                                         :id_justif_classif_esg,
                                                                         :empcod, 
@@ -255,7 +256,8 @@ namespace Repository.PainelEsg
                                                                         :idsubclassif, 
                                                                         :justificativa, 
                                                                         :uscriacao,
-                                                                        :status_aprovacao)",
+                                                                        :status_aprovacao,
+                                                                        :perc_kpi)",
             new
             {
                 id_justif_classif_esg = id,
@@ -266,7 +268,8 @@ namespace Repository.PainelEsg
                 idsubclassif = justificativa.IdSubClassif,
                 justificativa = justificativa.Justificativa,
                 uscriacao = justificativa.UsCriacao,
-                status_aprovacao = justificativa.StatusAprovacao
+                status_aprovacao = justificativa.StatusAprovacao,
+                perc_kpi = justificativa.PercentualKpi
             });
             return id;
         }
@@ -324,6 +327,7 @@ namespace Repository.PainelEsg
                                                                                         , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
                                                                                         , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
                                                                                         , j.uscriacao         as Usuario
+                                                                                        , j.perc_kpi          as PercentualKpi
                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
@@ -344,6 +348,7 @@ namespace Repository.PainelEsg
                                                                                           , 'Pendente'         as DescricaoStatusAprovacao
                                                                                           , 0                  as ClassificacaoBloqueada
                                                                                           , trim(p.prjreq)     as Usuario
+                                                                                          , m.prjmetvalfim     as PercentualKpi
                                                                                     from projeto p, prjmet m, claesg c1, claesgmet c2
                                                                                     where c1.clecod = m.clecod 
                                                                                       and c2.clecod = m.clecod 
