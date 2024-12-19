@@ -1,6 +1,6 @@
 ﻿using Infra.Data;
 using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.Helper;
+using Service.Helper;
 using MGI.ClassificacaoContabil.Service.Service.Classificacao;
 using MGI.ClassificacaoContabil.Service.Service.PainelClassificacao;
 using Repository.Cenario;
@@ -53,6 +53,7 @@ namespace API.Config
             services.AddScoped<IClassificacaoContabilService, ClassificacaoContabilService>();
             services.AddScoped<IPainelClassificacaoEsgService, PainelClassificacaoEsgService>();
             services.AddScoped<IPainelEsgService, PainelEsgService>();
+            services.AddScoped<IEsgAnexoService, EsgAnexoService>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();

@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Infra.Data;
-using OfficeOpenXml.Drawing.Chart;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
@@ -477,7 +476,10 @@ namespace Repository.PainelEsg
             });
             return result == 1;
         }
-
-        
+        public async Task<bool> ApagarAnexo(int id)
+        {
+            int qtdDeletado = await _session.Connection.ExecuteAsync(@"delete from justif_classif_esg_anexo where id_anexo = :id", new { id });
+            return qtdDeletado == 1;
+        }
     }
 }

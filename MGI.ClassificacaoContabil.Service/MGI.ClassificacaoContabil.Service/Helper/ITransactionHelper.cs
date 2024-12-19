@@ -1,6 +1,6 @@
 ﻿using DTO.Payload;
 
-namespace MGI.ClassificacaoContabil.Service.Helper
+namespace Service.Helper
 {
     public interface ITransactionHelper
     {

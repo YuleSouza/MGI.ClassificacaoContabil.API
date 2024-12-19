@@ -3,7 +3,7 @@ using Infra.Interface;
 using Service.Interface.Parametrizacao;
 using Service.DTO.Parametrizacao;
 using Service.Repository.Parametrizacao;
-using MGI.ClassificacaoContabil.Service.Helper;
+using Service.Helper;
 
 namespace Service.Parametrizacao
 {

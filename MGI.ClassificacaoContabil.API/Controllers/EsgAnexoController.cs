@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
 using Service.Interface.PainelEsg;
+using System.Collections.Generic;
 
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
@@ -9,9 +10,9 @@ namespace MGI.ClassificacaoContabil.API.Controllers
     [Route("api/[controller]")]
     public class EsgAnexoController : ControllerBase
     {
-        private readonly IPainelEsgService _service;
+        private readonly IEsgAnexoService _service;
 
-        public EsgAnexoController(IPainelEsgService service)
+        public EsgAnexoController(IEsgAnexoService service)
         {
             _service = service;
         }
@@ -22,7 +23,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             try
             {
                 var arquivo = await _service.ObterArquivo(nomeArquivo);
-                return File(arquivo, GetContentType(nomeArquivo), nomeArquivo);
+                return File(arquivo, _service.GetContentType(nomeArquivo), nomeArquivo);
             }
             catch (FileNotFoundException)
             {
@@ -37,31 +38,27 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpPost("v1/upload")]
-        public async Task<IActionResult> UploadAnexo(List<IFormFile> arquivos, List<AnexoJustificaitvaClassifEsgDTO> anexos)
+        public async Task<IActionResult> UploadAnexo(List<IFormFile> arquivos)
         {
+            await _service.SalvarAnexos(arquivos);
             return Ok();
         }
-        private string GetContentType(string path)
+
+        [HttpPut("v1/adicionar")]
+        public async Task<IActionResult> AdicionarAnexos(List<IFormFile> arquivos, string anexos)
         {
-            var types = GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
-            return types[ext];
+            var listaAnexos = System.Text.Json.JsonSerializer.Deserialize<List<AnexoJustificaitvaClassifEsgDTO>>(anexos);
+            await _service.InserirAnexos(listaAnexos);
+            await _service.SalvarAnexos(arquivos);
+            return Ok();
         }
-        private Dictionary<string, string> GetMimeTypes()
+
+        [HttpDelete("v1/delete")]
+        public async Task<IActionResult> DeleteAnexo([FromQuery] string nomeArquivo, int idAnexo)
         {
-            return new Dictionary<string, string> {
-                { ".txt", "text/plain" },
-                { ".pdf", "application/pdf" },
-                { ".doc", "application/vnd.ms-word" },
-                { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-                { ".xls", "application/vnd.ms-excel" },
-                { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-                { ".png", "image/png" },
-                { ".jpg", "image/jpeg" },
-                { ".jpeg", "image/jpeg" },
-                { ".gif", "image/gif" },
-                { ".csv", "text/csv" }
-            };
+            await _service.ApagarAnexo(idAnexo);
+            await _service.ApagarArquivoAnexo(nomeArquivo);
+            return Ok();
         }
     }
 }

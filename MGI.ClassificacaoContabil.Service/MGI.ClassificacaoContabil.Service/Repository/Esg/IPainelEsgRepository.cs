@@ -21,5 +21,6 @@ namespace Service.Repository.Esg
         Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id);
         Task<IEnumerable<AprovacaoClassifEsg>> ConsultarAprovacoesPorId(int id);
         Task<bool> ExcluirClassificacao(int id);
+        Task<bool> ApagarAnexo(int id);
     }
 }

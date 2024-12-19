@@ -1,31 +1,33 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.Helper;
 
-public class TransactionHelper : ITransactionHelper
+namespace Service.Helper
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public TransactionHelper(IUnitOfWork unitOfWork)
+    public class TransactionHelper : ITransactionHelper
     {
-        _unitOfWork = unitOfWork;
-    }
+        private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<PayloadDTO> ExecuteInTransactionAsync(Func<Task<bool>> action, string successMessage)
-    {
-        using (IUnitOfWork unitOfWork = _unitOfWork)
+        public TransactionHelper(IUnitOfWork unitOfWork)
         {
-            try
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<PayloadDTO> ExecuteInTransactionAsync(Func<Task<bool>> action, string successMessage)
+        {
+            using (IUnitOfWork unitOfWork = _unitOfWork)
             {
-                unitOfWork.BeginTransaction();
-                bool result = await action();
-                unitOfWork.Commit();
-                return new PayloadDTO(successMessage, result, string.Empty);
-            }
-            catch (Exception ex)
-            {
-                unitOfWork.Rollback();
-                throw;
+                try
+                {
+                    unitOfWork.BeginTransaction();
+                    bool result = await action();
+                    unitOfWork.Commit();
+                    return new PayloadDTO(successMessage, result, string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    unitOfWork.Rollback();
+                    throw;
+                }
             }
         }
     }

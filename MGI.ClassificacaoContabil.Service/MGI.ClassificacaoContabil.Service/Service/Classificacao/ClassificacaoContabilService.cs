@@ -1,5 +1,5 @@
 ﻿using DTO.Payload;
-using MGI.ClassificacaoContabil.Service.Helper;
+using Service.Helper;
 using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
 using Service.Interface.Classificacao;

@@ -1,6 +1,6 @@
 ﻿using DTO.Payload;
 using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.Helper;
+using Service.Helper;
 using Service.DTO.Parametrizacao;
 using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;
