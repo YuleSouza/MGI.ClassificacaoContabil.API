@@ -18,5 +18,6 @@ namespace Service.Interface.PainelEsg
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);
         Task<PayloadDTO> InserirAprovacao(int idClassifEsg, char aprovacao, string usuarioAprovacao);
         Task<PayloadDTO> ExcluirClassificacao(int id, string usCriacao);
+        Task<byte[]> ObterArquivo(string nomeArquivo);
     }
 }

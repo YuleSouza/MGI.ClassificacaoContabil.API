@@ -1,6 +1,7 @@
 ﻿using DTO.Payload;
 using MGI.ClassificacaoContabil.Service.DTO.Esg.Classificacao;
 using MGI.ClassificacaoContabil.Service.Helper;
+using Microsoft.Extensions.Configuration;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
@@ -14,10 +15,12 @@ namespace Service.Esg
         private readonly IPainelEsgRepository _painelEsgRepository;
         private ITransactionHelper _transactionHelper;
         private List<char> _aprovacoes = new List<char> { 'P', 'A', 'R' };
-        public PainelEsgService(IPainelEsgRepository painelEsgRepository, ITransactionHelper transactionHelper)
+        private IConfiguration _configuration;
+        public PainelEsgService(IPainelEsgRepository painelEsgRepository, ITransactionHelper transactionHelper, IConfiguration configuration)
         {
             _painelEsgRepository = painelEsgRepository;
             _transactionHelper = transactionHelper;
+            _configuration = configuration;
         }
 
         #region [ Classificação Esg]
@@ -53,7 +56,7 @@ namespace Service.Esg
             /*
                 validar percentual
                 validar se não existe na tabela a mesma classificação e subclassificação
-             */
+            */
             PayloadDTO percentualValido = await ValidarPercentualKpi(new ValidacaoJustificativaClassif()
             {
                 IdEmpresa = justificativa.IdEmpresa,
@@ -67,16 +70,33 @@ namespace Service.Esg
                 {
                     justificativa.StatusAprovacao = 'P';
                     int id_classif_esg = await _painelEsgRepository.InserirJustificativaEsg(justificativa);
+                    int anexos = await _painelEsgRepository.InserirAnexoJustificativaEsg(justificativa.Anexos);
+                    foreach (var anexo in justificativa.Anexos)
+                    {
+                        await SalvarAnexo(anexo.Arquivo, anexo.NomeAnexo);
+                    }
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
                     {
                         IdJustifClassifEsg = id_classif_esg,
                         Aprovacao = 'P', // Pendente
-                        UsCriacao = justificativa.UsCriacao                        
+                        UsCriacao = justificativa.UsCriacao
                     });
                     // to-do enviar aprovacao pro email
                     return true;
                 }, "Classificacao Inserido com sucesso"
             );
+        }
+
+        private async Task SalvarAnexo(byte[] arquivo, string nomearquivo)
+        {
+            string caminho = _configuration.GetSection("dir_anexo").Value;
+            string diretorio = Path.GetDirectoryName(caminho); 
+            if (!Directory.Exists(diretorio)) 
+            { 
+                Directory.CreateDirectory(diretorio); 
+            }
+            string fileName = Path.Combine(diretorio, nomearquivo);
+            File.WriteAllBytes(fileName, arquivo);
         }
 
         private async Task<PayloadDTO> ValidarPercentualKpi(ValidacaoJustificativaClassif validacao)
@@ -184,6 +204,17 @@ namespace Service.Esg
                 }
                 , "Classificação excluida com sucesso!"
                 );
+        }
+
+        public async Task<byte[]> ObterArquivo(string nomeArquivo)
+        {
+            string caminho = _configuration.GetSection("dir_anexo").Value;
+            var filePath = Path.Combine(caminho, nomeArquivo); 
+            if (!File.Exists(filePath)) 
+            { 
+                throw new FileNotFoundException("Arquivo não encontrado.", nomeArquivo);
+            }
+            return File.ReadAllBytes(filePath);
         }
     }
 }

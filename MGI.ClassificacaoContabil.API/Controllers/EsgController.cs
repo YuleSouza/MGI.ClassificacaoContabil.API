@@ -1,4 +1,5 @@
-﻿using MGI.ClassificacaoContabil.API.ControllerAtributes;
+﻿using DTO.Payload;
+using MGI.ClassificacaoContabil.API.ControllerAtributes;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
@@ -6,6 +7,7 @@ using Service.Interface.PainelEsg;
 
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
+
     [ApiController]
     [Route("api/[controller]")]
     public class EsgController : ControllerBase
@@ -24,7 +26,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             var resultado = await _service.ConsultarProjetosPainelEsg(filtro);
             return Ok(resultado);
         }
-        
+
         [HttpGet("v1/consultar/classif-investimento")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Consultar Classificação de Investimentos")]
@@ -33,7 +35,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             var resultado = await _service.ConsultarCalssifInvestimento();
             return Ok(resultado);
         }
-        
+
         [HttpGet("v1/projeto/status")]
         [ActionDescription("Consultar Status do Projeto")]
         public async Task<IActionResult> ConsultarStatusProjeto()
@@ -103,9 +105,9 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         [HttpDelete("v1/classificacao/excluir/{idClassifEsg}/{usuarioExclusao}")]
         [ActionDescription("Exclusão da classificação Esg")]
-        public async Task<IActionResult> Excluir([FromRoute] int idClassifEsg, string usuarioExclusao) 
+        public async Task<IActionResult> Excluir([FromRoute] int idClassifEsg, string usuarioExclusao)
         {
-            var resultado = await _service. ExcluirClassificacao(idClassifEsg, usuarioExclusao);
+            var resultado = await _service.ExcluirClassificacao(idClassifEsg, usuarioExclusao);
             if (resultado != null) return BadRequest(resultado);
             return Ok(resultado);
         }

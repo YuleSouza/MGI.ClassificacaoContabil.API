@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Infra.Data;
+using OfficeOpenXml.Drawing.Chart;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
@@ -273,6 +274,31 @@ namespace Repository.PainelEsg
             });
             return id;
         }
+        public async Task<int> InserirAnexoJustificativaEsg(List<AnexoJustificaitvaClassifEsgDTO> anexos)
+        {
+            if (anexos.Any())
+            {
+                foreach (var anexo in anexos)
+                {
+                    int result = await _session.Connection.ExecuteAsync(@"insert into justif_classif_esg_anexo (
+                                                                                id_justif_classif,
+                                                                                nome_anexo,
+                                                                                descricao_anexo
+                                                                            ) values (
+                                                                                :id_justif_classif,
+                                                                                :nome_anexo,
+                                                                                :descricao_anexo
+                                                                            )", new
+                    {
+                        id_justif_classif = anexo.IdJustifClassifEsg,
+                        nome_anexo = anexo.NomeAnexo,
+                        descricao_anexo = anexo.Descricao,
+                    });
+                }
+            }
+            return 1;
+        }
+
         public async Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {
             int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg 
@@ -451,5 +477,7 @@ namespace Repository.PainelEsg
             });
             return result == 1;
         }
+
+        
     }
 }

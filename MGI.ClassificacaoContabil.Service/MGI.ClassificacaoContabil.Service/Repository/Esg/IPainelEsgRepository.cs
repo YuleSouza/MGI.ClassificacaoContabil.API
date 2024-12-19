@@ -13,6 +13,7 @@ namespace Service.Repository.Esg
         Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg();
         Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao);
         Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
+        Task<int> InserirAnexoJustificativaEsg(List<AnexoJustificaitvaClassifEsgDTO> anexos);
         Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);

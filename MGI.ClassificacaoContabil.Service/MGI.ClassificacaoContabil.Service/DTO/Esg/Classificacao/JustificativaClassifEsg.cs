@@ -1,4 +1,7 @@
-﻿namespace Service.DTO.Esg
+﻿using MGI.ClassificacaoContabil.Service.DTO.Esg.Classificacao;
+using Microsoft.AspNetCore.Http;
+
+namespace Service.DTO.Esg
 {
     public class JustificativaClassifEsg
     {        
@@ -11,5 +14,7 @@
         public string UsCriacao { get; set; }
         public char StatusAprovacao { get; set; }
         public decimal PercentualKpi { get; set; }
+        public List<AnexoJustificaitvaClassifEsgDTO>? Anexos { get; set; }
+        public List<IFormFile> ArquivosAnexos { get; set; }
     }
 }
