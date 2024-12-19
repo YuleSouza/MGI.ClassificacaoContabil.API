@@ -110,5 +110,10 @@ namespace Service.Esg
                     async () => await _painelEsgRepository.ApagarAnexo(id),"Registro apagado com sucesso!"
                 );
         }
+
+        public async Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif)
+        {
+            return await _painelEsgRepository.ConsultarAnexos(idJustifClassif);
+        }
     }
 }

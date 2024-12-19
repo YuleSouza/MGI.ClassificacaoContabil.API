@@ -12,5 +12,6 @@ namespace Service.Interface.PainelEsg
         string GetContentType(string path);
         Task<PayloadDTO> ApagarArquivoAnexo(string arquivo);
         Task<PayloadDTO> ApagarAnexo(int id);
+        Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif);
     }
 }

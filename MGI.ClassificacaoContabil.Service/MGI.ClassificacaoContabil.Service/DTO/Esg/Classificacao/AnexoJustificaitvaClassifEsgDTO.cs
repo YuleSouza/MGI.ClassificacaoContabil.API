@@ -6,6 +6,5 @@
         public int IdJustifClassifEsg { get; set; }
         public string NomeAnexo { get; set; }
         public string Descricao { get; set; }
-        public byte[] Arquivo { get; set; }
     }
 }

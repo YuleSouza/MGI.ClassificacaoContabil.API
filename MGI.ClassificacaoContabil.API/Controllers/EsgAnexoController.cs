@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
 using Service.Interface.PainelEsg;
-using System.Collections.Generic;
 
 namespace MGI.ClassificacaoContabil.API.Controllers
 {
@@ -44,7 +43,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok();
         }
 
-        [HttpPut("v1/adicionar")]
+        [HttpPost("v1/adicionar")]
         public async Task<IActionResult> AdicionarAnexos(List<IFormFile> arquivos, string anexos)
         {
             var listaAnexos = System.Text.Json.JsonSerializer.Deserialize<List<AnexoJustificaitvaClassifEsgDTO>>(anexos);
@@ -59,6 +58,13 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             await _service.ApagarAnexo(idAnexo);
             await _service.ApagarArquivoAnexo(nomeArquivo);
             return Ok();
+        }
+
+        [HttpGet("v1/consultar")]
+        public async Task<IActionResult> ConsultarAnexos([FromQuery] int idClassifEsg)
+        {
+            var resultado = await _service.ConsultarAnexos(idClassifEsg);
+            return  Ok(resultado);
         }
     }
 }

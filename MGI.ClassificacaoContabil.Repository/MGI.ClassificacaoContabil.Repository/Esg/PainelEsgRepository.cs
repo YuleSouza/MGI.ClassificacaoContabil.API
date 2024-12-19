@@ -481,5 +481,16 @@ namespace Repository.PainelEsg
             int qtdDeletado = await _session.Connection.ExecuteAsync(@"delete from justif_classif_esg_anexo where id_anexo = :id", new { id });
             return qtdDeletado == 1;
         }
+
+        public async Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif)
+        {
+            return await _session.Connection.QueryAsync<AnexoJustificaitvaClassifEsgDTO>(@"select 
+                                                                                                id_anexo as IdAnexo, 
+                                                                                                id_justif_classif as IdJustifClassifEsg, 
+                                                                                                nome_anexo as NomeAnexo, 
+                                                                                                descricao_anexo as DescricaoAnexo 
+                                                                                             from justif_classif_esg_anexo
+                                                                                            where id_justif_classif = :idJustifClassif", new { idJustifClassif });
+        }
     }
 }
