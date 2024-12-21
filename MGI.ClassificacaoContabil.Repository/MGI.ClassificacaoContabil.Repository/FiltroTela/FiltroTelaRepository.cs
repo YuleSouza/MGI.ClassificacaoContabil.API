@@ -185,7 +185,8 @@ namespace Repository.FiltroTela
                                                 nome                  as Nome
                                             from classificacao_esg
                                             where 1 = 1
-                                              and status = 'A' ");
+                                              and status = 'A'
+                                            order by nome");
             return resultado;
         }
         public async Task<IEnumerable<CenarioDTO>> Cenario()

@@ -429,7 +429,8 @@ namespace Repository.Classificacao
                                                 dtalteracao         as DataModificacao,
                                                 usalteracao         as UsuarioModificacao
                                             from classificacao_esg
-                                            where 1 = 1");
+                                           where 1 = 1
+                                           order by status, nome");
             return resultado;
         }
         public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg(ClassificacaoEsgFiltro filtro)
