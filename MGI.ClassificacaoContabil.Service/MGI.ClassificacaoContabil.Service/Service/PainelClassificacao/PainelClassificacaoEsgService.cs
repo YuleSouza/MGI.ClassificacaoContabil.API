@@ -184,7 +184,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                                                                                  IdEmpresa = grpFse.Key.IdEmpresa,
                                                                                                  SeqFase = grpFse.Key.SeqFase,
                                                                                                  Nome = grpFse.Key.NomeFase.Trim(),
-                                                                                                 Pep = grpFse.Key.Pep.Trim(),
+                                                                                                 Pep = grpFse.Key.Pep?.Trim(),
                                                                                                  LancamentoESG = new LancamentoESG()
                                                                                                  {
                                                                                                      ValorBaseOrcamento = CalcularValorBaseOrcamento(grpFse, filtro.BaseOrcamento, p.PredicateFasePrevisto, p.PredicateFasePrevisto_Realizado, p.PredicateFaseReplan, p.PredicateFaseOrcado),
