@@ -30,8 +30,8 @@ namespace Repository.Classificacao
             {
                 idempresa = classificacao.IdEmpresa,
                 status = 1,
-                dataInicial = classificacao.MesAnoInicio!.Value.ToString("01/01/yyyy"),
-                dataFinal = classificacao.MesAnoFim!.Value.ToString("01/01/yyyy"),
+                dataInicial = classificacao.MesAnoInicio!.Value.ToString("01/MM/yyyy"),
+                dataFinal = classificacao.MesAnoFim!.Value.ToString("01/MM/yyyy"),
                 dat_termino_concessao = classificacao.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
                 uscriacao = classificacao.Usuario?.UsuarioCriacao
             });
@@ -157,8 +157,8 @@ namespace Repository.Classificacao
             {
                 IdClassificacaoContabil = classificacaoContabil.IdClassificacaoContabil == 0 ? novoId : classificacaoContabil.IdClassificacaoContabil,
                 IdEmpresa = classificacaoContabil.IdEmpresa,
-                MesAnoInicio = classificacaoContabil.MesAnoInicio!.Value.ToString("01/01/yyyy"),
-                MesAnoFim = classificacaoContabil.MesAnoFim!.Value.ToString("01/01/yyyy"),
+                MesAnoInicio = classificacaoContabil.MesAnoInicio!.Value.ToString("01/MMyyyy"),
+                MesAnoFim = classificacaoContabil.MesAnoFim!.Value.ToString("01/MM/yyyy"),
                 DataTerminoConcessao = classificacaoContabil.DataTerminoConcessao!.Value.ToString("01/MM/yyyy"),
                 UsCriacao = classificacaoContabil.Usuario?.UsuarioCriacao,
                 UsAlteracao = classificacaoContabil.Usuario?.UsuarioModificacao
