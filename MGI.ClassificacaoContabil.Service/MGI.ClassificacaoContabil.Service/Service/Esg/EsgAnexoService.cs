@@ -17,7 +17,7 @@ namespace Service.Esg
             , ITransactionHelper transactionHelper
             , IPainelEsgRepository painelEsgRepository)
         {
-            configuration = _configuration;
+            _configuration = configuration;
             _transactionHelper = transactionHelper;
             _painelEsgRepository = painelEsgRepository;
         }
@@ -83,12 +83,25 @@ namespace Service.Esg
                 { ".csv", "text/csv" }
             };
         }
-        public async Task<PayloadDTO> ApagarArquivoAnexo(string arquivo)
+        public Task<PayloadDTO> ApagarAnexo(int id)
+        {
+            return _transactionHelper.ExecuteInTransactionAsync(
+                    async () => 
+                    {
+                        var anexo = await _painelEsgRepository.ConsultarAnexoiPorId(id);
+                        await ApagarArquivoAnexo(anexo.NomeAnexo);
+                        await _painelEsgRepository.ApagarAnexo(id);
+                        return true;
+                        
+                    },"Registro apagado com sucesso!"
+                );
+        }
+        private async Task<PayloadDTO> ApagarArquivoAnexo(string nomeArquivo)
         {
             try
             {
                 string? diretorio = _configuration.GetSection("dir_anexo").Value;
-                var filePath = Path.Combine(diretorio, arquivo);
+                var filePath = Path.Combine(diretorio, nomeArquivo);
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
@@ -104,13 +117,6 @@ namespace Service.Esg
                 return new PayloadDTO(string.Empty, false, "Ocorreu um erro ao salvar os arquivos.");
             }
         }
-        public Task<PayloadDTO> ApagarAnexo(int id)
-        {
-            return _transactionHelper.ExecuteInTransactionAsync(
-                    async () => await _painelEsgRepository.ApagarAnexo(id),"Registro apagado com sucesso!"
-                );
-        }
-
         public async Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif)
         {
             return await _painelEsgRepository.ConsultarAnexos(idJustifClassif);

@@ -492,5 +492,16 @@ namespace Repository.PainelEsg
                                                                                              from justif_classif_esg_anexo
                                                                                             where id_justif_classif = :idJustifClassif", new { idJustifClassif });
         }
+
+        public async Task<AnexoJustificaitvaClassifEsgDTO> ConsultarAnexoiPorId(int idAnexo)
+        {
+            return await _session.Connection.QueryFirstOrDefaultAsync<AnexoJustificaitvaClassifEsgDTO>(@"select 
+                                                                                                            id_anexo as IdAnexo, 
+                                                                                                            id_justif_classif as IdJustifClassifEsg, 
+                                                                                                            nome_anexo as NomeAnexo, 
+                                                                                                            descricao_anexo as DescricaoAnexo 
+                                                                                                         from justif_classif_esg_anexo
+                                                                                                        where id_anexo = :idAnexo", new { idAnexo });
+        }
     }
 }

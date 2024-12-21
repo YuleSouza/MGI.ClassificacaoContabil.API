@@ -9,8 +9,7 @@ namespace Service.Interface.PainelEsg
         Task<byte[]> ObterArquivo(string nomeArquivo);
         Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos);
         Task<PayloadDTO> InserirAnexos(List<AnexoJustificaitvaClassifEsgDTO> anexos);
-        string GetContentType(string path);
-        Task<PayloadDTO> ApagarArquivoAnexo(string arquivo);
+        string GetContentType(string path);        
         Task<PayloadDTO> ApagarAnexo(int id);
         Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif);
     }

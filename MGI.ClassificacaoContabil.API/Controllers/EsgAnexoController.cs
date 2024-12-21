@@ -45,19 +45,22 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         [HttpPost("v1/adicionar")]
         public async Task<IActionResult> AdicionarAnexos(List<IFormFile> arquivos, string anexos)
-        {
+        {            
             var listaAnexos = System.Text.Json.JsonSerializer.Deserialize<List<AnexoJustificaitvaClassifEsgDTO>>(anexos);
             await _service.InserirAnexos(listaAnexos);
-            await _service.SalvarAnexos(arquivos);
+            var arquivoGravado = await _service.SalvarAnexos(arquivos);
+            if (!arquivoGravado.Sucesso)
+            {
+                return BadRequest(arquivoGravado);
+            }
             return Ok();
         }
 
         [HttpDelete("v1/delete")]
-        public async Task<IActionResult> DeleteAnexo([FromQuery] string nomeArquivo, int idAnexo)
+        public async Task<IActionResult> DeleteAnexo([FromQuery] int idAnexo)
         {
-            await _service.ApagarAnexo(idAnexo);
-            await _service.ApagarArquivoAnexo(nomeArquivo);
-            return Ok();
+            var resultado = await _service.ApagarAnexo(idAnexo);
+            return Ok(resultado);
         }
 
         [HttpGet("v1/consultar")]
