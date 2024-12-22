@@ -348,8 +348,7 @@ namespace Repository.PainelEsg
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
             #region [ Filtros ]
-            StringBuilder parametros = new StringBuilder();
-            StringBuilder parametrosMgp = new StringBuilder();
+            StringBuilder parametros = new StringBuilder();            
             if (filtro.ExibirClassificaoExcluida)
             {
                 parametros.Append(" and j.status_aprovacao = 'E'");
@@ -361,12 +360,10 @@ namespace Repository.PainelEsg
             if (filtro.IdClassif > 0)
             {
                 parametros.Append(" and j.id_classis = :idclassif");
-                parametrosMgp.Append(" and c1 = :idclassif");
             }
             if (filtro.IdSubClassif > 0) 
             {
                 parametros.Append(" and j.id_sub_classis = :idsubclassif");
-                parametrosMgp.Append(" and c2.clemetcod = :idsubclassif");
             }
             #endregion
             return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
@@ -389,38 +386,7 @@ namespace Repository.PainelEsg
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                         where j.prjcod     = :idprojeto 
                                                                                           and j.empcod     = :idempresa
-                                                                                          and j.dat_anomes = :datClassif {parametros}
-                                                                                    union
-                                                                                    select 0                   as idjustifclassifesg
-                                                                                          , p.prjempcus        as IdEmpresa
-                                                                                          , sysdate            as DataClassif
-                                                                                          , p.prjcod           as IdProjeto
-                                                                                          , c1.clecod          as IdClassif
-                                                                                          , trim(c1.clenom)    as DescricaoClassif
-                                                                                          , c2.clemetcod       as IdSubClassif
-                                                                                          , trim(c2.clemetnom) as DescricaoSubClassif
-                                                                                          , ''                 as Justificativa
-                                                                                          , 'P'                as StatusAprovacao
-                                                                                          , 'Pendente'         as DescricaoStatusAprovacao
-                                                                                          , 0                  as ClassificacaoBloqueada
-                                                                                          , trim(p.prjreq)     as Usuario
-                                                                                          , m.prjmetvalfim     as PercentualKpi
-                                                                                    from projeto p, prjmet m, claesg c1, claesgmet c2
-                                                                                    where c1.clecod = m.clecod 
-                                                                                      and c2.clecod = m.clecod 
-                                                                                      and c2.clemetcod = m.clemetcod 
-                                                                                      and m.prjcod = p.prjcod
-                                                                                      and p.prjcod = :idprojeto
-                                                                                      and p.prjempcus = :idempresa
-                                                                                      and prjmetesg  = 'S'
-                                                                                      and not exists (select 1 
-                                                                                                        from justif_classif_esg j
-                                                                                                       where j.prjcod     = p.prjcod 
-                                                                                                         and j.empcod     = p.prjempcus 
-                                                                                                         and c2.clemetcod = j.id_sub_classif
-                                                                                                         and j.prjcod     = :idprojeto
-                                                                                                         and j.empcod     = :idempresa
-                                                                                                         and j.dat_anomes = :datClassif) {parametrosMgp}",
+                                                                                          and j.dat_anomes = :datClassif {parametros}",
                                                                                           new
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,

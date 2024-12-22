@@ -104,24 +104,7 @@ namespace Service.Esg
         }
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
-            var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
-            var classifMgp = retorno.Where(p => p.IdJustifClassifEsg == 0);
-            if (classifMgp.Any())
-            { 
-                foreach (var p in classifMgp)
-                {
-                    await InserirJustificativaEsg(new JustificativaClassifEsg()
-                    {
-                        IdEmpresa = p.IdEmpresa,
-                        IdProjeto = p.IdProjeto,
-                        DataClassif = DateTime.Now,
-                        IdClassif = p.IdClassif,
-                        IdSubClassif = p.IdSubClassif,
-                        UsCriacao = p.Usuario
-                    });
-                }
-                retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);
-            }
+            var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);            
             foreach (var item in retorno)
             {
                 var aprovacoes = await _painelEsgRepository.ConsultarAprovacoesPorId(item.IdJustifClassifEsg);
