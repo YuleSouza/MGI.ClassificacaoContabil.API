@@ -47,18 +47,15 @@ namespace Service.Esg
                     }, "Anexos salvos com sucesso!"
                 );
         }
-        public async Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos, int idProjeto)
+        public async Task<PayloadDTO> SalvarAnexo(IFormFile arquivo, int idProjeto)
         {
             try
             {
-                string? diretorio = _configuration.GetSection("dir_anexo").Value;
-                foreach (var arquivo in arquivos)
+                string? diretorio = _configuration.GetSection("dir_anexo").Value;                
+                var filePath = Path.Combine(diretorio, $"{ObterPrefixoAnexo(idProjeto)}{arquivo.FileName}");
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    var filePath = Path.Combine(diretorio, $"{ObterPrefixoAnexo(idProjeto)}{arquivo.FileName}");
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        arquivo.CopyTo(stream);                        
-                    }
+                    arquivo.CopyTo(stream);
                 }
                 return new PayloadDTO("Arquivos salvos com sucesso", true);
             }

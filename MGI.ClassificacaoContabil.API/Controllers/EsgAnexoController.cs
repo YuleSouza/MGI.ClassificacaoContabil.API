@@ -38,12 +38,12 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }        
 
         [HttpPost("v1/upload")]
-        public async Task<IActionResult> UploadAnexos([FromForm] List<IFormFile> arquivos, [FromForm] string anexos)
+        public async Task<IActionResult> UploadAnexos([FromForm] IFormFile arquivo, [FromForm] string anexos)
         {
             var listaAnexos = System.Text.Json.JsonSerializer.Deserialize<List<AnexoJustificaitvaClassifEsgDTO>>(anexos);
             int idProjeto = listaAnexos.Select(p => p.IdProjeto).FirstOrDefault();
             await _service.InserirAnexos(listaAnexos);
-            var arquivoGravado = await _service.SalvarAnexos(arquivos, idProjeto);
+            var arquivoGravado = await _service.SalvarAnexo(arquivo, idProjeto);
             if (!arquivoGravado.Sucesso)
             {
                 return BadRequest(arquivoGravado);

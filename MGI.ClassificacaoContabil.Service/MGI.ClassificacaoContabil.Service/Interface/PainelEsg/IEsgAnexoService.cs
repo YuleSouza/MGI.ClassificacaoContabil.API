@@ -7,7 +7,7 @@ namespace Service.Interface.PainelEsg
     public interface IEsgAnexoService
     {
         Task<byte[]> ObterAnexo(int idAnexo);
-        Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos, int idProjeto);
+        Task<PayloadDTO> SalvarAnexo(IFormFile arquivo, int idProjeto);
         Task<PayloadDTO> InserirAnexos(List<AnexoJustificaitvaClassifEsgDTO> anexos);
         Task<(string extensao, string nomeArquico)> GetContentType(int idAnexo);
         Task<PayloadDTO> ApagarAnexo(int id);
