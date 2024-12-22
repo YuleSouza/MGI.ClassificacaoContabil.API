@@ -6,5 +6,6 @@
         public string Justificativa { get; set; }
         public string UsAlteracao { get; set; }
         public char? StatusAprovacao { get; set; }
+        public int PercentualKpi { get; set; }
     }
 }

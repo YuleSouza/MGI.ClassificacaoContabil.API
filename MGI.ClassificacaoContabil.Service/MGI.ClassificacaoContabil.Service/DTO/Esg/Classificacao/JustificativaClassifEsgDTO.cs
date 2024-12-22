@@ -16,5 +16,6 @@
         public List<AprovacaoClassifEsg> Logs { get; set; }
         public string Usuario { get; set; }
         public decimal PercentualKpi { get; set; }
+        public DateTime DataClassif { get; set; }
     }
 }

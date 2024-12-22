@@ -323,13 +323,16 @@ namespace Repository.PainelEsg
             int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg 
                                                                      set justificativa = :justificativa, 
                                                                          usalteracao = :usalteracao,
-                                                                         dtalteracao = sysdate
+                                                                         dtalteracao = sysdate,
+                                                                         perc_kpi = :percentualKpi
                                                                    where id_justif_classif_esg = :id_justif_classif_esg",
             new
             {
     
                 justificativa = justificativa.Justificativa,
                 usalteracao = justificativa.UsAlteracao,
+                id_justif_classif_esg = justificativa.IdJustifClassifEsg,
+                percentualKpi = justificativa.PercentualKpi,
             });
             return result == 1;
         }
@@ -429,7 +432,7 @@ namespace Repository.PainelEsg
                                                                                                         , m.clemetnom         as DescricaoSubClassif
                                                                                                         , justificativa
                                                                                                     from justif_classif_esg j 
-                                                                                                            inner join claesg c on (j.id_cat_classif = c.clecod)
+                                                                                                            inner join claesg c on (j.id_classif = c.clecod)
                                                                                                             inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                                     where j.id_justif_classif_esg = :id_justif_classif_esg ",
                                                                                                     new
