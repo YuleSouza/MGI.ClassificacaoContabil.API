@@ -7,23 +7,27 @@ namespace Service.Esg
 {
     public class ImportacaoProjetoMGPService : IImportacaoProjetoMGPService
     {
-        private readonly IPainelEsgRepository _repository;
+        private readonly IEsgAnexoRepository _esgAnexoRepository;
+        private readonly IPainelEsgRepository _panelEsgRepository;
         private ITransactionHelper _transactionHelper;
 
-        public ImportacaoProjetoMGPService(IPainelEsgRepository painelEsgRepository, ITransactionHelper transactionHelper)
+        public ImportacaoProjetoMGPService(IEsgAnexoRepository esgAnexoRepository
+            , IPainelEsgRepository painelEsgRepository
+            , ITransactionHelper transactionHelper)
         {
-            _repository = painelEsgRepository;
+            _esgAnexoRepository = esgAnexoRepository;
             _transactionHelper = transactionHelper;
+            _panelEsgRepository = painelEsgRepository;
         }
         public async Task ImportarProjetosEsg()
         {
-            IEnumerable<ImportacaoProjetoEsgMGPDTO> projetosEsg = await _repository.ConsultarProjetosEsgMGP();
+            IEnumerable<ImportacaoProjetoEsgMGPDTO> projetosEsg = await _esgAnexoRepository.ConsultarProjetosEsgMGP();
             DateTime dataCassif = new (DateTime.Now.Year, DateTime.Now.Month, 1);
             foreach (var projeto in projetosEsg)
             {
                 await _transactionHelper.ExecuteInTransactionAsync(async () =>
                 {
-                    int id = await _repository.InserirJustificativaEsg(new JustificativaClassifEsg()
+                    int id = await _panelEsgRepository.InserirJustificativaEsg(new JustificativaClassifEsg()
                     {
                         IdEmpresa = projeto.IdEmpresa,
                         IdClassif = projeto.IdClassif,
@@ -34,16 +38,16 @@ namespace Service.Esg
                         DataClassif = dataCassif,
                         PercentualKpi = projeto.PercentualKpi,
                     });
-                    await _repository.InserirAprovacao(new AprovacaoClassifEsg()
+                    await _panelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
                     {
                         Aprovacao = projeto.StatusAprovacao,
                         IdJustifClassifEsg = id,
                         UsCriacao = projeto.Usuario
                     });
-                    var anexos = await _repository.ConsultarAnexosMGP(projeto.IdProjeto, projeto.SeqMeta);
+                    var anexos = await _esgAnexoRepository.ConsultarAnexosMGP(projeto.IdProjeto, projeto.SeqMeta);
                     foreach (var anexo in anexos)
                     {
-                        await _repository.InserirAnexoJustificativaEsg(new AnexoJustificaitvaClassifEsgDTO()
+                        await _esgAnexoRepository.InserirAnexoJustificativaEsg(new AnexoJustificaitvaClassifEsgDTO()
                         {
                             IdJustifClassifEsg = projeto.IdJustifClassifEsg,
                             IdProjeto = projeto.IdProjeto,

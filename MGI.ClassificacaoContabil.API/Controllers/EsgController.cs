@@ -1,5 +1,4 @@
-﻿using DTO.Payload;
-using MGI.ClassificacaoContabil.API.ControllerAtributes;
+﻿using MGI.ClassificacaoContabil.API.ControllerAtributes;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;

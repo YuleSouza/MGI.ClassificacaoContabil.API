@@ -13,14 +13,19 @@ namespace Service.Esg
     public class PainelEsgService : IPainelEsgService
     {
         private readonly IPainelEsgRepository _painelEsgRepository;
+        private readonly IEsgAnexoRepository _esgAnexoRepository;
         private ITransactionHelper _transactionHelper;
         private List<char> _aprovacoes = new List<char> { 'P', 'A', 'R' };
         private IConfiguration _configuration;
-        public PainelEsgService(IPainelEsgRepository painelEsgRepository, ITransactionHelper transactionHelper, IConfiguration configuration)
+        public PainelEsgService(IPainelEsgRepository painelEsgRepository
+            , ITransactionHelper transactionHelper
+            , IEsgAnexoRepository esgAnexoRepository
+            , IConfiguration configuration)
         {
             _painelEsgRepository = painelEsgRepository;
             _transactionHelper = transactionHelper;
             _configuration = configuration;
+            _esgAnexoRepository = esgAnexoRepository;
         }
 
         #region [ Classificação Esg]
@@ -71,7 +76,7 @@ namespace Service.Esg
                     justificativa.StatusAprovacao = 'P';
                     justificativa.DataClassif = new DateTime(justificativa.DataClassif.Year, justificativa.DataClassif.Month, 1);
                     int id_classif_esg = await _painelEsgRepository.InserirJustificativaEsg(justificativa);
-                    int anexos = await _painelEsgRepository.InserirAnexoJustificativaEsg(justificativa.Anexos);
+                    int anexos = await _esgAnexoRepository.InserirAnexoJustificativaEsg(justificativa.Anexos);
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
                     {
                         IdJustifClassifEsg = id_classif_esg,

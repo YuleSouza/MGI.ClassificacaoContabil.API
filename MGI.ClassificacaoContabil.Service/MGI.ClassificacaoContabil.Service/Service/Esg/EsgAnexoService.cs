@@ -12,18 +12,18 @@ namespace Service.Esg
     {
         private IConfiguration _configuration;
         private ITransactionHelper _transactionHelper;
-        private readonly IPainelEsgRepository _painelEsgRepository;
+        private readonly IEsgAnexoRepository _esgAnexoRepository;
         public EsgAnexoService(IConfiguration configuration
             , ITransactionHelper transactionHelper
-            , IPainelEsgRepository painelEsgRepository)
+            , IEsgAnexoRepository esgAnexoRepository)
         {
             _configuration = configuration;
             _transactionHelper = transactionHelper;
-            _painelEsgRepository = painelEsgRepository;
+            _esgAnexoRepository = esgAnexoRepository;
         }
         public async Task<byte[]> ObterAnexo(int idAnexo)
         {
-            var anexo = await _painelEsgRepository.ConsultarAnexoiPorId(idAnexo);
+            var anexo = await _esgAnexoRepository.ConsultarAnexoiPorId(idAnexo);
             string caminho = _configuration.GetSection("dir_anexo").Value;
             var filePath = Path.Combine(caminho, anexo.NomeAnexo);
             if (!File.Exists(filePath))
@@ -42,7 +42,7 @@ namespace Service.Esg
                             string prefixo = ObterPrefixoAnexo(anexo.IdProjeto);
                             anexo.NomeAnexo = $"{prefixo}{anexo.NomeAnexo}";
                         }
-                        await _painelEsgRepository.InserirAnexoJustificativaEsg(anexos);
+                        await _esgAnexoRepository.InserirAnexoJustificativaEsg(anexos);
                         return true;
                     }, "Anexos salvos com sucesso!"
                 );
@@ -70,7 +70,7 @@ namespace Service.Esg
         }
         public async Task<(string extensao, string nomeArquico)> GetContentType(int idAnexo)
         {
-            var anexo = await _painelEsgRepository.ConsultarAnexoiPorId(idAnexo);
+            var anexo = await _esgAnexoRepository.ConsultarAnexoiPorId(idAnexo);
             var types = GetMimeTypes();
             var ext = Path.GetExtension(anexo.NomeAnexo).ToLowerInvariant();
             return (types[ext], anexo.NomeAnexo);
@@ -96,9 +96,9 @@ namespace Service.Esg
             return _transactionHelper.ExecuteInTransactionAsync(
                     async () => 
                     {
-                        var anexo = await _painelEsgRepository.ConsultarAnexoiPorId(id);
+                        var anexo = await _esgAnexoRepository.ConsultarAnexoiPorId(id);
                         await ApagarArquivoAnexo(anexo.NomeAnexo);
-                        await _painelEsgRepository.ApagarAnexo(id);
+                        await _esgAnexoRepository.ApagarAnexo(id);
                         return true;
                         
                     },"Registro apagado com sucesso!"
@@ -127,7 +127,7 @@ namespace Service.Esg
         }
         public async Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif)
         {
-            return await _painelEsgRepository.ConsultarAnexos(idJustifClassif);
+            return await _esgAnexoRepository.ConsultarAnexos(idJustifClassif);
         }
     }
 }
