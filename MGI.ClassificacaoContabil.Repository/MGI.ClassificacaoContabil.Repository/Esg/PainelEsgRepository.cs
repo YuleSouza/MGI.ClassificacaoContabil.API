@@ -297,7 +297,6 @@ namespace Repository.PainelEsg
             }
             return 1;
         }
-
         public async Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {
             int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg 

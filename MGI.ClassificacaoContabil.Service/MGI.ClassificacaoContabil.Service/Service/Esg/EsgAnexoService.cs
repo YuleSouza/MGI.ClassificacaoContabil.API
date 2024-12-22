@@ -21,13 +21,14 @@ namespace Service.Esg
             _transactionHelper = transactionHelper;
             _painelEsgRepository = painelEsgRepository;
         }
-        public async Task<byte[]> ObterArquivo(string nomeArquivo)
+        public async Task<byte[]> ObterAnexo(int idAnexo)
         {
+            var anexo = await _painelEsgRepository.ConsultarAnexoiPorId(idAnexo);
             string caminho = _configuration.GetSection("dir_anexo").Value;
-            var filePath = Path.Combine(caminho, nomeArquivo);
+            var filePath = Path.Combine(caminho, anexo.NomeAnexo);
             if (!File.Exists(filePath))
             {
-                throw new FileNotFoundException("Arquivo não encontrado.", nomeArquivo);
+                throw new FileNotFoundException("Arquivo não encontrado.", anexo.NomeAnexo);
             }
             return File.ReadAllBytes(filePath);
         }
@@ -36,19 +37,24 @@ namespace Service.Esg
             return await _transactionHelper.ExecuteInTransactionAsync(
                     async () =>
                     {
+                        foreach (var anexo in anexos)
+                        {
+                            string prefixo = ObterPrefixoAnexo(anexo.IdProjeto);
+                            anexo.NomeAnexo = $"{prefixo}{anexo.NomeAnexo}";
+                        }
                         await _painelEsgRepository.InserirAnexoJustificativaEsg(anexos);
                         return true;
                     }, "Anexos salvos com sucesso!"
                 );
         }
-        public async Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos)
+        public async Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos, int idProjeto)
         {
             try
             {
                 string? diretorio = _configuration.GetSection("dir_anexo").Value;
                 foreach (var arquivo in arquivos)
                 {
-                    var filePath = Path.Combine(diretorio, arquivo.FileName);
+                    var filePath = Path.Combine(diretorio, $"{ObterPrefixoAnexo(idProjeto)}{arquivo.FileName}");
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         arquivo.CopyTo(stream);                        
@@ -61,11 +67,17 @@ namespace Service.Esg
                 return new PayloadDTO(string.Empty, false, "Ocorreu um erro ao salvar os arquivos.");
             }
         }
-        public string GetContentType(string path)
+
+        private string ObterPrefixoAnexo(int idProjeto)
         {
+            return $"PRJ_{idProjeto}_MET_";
+        }
+        public async Task<(string extensao, string nomeArquico)> GetContentType(int idAnexo)
+        {
+            var anexo = await _painelEsgRepository.ConsultarAnexoiPorId(idAnexo);
             var types = GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
-            return types[ext];
+            var ext = Path.GetExtension(anexo.NomeAnexo).ToLowerInvariant();
+            return (types[ext], anexo.NomeAnexo);
         }
         private Dictionary<string, string> GetMimeTypes()
         {

@@ -6,11 +6,11 @@ namespace Service.Interface.PainelEsg
 {
     public interface IEsgAnexoService
     {
-        Task<byte[]> ObterArquivo(string nomeArquivo);
-        Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos);
+        Task<byte[]> ObterAnexo(int idAnexo);
+        Task<PayloadDTO> SalvarAnexos(List<IFormFile> arquivos, int idProjeto);
         Task<PayloadDTO> InserirAnexos(List<AnexoJustificaitvaClassifEsgDTO> anexos);
-        string GetContentType(string path);        
+        Task<(string extensao, string nomeArquico)> GetContentType(int idAnexo);
         Task<PayloadDTO> ApagarAnexo(int id);
-        Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif);
+        Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idsJustifClassif);
     }
 }

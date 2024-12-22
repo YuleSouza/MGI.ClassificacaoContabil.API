@@ -17,12 +17,13 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpGet("v1/download")]
-        public async Task<IActionResult> DownloadAnexo([FromQuery] string nomeArquivo)
+        public async Task<IActionResult> DownloadAnexo([FromQuery] int idAnexo)
         {
             try
             {
-                var arquivo = await _service.ObterArquivo(nomeArquivo);
-                return File(arquivo, _service.GetContentType(nomeArquivo), nomeArquivo);
+                var anexo = await _service.ObterAnexo(idAnexo);
+                var tipoArquivo = await _service.GetContentType(idAnexo);
+                return File(anexo, tipoArquivo.extensao, tipoArquivo.nomeArquico);
             }
             catch (FileNotFoundException)
             {
@@ -34,21 +35,15 @@ namespace MGI.ClassificacaoContabil.API.Controllers
                 return BadRequest(new PayloadDTO(string.Empty, false, "Erro ao fazer download do arquivo"));
 
             }
-        }
+        }        
 
         [HttpPost("v1/upload")]
-        public async Task<IActionResult> UploadAnexo(List<IFormFile> arquivos)
+        public async Task<IActionResult> UploadAnexos(List<IFormFile> arquivos, [FromForm] string anexos)
         {
-            await _service.SalvarAnexos(arquivos);
-            return Ok();
-        }
-
-        [HttpPost("v1/adicionar")]
-        public async Task<IActionResult> AdicionarAnexos(List<IFormFile> arquivos, string anexos)
-        {            
             var listaAnexos = System.Text.Json.JsonSerializer.Deserialize<List<AnexoJustificaitvaClassifEsgDTO>>(anexos);
+            int idProjeto = listaAnexos.Select(p => p.IdProjeto).FirstOrDefault();
             await _service.InserirAnexos(listaAnexos);
-            var arquivoGravado = await _service.SalvarAnexos(arquivos);
+            var arquivoGravado = await _service.SalvarAnexos(arquivos, idProjeto);
             if (!arquivoGravado.Sucesso)
             {
                 return BadRequest(arquivoGravado);
