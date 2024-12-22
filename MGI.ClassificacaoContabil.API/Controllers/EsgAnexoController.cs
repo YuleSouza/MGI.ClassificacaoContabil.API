@@ -16,8 +16,8 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             _service = service;
         }
 
-        [HttpGet("v1/download")]
-        public async Task<IActionResult> DownloadAnexo([FromQuery] int idAnexo)
+        [HttpGet("v1/download/{idAnexo}")]
+        public async Task<IActionResult> DownloadAnexo([FromRoute] int idAnexo)
         {
             try
             {
@@ -51,15 +51,15 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok();
         }
 
-        [HttpDelete("v1/delete")]
-        public async Task<IActionResult> DeleteAnexo([FromQuery] int idAnexo)
+        [HttpDelete("v1/delete/{idAnexo}")]
+        public async Task<IActionResult> DeleteAnexo([FromRoute] int idAnexo)
         {
             var resultado = await _service.ApagarAnexo(idAnexo);
             return Ok(resultado);
         }
 
-        [HttpGet("v1/consultar")]
-        public async Task<IActionResult> ConsultarAnexos([FromQuery] int idClassifEsg)
+        [HttpGet("v1/consultar/{idClassifEsg}")]
+        public async Task<IActionResult> ConsultarAnexos([FromRoute] int idClassifEsg)
         {
             var resultado = await _service.ConsultarAnexos(idClassifEsg);
             return  Ok(resultado);
