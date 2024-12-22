@@ -108,7 +108,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> Excluir([FromRoute] int idClassifEsg, string usuarioExclusao)
         {
             var resultado = await _service.ExcluirClassificacao(idClassifEsg, usuarioExclusao);
-            if (resultado != null) return BadRequest(resultado);
+            if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }
     }
