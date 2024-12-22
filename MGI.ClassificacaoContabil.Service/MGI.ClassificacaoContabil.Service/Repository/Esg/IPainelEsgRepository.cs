@@ -14,6 +14,7 @@ namespace Service.Repository.Esg
         Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao);
         Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<int> InserirAnexoJustificativaEsg(List<AnexoJustificaitvaClassifEsgDTO> anexos);
+        Task<int> InserirAnexoJustificativaEsg(AnexoJustificaitvaClassifEsgDTO anexo);
         Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);
@@ -24,5 +25,7 @@ namespace Service.Repository.Esg
         Task<bool> ApagarAnexo(int id);
         Task<IEnumerable<AnexoJustificaitvaClassifEsgDTO>> ConsultarAnexos(int idJustifClassif);
         Task<AnexoJustificaitvaClassifEsgDTO> ConsultarAnexoiPorId(int idAnexo);
+        Task<IEnumerable<ImportacaoProjetoEsgMGPDTO>> ConsultarProjetosEsgMGP();
+        Task<IEnumerable<AnexosMGPDTO>> ConsultarAnexosMGP(int idProjeto, int seqMeta);
     }
 }

@@ -67,7 +67,6 @@ namespace Service.Esg
                 return new PayloadDTO(string.Empty, false, "Ocorreu um erro ao salvar os arquivos.");
             }
         }
-
         private string ObterPrefixoAnexo(int idProjeto)
         {
             return $"PRJ_{idProjeto}_MET_";

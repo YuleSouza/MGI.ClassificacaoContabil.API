@@ -69,6 +69,7 @@ namespace Service.Esg
                 async () =>
                 {
                     justificativa.StatusAprovacao = 'P';
+                    justificativa.DataClassif = new DateTime(justificativa.DataClassif.Year, justificativa.DataClassif.Month, 1);
                     int id_classif_esg = await _painelEsgRepository.InserirJustificativaEsg(justificativa);
                     int anexos = await _painelEsgRepository.InserirAnexoJustificativaEsg(justificativa.Anexos);
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()

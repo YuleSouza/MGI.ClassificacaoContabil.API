@@ -54,6 +54,7 @@ namespace API.Config
             services.AddScoped<IPainelClassificacaoEsgService, PainelClassificacaoEsgService>();
             services.AddScoped<IPainelEsgService, PainelEsgService>();
             services.AddScoped<IEsgAnexoService, EsgAnexoService>();
+            services.AddScoped<IImportacaoProjetoMGPService, ImportacaoProjetoMGPService>();
 
             //Repository            
             services.AddScoped<IEmpresaRepository, EmpresaRepository>();
