@@ -38,7 +38,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }        
 
         [HttpPost("v1/upload")]
-        public async Task<IActionResult> UploadAnexos(List<IFormFile> arquivos, [FromForm] string anexos)
+        public async Task<IActionResult> UploadAnexos([FromForm] List<IFormFile> arquivos, [FromForm] string anexos)
         {
             var listaAnexos = System.Text.Json.JsonSerializer.Deserialize<List<AnexoJustificaitvaClassifEsgDTO>>(anexos);
             int idProjeto = listaAnexos.Select(p => p.IdProjeto).FirstOrDefault();
