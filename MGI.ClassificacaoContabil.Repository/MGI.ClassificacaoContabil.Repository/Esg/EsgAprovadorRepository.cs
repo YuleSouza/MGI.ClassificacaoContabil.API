@@ -2,6 +2,7 @@
 using Infra.Data;
 using Service.DTO.Esg;
 using Service.Repository.Esg;
+using System.Text;
 
 namespace Repository.Esg
 {
@@ -19,22 +20,33 @@ namespace Repository.Esg
             return qtdLinhas == 1;
         }
 
-        public async Task<EsgAprovadorDTO> ConsultarAprovadorPorUsuario(string usuario)
+        public async Task<IEnumerable<EsgAprovadorDTO>> ConsultarUsuarioAprovador(string usuario, string email)
         {
-            return await _session.Connection.QueryFirstOrDefaultAsync(@"select id as IdEsgAprovador
+            StringBuilder parametros = new StringBuilder();
+            if (!string.IsNullOrEmpty(usuario)) 
+            { 
+                parametros.Append(" and id_usuario = :usuario");
+            }
+            if (!string.IsNullOrEmpty(email))
+            {
+                parametros.Append(" and email = :email");
+            }
+            var result = await _session.Connection.QueryAsync<EsgAprovadorDTO>(@$"select id        as IdEsgAprovador
                                                                             , id_usuario as usuario
-                                                                            , email as Email
-                                                                            , status 
+                                                                            , email      as Email
+                                                                            , status     as Status
                                                                             from esg_aprovadores 
-                                                                            where id_usuario = :usuario", new
-                                                                                        {
-                                                                                            usuario 
-                                                                                        });
+                                                                            where 1 = 1 {parametros}" , new
+                                                                            {
+                                                                                usuario,
+                                                                                email
+                                                                            });
+            return result;
         }
 
         public async Task<bool> InserirUsuarioAprovador(string usuario, string email)
         {
-            int qtdLinhas = await _session.Connection.ExecuteAsync(@"insert into esg_aprovadores (id_usuario, email) values (:usuario, :email)", new
+            int qtdLinhas = await _session.Connection.ExecuteAsync(@"insert into SERVDESK.esg_aprovadores (id_usuario, email) values (:usuario, :email)", new
             {
                 usuario,
                 email

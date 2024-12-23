@@ -1,4 +1,5 @@
 ﻿using MGI.ClassificacaoContabil.API.ControllerAtributes;
+using MGI.ClassificacaoContabil.API.Model;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interface.PainelEsg;
 
@@ -14,40 +15,41 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             _service = service;
         }
 
-        [HttpPost("v1/consultar/{usuario}")]
+        [HttpGet("v1/consultar/{usuario}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Consultar usuário aprovador")]
-        public async Task<IActionResult> ConsultarAprovador([FromQuery] string usuario)
+        public async Task<IActionResult> Consultar(string usuario, string email)
         {
-            await _service.ConsultarAprovadorPorUsuario(usuario);
-            return Ok();
+            var resultado = await _service.ConsultarUsuarioAprovador(usuario, email);
+            return Ok(resultado);
         }
 
         [HttpPut("v1/alterar/{id}/{usuario}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Alterar usuário aprovador")]
-        public async Task<IActionResult> AlterarAprovador([FromQuery] int id, [FromQuery] string usuario)
+        public async Task<IActionResult> Alterar([FromBody] AprovadorModel aprovador)
         {
-            await _service.ConsultarAprovadorPorUsuario(usuario);
+            await _service.AlterarUsuarioAprovador(aprovador.Email, aprovador.Id);
             return Ok();
         }
 
-        [HttpPut("v1/excluir/{id}/{usuario}")]
+        [HttpPut("v1/excluir/{id:int}")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Excluir usuário aprovador")]
-        public async Task<IActionResult> ExcluirAprovador([FromQuery] int id)
+        public async Task<IActionResult> Excluir(int id)
         {
             await _service.ExcluirUsuarioAprovador(id);
             return Ok();
         }
 
-        [HttpPost("v1/inserir/{email}/{usuario}")]
+        [HttpPost("v1/inserir")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-        [ActionDescription("Excluir usuário aprovador")]
-        public async Task<IActionResult> ExcluirAprovador([FromQuery] string usuario, string email)
+        [ActionDescription("Inserir usuário aprovador")]
+        public async Task<IActionResult> Inserir([FromBody] AprovadorModel aprovador)
         {
-            await _service.InserirUsuarioAprovador(usuario, email);
-            return Ok();
+            var resultado = await _service.InserirUsuarioAprovador(aprovador.Usuario, aprovador.Email);
+            if (!resultado.Sucesso) return BadRequest(resultado);
+            return Ok(resultado);
         }
     }
 }
