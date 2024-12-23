@@ -175,7 +175,7 @@ namespace Service.Esg
         {
             return await _transactionHelper.ExecuteInTransactionAsync(
                 async () => {
-                    await _painelEsgRepository.ExcluirClassificacao(id);
+                    await _painelEsgRepository.RemoverClassificacao(id);
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
                     {
                         Aprovacao = 'E',

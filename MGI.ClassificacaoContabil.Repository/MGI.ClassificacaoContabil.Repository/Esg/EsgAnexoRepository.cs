@@ -14,7 +14,7 @@ namespace Repository.AnexoEsg
             _session = session;
         }
 
-        public async Task<bool> ApagarAnexo(int id)
+        public async Task<bool> RemoverAnexo(int id)
         {
             int qtdDeletado = await _session.Connection.ExecuteAsync(@"delete from justif_classif_esg_anexo where id_anexo = :id", new { id });
             return qtdDeletado == 1;

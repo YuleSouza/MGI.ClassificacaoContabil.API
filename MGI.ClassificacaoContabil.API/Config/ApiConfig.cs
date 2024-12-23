@@ -32,6 +32,7 @@ using Service.Repository.FiltroTela;
 using Service.Repository.PainelClassificacao;
 using Service.Repository.Parametrizacao;
 using Repository.AnexoEsg;
+using Repository.Esg;
 
 namespace API.Config
 {
@@ -66,6 +67,7 @@ namespace API.Config
             services.AddScoped<IPainelClassificacaoRepository, PainelClassificacaoRepository>();
             services.AddScoped<IPainelEsgRepository, PainelEsgRepository>();
             services.AddScoped<IEsgAnexoRepository, EsgAnexoRepository>();
+            services.AddScoped<IEsgAprovadorRepository,EsgAprovadorRepository>();
 
             services.AddScoped<ITransactionHelper, TransactionHelper>(); 
 

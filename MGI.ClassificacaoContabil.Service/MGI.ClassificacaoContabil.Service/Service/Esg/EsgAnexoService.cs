@@ -98,7 +98,7 @@ namespace Service.Esg
                     {
                         var anexo = await _esgAnexoRepository.ConsultarAnexoiPorId(id);
                         await ApagarArquivoAnexo(anexo.NomeAnexo);
-                        await _esgAnexoRepository.ApagarAnexo(id);
+                        await _esgAnexoRepository.RemoverAnexo(id);
                         return true;
                         
                     },"Registro apagado com sucesso!"

@@ -409,7 +409,7 @@ namespace Repository.PainelEsg
                     id_justf_classif_esg = id
                 });
         }
-        public async Task<bool> ExcluirClassificacao(int id)
+        public async Task<bool> RemoverClassificacao(int id)
         {
             int result = await _session.Connection.ExecuteAsync(@"update justif_classif_esg
                                                                      set status_aprovacao = 'E'
