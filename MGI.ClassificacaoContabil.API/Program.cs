@@ -1,5 +1,6 @@
 using API.Config;
-
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -21,7 +22,12 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddAuthentication();
 builder.Services.AddControllers();
-builder.Services.AddApiConfig();
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+{
+    containerBuilder.RegisterRepositories("MGI.ClassificacaoContabil.Repository");
+    containerBuilder.RegisterServices("MGI.ClassificacaoContabil.Service");
+});
 
 builder.Services.AddSwaggerGen(options =>
 {
