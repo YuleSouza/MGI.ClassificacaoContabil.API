@@ -7,13 +7,10 @@ namespace Service.Empresa
 {
     public class EmpresaService : IEmpresaService
     {
-        private readonly IEmpresaRepository _EmpresaRepository;
-
-        private IUnitOfWork _unitOfWork;
-        public EmpresaService(IEmpresaRepository EmpresaRepository, IUnitOfWork unitOfWork)
+        private readonly IEmpresaRepository _EmpresaRepository;        
+        public EmpresaService(IEmpresaRepository EmpresaRepository)
         {
-            _EmpresaRepository = EmpresaRepository;
-            _unitOfWork = unitOfWork;
+            _EmpresaRepository = EmpresaRepository;            
         }
         public async Task<PayloadDTO> ConsultarEmpresa()
         {

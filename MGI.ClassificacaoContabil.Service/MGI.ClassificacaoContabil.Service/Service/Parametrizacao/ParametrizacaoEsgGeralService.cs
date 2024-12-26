@@ -1,27 +1,25 @@
 ﻿using DTO.Payload;
-using Infra.Interface;
-using Service.Interface.Parametrizacao;
+using Service.Base;
 using Service.DTO.Parametrizacao;
-using Service.Repository.Parametrizacao;
 using Service.Helper;
+using Service.Interface.Parametrizacao;
+using Service.Repository.Parametrizacao;
 
 namespace Service.Parametrizacao
 {
-    public class ParametrizacaoEsgGeralService : IParametrizacaoEsgGeralService
+    public class ParametrizacaoEsgGeralService : ServiceBase, IParametrizacaoEsgGeralService
     {
-        private IParametrizacaoRepository _repository;
-        private ITransactionHelper _transactionHelper;
-        public ParametrizacaoEsgGeralService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper)
+        private IParametrizacaoRepository _repository;        
+        public ParametrizacaoEsgGeralService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper) : base (transactionHelper)
         {
             _repository = cenarioRepository;
-            _transactionHelper = transactionHelper;
         }
         public async Task<PayloadDTO> InserirParametrizacaoClassificacaoGeral(ParametrizacaoClassificacaoGeralDTO parametrizacao)
         {
             var validacao = await Validar(parametrizacao);
             if (!validacao.Sucesso) return validacao;
 
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.InserirParametrizacaoClassificacaoGeral(parametrizacao),
                 "Parametrização classificação esg geral inserida com successo"
             );
@@ -31,7 +29,7 @@ namespace Service.Parametrizacao
             var validacao = await Validar(parametrizacao);
             if (!validacao.Sucesso) return validacao;
 
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.AlterarParametrizacaoClassificacaoGeral(parametrizacao),
                 "Parametrização da classificação esg geral alterada com successo"
             );

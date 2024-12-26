@@ -1,22 +1,21 @@
-﻿using Service.DTO.Esg;
+﻿using Service.Base;
+using Service.DTO.Esg;
 using Service.Helper;
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
 
 namespace Service.Esg
 {
-    public class ImportacaoProjetoMGPService : IImportacaoProjetoMGPService
+    public class ImportacaoProjetoMGPService : ServiceBase, IImportacaoProjetoMGPService
     {
         private readonly IEsgAnexoRepository _esgAnexoRepository;
         private readonly IPainelEsgRepository _panelEsgRepository;
-        private ITransactionHelper _transactionHelper;
 
         public ImportacaoProjetoMGPService(IEsgAnexoRepository esgAnexoRepository
             , IPainelEsgRepository painelEsgRepository
-            , ITransactionHelper transactionHelper)
+            , ITransactionHelper transactionHelper) : base (transactionHelper)
         {
-            _esgAnexoRepository = esgAnexoRepository;
-            _transactionHelper = transactionHelper;
+            _esgAnexoRepository = esgAnexoRepository;            
             _panelEsgRepository = painelEsgRepository;
         }
         public async Task ImportarProjetosEsg()
@@ -25,7 +24,7 @@ namespace Service.Esg
             DateTime dataCassif = new (DateTime.Now.Year, DateTime.Now.Month, 1);
             foreach (var projeto in projetosEsg)
             {
-                await _transactionHelper.ExecuteInTransactionAsync(async () =>
+                await ExecutarTransacao(async () =>
                 {
                     int id = await _panelEsgRepository.InserirJustificativaEsg(new JustificativaClassifEsg()
                     {

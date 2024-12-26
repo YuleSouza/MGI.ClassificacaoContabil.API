@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using Service.Base;
 using Service.DTO.Esg;
 using Service.Helper;
 using Service.Interface.PainelEsg;
@@ -6,20 +7,18 @@ using Service.Repository.Esg;
 
 namespace Service.Esg
 {
-    public class EsgAprovadorService : IEsgAprovadorService
+    public class EsgAprovadorService : ServiceBase, IEsgAprovadorService
     {
         private readonly IEsgAprovadorRepository _repository;
-        private ITransactionHelper _transactionHelper;
 
-        public EsgAprovadorService(IEsgAprovadorRepository esgAprovadorRepository, ITransactionHelper transactionHelper)
+        public EsgAprovadorService(IEsgAprovadorRepository esgAprovadorRepository, ITransactionHelper transactionHelper): base(transactionHelper) 
         {
-            _repository = esgAprovadorRepository;
-            _transactionHelper = transactionHelper;
+            _repository = esgAprovadorRepository;            
         }
 
         public async Task<PayloadDTO> AlterarUsuarioAprovador(string email, int id)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(async () =>
+            return await ExecutarTransacao(async () =>
                 await _repository.AlterarUsuarioAprovador(email, id)
                 ,"Usuário aprovador alterado com sucesso!"
             );
@@ -34,7 +33,7 @@ namespace Service.Esg
         {
             var validacao = await ValidarUsuarioAprovador(usuario, email);
             if (!validacao.Sucesso) return validacao;
-            return await _transactionHelper.ExecuteInTransactionAsync(async () =>
+            return await ExecutarTransacao(async () =>
                 await _repository.InserirUsuarioAprovador(usuario, email)
                 , "Usuário aprovador inserido com sucesso!"
             );
@@ -70,7 +69,7 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> ExcluirUsuarioAprovador(int id)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(async () =>
+            return await ExecutarTransacao(async () =>
                 await _repository.RemoverUsuarioAprovador(id)
                 , "Usuário aprovador removido com sucesso!"
             );

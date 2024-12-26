@@ -5,33 +5,28 @@ using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
 using Service.Interface.Classificacao;
 using Service.Repository.Classificacao;
+using Service.Base;
 
 namespace Service.Classificacao
 {
-    public class ClassificacaoEsgService : IClassificacaoEsgService
+    public class ClassificacaoEsgService : ServiceBase, IClassificacaoEsgService
     {
         private IClassificacaoRepository _repository;
-        private IUnitOfWork _unitOfWork;
-        private readonly ITransactionHelper _transactionHelper;
-
-        public ClassificacaoEsgService(IClassificacaoRepository classificacaoRepository, ITransactionHelper transactionHelper)
+        public ClassificacaoEsgService(IClassificacaoRepository classificacaoRepository, ITransactionHelper transactionHelper) : base(transactionHelper)
         {
-            _repository = classificacaoRepository;
-            _transactionHelper = transactionHelper;
+            _repository = classificacaoRepository;            
         }
-
-        
 
         #region ESG
         public async Task<PayloadDTO> InserirClassificacaoEsg(ClassificacaoEsgDTO classificacao)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.InserirClassificacaoEsg(classificacao)
             , "Classificação Esg inserida com successo");
         }
         public async Task<PayloadDTO> AlterarClassificacaoEsg(ClassificacaoEsgDTO classificacao)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.AlterarClassificacaoEsg(classificacao)
             , "Classificação Esg alterada com successo");
         }

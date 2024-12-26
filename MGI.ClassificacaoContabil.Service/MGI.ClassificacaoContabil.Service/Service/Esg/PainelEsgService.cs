@@ -7,23 +7,22 @@ using Service.DTO.Filtros;
 using Service.DTO.Projeto;
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
+using Service.Base;
 
 namespace Service.Esg
 {
-    public class PainelEsgService : IPainelEsgService
+    public class PainelEsgService : ServiceBase, IPainelEsgService
     {
         private readonly IPainelEsgRepository _painelEsgRepository;
-        private readonly IEsgAnexoRepository _esgAnexoRepository;
-        private ITransactionHelper _transactionHelper;
+        private readonly IEsgAnexoRepository _esgAnexoRepository;        
         private List<char> _aprovacoes = new List<char> { 'P', 'A', 'R' };
         private IConfiguration _configuration;
         public PainelEsgService(IPainelEsgRepository painelEsgRepository
             , ITransactionHelper transactionHelper
             , IEsgAnexoRepository esgAnexoRepository
-            , IConfiguration configuration)
+            , IConfiguration configuration) : base(transactionHelper)
         {
-            _painelEsgRepository = painelEsgRepository;
-            _transactionHelper = transactionHelper;
+            _painelEsgRepository = painelEsgRepository;            
             _configuration = configuration;
             _esgAnexoRepository = esgAnexoRepository;
         }
@@ -70,7 +69,7 @@ namespace Service.Esg
                 Percentual = justificativa.PercentualKpi
             });
             if (!percentualValido.Sucesso) return percentualValido;
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () =>
                 {
                     justificativa.StatusAprovacao = 'P';
@@ -111,7 +110,7 @@ namespace Service.Esg
                 Percentual = justificativa.PercentualKpi
             });
             if (!percentualValido.Sucesso) return percentualValido;
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _painelEsgRepository.AlterarJustificativaEsg(justificativa)
                 , "Classificacao alterada com sucesso!"
             );
@@ -131,7 +130,7 @@ namespace Service.Esg
         {
             var validacao = await ValidarAprovacao(idClassifEsg, aprovacao);
             if (!validacao.Sucesso) return validacao;
-            await _transactionHelper.ExecuteInTransactionAsync(
+            await ExecutarTransacao(
                 async () =>
                 {
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
@@ -173,7 +172,7 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> ExcluirClassificacao(int id, string usuarioExclusao)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => {
                     await _painelEsgRepository.RemoverClassificacao(id);
                     await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()

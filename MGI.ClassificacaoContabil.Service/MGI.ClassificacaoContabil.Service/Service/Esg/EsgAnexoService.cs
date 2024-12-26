@@ -1,24 +1,23 @@
 ﻿using DTO.Payload;
-using Service.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Service.Base;
 using Service.DTO.Esg;
+using Service.Helper;
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
 
 namespace Service.Esg
 {
-    public class EsgAnexoService : IEsgAnexoService
+    public class EsgAnexoService : ServiceBase, IEsgAnexoService
     {
-        private IConfiguration _configuration;
-        private ITransactionHelper _transactionHelper;
+        private IConfiguration _configuration;        
         private readonly IEsgAnexoRepository _esgAnexoRepository;
         public EsgAnexoService(IConfiguration configuration
             , ITransactionHelper transactionHelper
-            , IEsgAnexoRepository esgAnexoRepository)
+            , IEsgAnexoRepository esgAnexoRepository) : base(transactionHelper)
         {
             _configuration = configuration;
-            _transactionHelper = transactionHelper;
             _esgAnexoRepository = esgAnexoRepository;
         }
         public async Task<byte[]> ObterAnexo(int idAnexo)
@@ -34,7 +33,7 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> InserirAnexos(List<AnexoJustificaitvaClassifEsgDTO> anexos)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                     async () =>
                     {
                         foreach (var anexo in anexos)
@@ -93,7 +92,7 @@ namespace Service.Esg
         }
         public Task<PayloadDTO> ApagarAnexo(int id)
         {
-            return _transactionHelper.ExecuteInTransactionAsync(
+            return ExecutarTransacao(
                     async () => 
                     {
                         var anexo = await _esgAnexoRepository.ConsultarAnexoiPorId(id);

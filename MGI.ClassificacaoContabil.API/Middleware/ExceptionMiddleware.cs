@@ -34,7 +34,7 @@ public class ExceptionMiddleware
     {
         var endpoint = context.GetEndpoint();
         var controllerActionDescriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
-        var actionName = controllerActionDescriptor?.ActionName ?? "Unknown Action";
+        var actionName = controllerActionDescriptor?.ActionName ?? "ação indefinida.";
 
         return controllerActionDescriptor?.MethodInfo
             .GetCustomAttributes(typeof(ActionDescriptionAttribute), false)
