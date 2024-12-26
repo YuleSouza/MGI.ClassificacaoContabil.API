@@ -23,7 +23,7 @@ namespace Service.Helper
                     unitOfWork.Commit();
                     return new PayloadDTO(successMessage, result, string.Empty);
                 }
-                catch (Exception ex)
+                catch
                 {
                     unitOfWork.Rollback();
                     throw;

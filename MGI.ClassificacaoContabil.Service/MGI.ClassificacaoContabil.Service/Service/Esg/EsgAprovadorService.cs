@@ -40,26 +40,34 @@ namespace Service.Esg
             );
         }
 
-        private async Task<PayloadDTO> ValidarUsuarioAprovador(string usuario, string email)
+        public async Task<PayloadDTO> ValidarUsuarioAprovador(string usuario, string email)
         {
             if (!UtilsService.EmailValido(email))
             {
-                return new PayloadDTO(string.Empty, false, "E-mail inválido");
+                return new(string.Empty, false, "E-mail inválido");
             }
-            PayloadDTO payloadDTO = new PayloadDTO(string.Empty, true);
-            var usuarioAprovador = await ConsultarUsuarioAprovador(usuario, string.Empty);
-            if (usuarioAprovador.Any()) 
+
+            var payloadDTO = new PayloadDTO(string.Empty, true, string.Empty);
+            if (await UsuarioJaExiste(usuario, email))
             {
                 return new PayloadDTO(string.Empty, false, "Usuário já existe");
             }
-            usuarioAprovador = await ConsultarUsuarioAprovador(string.Empty, email);
-            if (usuarioAprovador.Any())
+            if (await EmailJaExiste(email))
             {
                 return new PayloadDTO(string.Empty, false, "E-mail já existe");
             }
             return payloadDTO;
+        }        
+        private async Task<bool> UsuarioJaExiste(string usuario, string email)
+        {
+            var usuarioAprovador = await ConsultarUsuarioAprovador(usuario, string.Empty);
+            return usuarioAprovador.Any();
         }
-
+        private async Task<bool> EmailJaExiste(string email)
+        {
+            var usuarioAprovador = await ConsultarUsuarioAprovador(string.Empty, email);
+            return usuarioAprovador.Any();
+        }
         public async Task<PayloadDTO> ExcluirUsuarioAprovador(int id)
         {
             return await _transactionHelper.ExecuteInTransactionAsync(async () =>

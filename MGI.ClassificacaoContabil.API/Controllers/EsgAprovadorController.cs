@@ -15,12 +15,12 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             _service = service;
         }
 
-        [HttpGet("v1/consultar/{usuario}")]
+        [HttpGet("v1/consultar")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Consultar usuário aprovador")]
-        public async Task<IActionResult> Consultar(string usuario, string email)
+        public async Task<IActionResult> Consultar([FromBody] AprovadorModel aprovador)
         {
-            var resultado = await _service.ConsultarUsuarioAprovador(usuario, email);
+            var resultado = await _service.ConsultarUsuarioAprovador(aprovador.Usuario, aprovador.Email);
             return Ok(resultado);
         }
 
