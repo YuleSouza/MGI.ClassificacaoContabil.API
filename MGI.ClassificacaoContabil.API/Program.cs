@@ -25,6 +25,7 @@ builder.Services.AddAuthentication("Bearer")
     .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("Bearer", null);
 
 builder.Services.AddControllers();
+builder.Services.AddResponseCaching();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
@@ -72,6 +73,7 @@ if (!environment.IsProduction())
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("ClientPermission");
 app.UseRouting();
+app.UseResponseCaching();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
