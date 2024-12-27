@@ -15,5 +15,9 @@ namespace Service.Base
         {
             return await _transactionHelper.ExecuteInTransactionAsync(action, mensagemSucesso);
         }
+        protected void SetPayload<T>(T payload) where T : class
+        {
+            _transactionHelper.SetPayload(payload);
+        }
     }
 }
