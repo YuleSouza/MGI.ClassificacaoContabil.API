@@ -13,12 +13,10 @@ namespace API.Controllers
     public class CenarioController : ControllerBase
     {
         private readonly ICenarioService _service;
-        private readonly ILogger<CenarioController> _logger;
 
-        public CenarioController(ICenarioService service, ILogger<CenarioController> logger)
+        public CenarioController(ICenarioService service)
         {
             _service = service;
-            _logger = logger;
         }
 
         [HttpPost]
@@ -39,18 +37,8 @@ namespace API.Controllers
         public async Task<IActionResult> AlterarDadosCenario([FromBody] CenarioDTO cenario)
         {
             var retorno = await _service.AlterarCenario(cenario);
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno);
-            }
-            else
-            {
-                _logger.LogError("Erro alteracao dados do cenário.", retorno);
-                return BadRequest(new
-                {
-                    message = retorno.MensagemErro
-                });
-            }
+            if (!retorno.Sucesso) return BadRequest(retorno);
+            return Ok(retorno);            
         }
 
         [HttpPost]
