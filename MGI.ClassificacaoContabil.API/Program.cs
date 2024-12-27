@@ -1,13 +1,15 @@
 using API.Config;
+using API.Handlers;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-// Add services to the container.
 var arrayClientAddress = configuration.GetSection("ClientPermission").GetChildren().Select(x => x.Value).ToArray();
 builder.Services.AddCors(options =>
 {
@@ -19,8 +21,9 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+builder.Services.AddAuthentication("Bearer")
+    .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("Bearer", null);
 
-builder.Services.AddAuthentication();
 builder.Services.AddControllers();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
@@ -59,13 +62,15 @@ var app = builder.Build();
 IWebHostEnvironment environment = app.Environment;
 
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (!environment.IsProduction())
 {
-    c.SwaggerEndpoint("/swagger/v1.0.0/swagger.json", "APIs - ClassificacaoContabil");
-});
-app.UseDeveloperExceptionPage();
-app.UseCors("ClientPermission");
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1.0.0/swagger.json", "APIs - ClassificacaoContabil");
+    });
+}
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("ClientPermission");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
