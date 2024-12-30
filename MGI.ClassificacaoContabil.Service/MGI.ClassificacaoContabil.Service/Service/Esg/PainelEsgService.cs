@@ -151,8 +151,8 @@ namespace Service.Esg
         }
         private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, char aprovacao)
         {
-            var classificacao = await _painelEsgRepository.ConsultarAprovacoesPorId(idClassifEsg);
-            if (!classificacao.Any())
+            var classificacao = await _painelEsgRepository.ConsultarJustificativaEsgPorId(idClassifEsg);
+            if (classificacao == null)
             {
                 return new PayloadDTO("Classificação não existe!", false);
             }
