@@ -58,12 +58,6 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
         {
-            // to-do 
-            /*
-                validar percentual
-                validar se não existe na tabela a mesma classificação e subclassificação
-                validar registros marcados como excluidos
-            */
             var validacao = new ValidacaoJustificativaClassif()
             {
                 IdEmpresa = justificativa.IdEmpresa,                
