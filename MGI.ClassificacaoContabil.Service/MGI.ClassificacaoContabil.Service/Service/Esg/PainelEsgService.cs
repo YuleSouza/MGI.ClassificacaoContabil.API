@@ -60,6 +60,7 @@ namespace Service.Esg
             /*
                 validar percentual
                 validar se não existe na tabela a mesma classificação e subclassificação
+                validar registros marcados como excluidos
             */
             PayloadDTO percentualValido = await ValidarPercentualKpi(new ValidacaoJustificativaClassif()
             {
