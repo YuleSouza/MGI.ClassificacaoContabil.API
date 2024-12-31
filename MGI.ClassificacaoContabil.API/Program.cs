@@ -3,7 +3,6 @@ using API.Handlers;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -30,7 +29,8 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterRepositories("MGI.ClassificacaoContabil.Repository");
-    containerBuilder.RegisterServices("MGI.ClassificacaoContabil.Service");
+    containerBuilder.RegisterServices("MGI.ClassificacaoContabil.Service", configuration);
+    containerBuilder.RegisterConnection(configuration);
 });
 
 builder.Services.AddSwaggerGen(options =>

@@ -8,11 +8,10 @@ namespace API.Config
 {
     public static class ApiConfig
     {
-        public static void RegisterServices(this ContainerBuilder builder, string assemblyName)
+        public static void RegisterServices(this ContainerBuilder builder, string assemblyName, IConfiguration configuration)
         {
             var assemblies = Assembly.Load(assemblyName);
             builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerDependency();
-            builder.RegisterType<DbSession>().InstancePerLifetimeScope();
             builder.RegisterType<TransactionHelper>().As<ITransactionHelper>().InstancePerDependency();
             builder.RegisterAssemblyTypes(assemblies)
                 .Where(t => t.Name.EndsWith("Service"))
@@ -28,6 +27,13 @@ namespace API.Config
             .Where(t => t.Name.EndsWith("Repository"))
             .AsImplementedInterfaces()
             .InstancePerLifetimeScope();
+        }
+
+        public static void RegisterConnection(this ContainerBuilder builder, IConfiguration configuration)
+        {
+            builder.RegisterType<DbSession>()
+           .WithParameter("stringConexao", configuration.GetSection("connectionString").Value!)
+           .InstancePerLifetimeScope();
         }
     }
 }
