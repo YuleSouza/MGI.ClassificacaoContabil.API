@@ -123,13 +123,17 @@ namespace Service.Esg
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {
             var justif = await _painelEsgRepository.ConsultarJustificativaEsgPorId(justificativa.IdJustifClassifEsg);
-            PayloadDTO percentualValido = await ValidarPercentualKpi(new ValidacaoJustificativaClassif()
+            var validacao = new ValidacaoJustificativaClassif()
             {
                 IdEmpresa = justif.IdEmpresa,
-                DataClassif = justif.DataClassif,
                 IdProjeto = justif.IdProjeto,
-                Percentual = justificativa.PercentualKpi
-            });
+                Percentual = justif.PercentualKpi,
+                IdSubClassif = justif.IdSubClassif,
+                IdClassif = justif.IdClassif,
+            };
+            PayloadDTO classificacaoValida = await ValidarClassificacaoEsg(validacao);
+            if (!classificacaoValida.Sucesso) return classificacaoValida;
+            PayloadDTO percentualValido = await ValidarPercentualKpi(validacao);
             if (!percentualValido.Sucesso) return percentualValido;
             return await ExecutarTransacao(
                 async () => await _painelEsgRepository.AlterarJustificativaEsg(justificativa)
