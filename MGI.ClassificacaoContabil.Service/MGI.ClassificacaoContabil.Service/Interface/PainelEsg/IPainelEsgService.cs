@@ -1,5 +1,4 @@
 ﻿using DTO.Payload;
-using Microsoft.AspNetCore.Http;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
@@ -17,7 +16,7 @@ namespace Service.Interface.PainelEsg
         Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa);
         Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro);
-        Task<PayloadDTO> InserirAprovacao(int idClassifEsg, char aprovacao, string usuarioAprovacao);
+        Task<PayloadDTO> InserirAprovacao(int idClassifEsg, string statusAprovacao, string usuarioAprovacao);
         Task<PayloadDTO> ExcluirClassificacao(int id, string usCriacao);
     }
 }

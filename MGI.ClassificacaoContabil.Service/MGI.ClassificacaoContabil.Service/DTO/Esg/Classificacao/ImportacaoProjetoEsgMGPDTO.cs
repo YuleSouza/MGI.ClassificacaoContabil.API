@@ -1,4 +1,6 @@
-﻿namespace Service.DTO.Esg
+﻿using Service.Enum;
+
+namespace Service.DTO.Esg
 {
     public class ImportacaoProjetoEsgMGPDTO
     {
@@ -9,7 +11,7 @@
         public DateTime DataClassif { get; set; }
         public int IdSubClassif { get; set; }        
         public string Justificativa { get; set; } = string.Empty;
-        public char StatusAprovacao { get; set; } = 'P';
+        public string StatusAprovacao { get; set; } = EStatusAprovacao.Pendente;
         public string Usuario { get; set; }
         public decimal PercentualKpi { get; set; }
         public int SeqMeta { get; set; }

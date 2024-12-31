@@ -96,9 +96,9 @@ namespace MGI.ClassificacaoContabil.API.Controllers
 
         [HttpPost("v1/classificacao/aprovar/{idClassifEsg}/{aprovacao}/{usuarioAprovacao}")]
         [ActionDescription("Aprovação Classificação e Justificativa Painel Esg")]
-        public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, char aprovacao, string usuarioAprovacao)
+        public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
-            var resultado = await _service.InserirAprovacao(idClassifEsg, aprovacao, usuarioAprovacao);
+            var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
             if (resultado != null) return BadRequest(resultado);
             return Ok(resultado);
         }

@@ -344,12 +344,11 @@ namespace Repository.PainelEsg
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                         where j.prjcod     = :idprojeto 
                                                                                           and j.empcod     = :idempresa
-                                                                                          and j.dat_anomes = :datClassif {parametros}",
+                                                                                          {parametros}",
                                                                                           new
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,
                                                                                               idempresa = filtro.IdEmpresa,
-                                                                                              datClassif = filtro.DataClassif.ToString("01/MM/yyyy"),
                                                                                               idclassif = filtro.IdClassif,
                                                                                               idsubclassif = filtro.IdSubClassif
                                                                                           });

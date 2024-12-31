@@ -12,7 +12,7 @@ namespace Service.DTO.Esg
         public int IdSubClassif { get; set; }
         public string Justificativa { get; set; }        
         public string UsCriacao { get; set; }
-        public char StatusAprovacao { get; set; }
+        public string StatusAprovacao { get; set; }
         public decimal PercentualKpi { get; set; }
         public List<AnexoJustificaitvaClassifEsgDTO>? Anexos { get; set; }
         public List<IFormFile> ArquivosAnexos { get; set; }
