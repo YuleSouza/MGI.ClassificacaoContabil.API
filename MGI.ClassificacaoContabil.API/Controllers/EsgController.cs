@@ -71,7 +71,6 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Inserir Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> InserirJustificativa([FromBody] JustificativaClassifEsg justificativaClassifEsg)
         {
-            // to-do validar inserir registro que não esteja excluido
             var resultado = await _service.InserirJustificativaEsg(justificativaClassifEsg);
             if (resultado != null) return BadRequest(resultado);
             return Ok(resultado);
