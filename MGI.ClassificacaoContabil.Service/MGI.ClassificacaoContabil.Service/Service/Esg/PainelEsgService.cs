@@ -131,8 +131,6 @@ namespace Service.Esg
                 IdSubClassif = justif.IdSubClassif,
                 IdClassif = justif.IdClassif,
             };
-            PayloadDTO classificacaoValida = await ValidarClassificacaoEsg(validacao);
-            if (!classificacaoValida.Sucesso) return classificacaoValida;
             PayloadDTO percentualValido = await ValidarPercentualKpi(validacao);
             if (!percentualValido.Sucesso) return percentualValido;
             return await ExecutarTransacao(
