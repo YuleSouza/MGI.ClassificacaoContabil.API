@@ -32,7 +32,7 @@ namespace API.Config
         public static void RegisterConnection(this ContainerBuilder builder, IConfiguration configuration)
         {
             builder.RegisterType<DbSession>()
-           .WithParameter("stringConexao", configuration.GetSection("connectionString").Value!)
+           .WithParameter("stringConexao", configuration.GetConnectionString("connectionString")!)
            .InstancePerLifetimeScope();
         }
     }
