@@ -1,11 +1,8 @@
 ﻿using Dapper;
 using Infra.Data;
-using Service.DTO.Empresa;
-using Service.DTO.Projeto;
+using Service.DTO.Combos;
 using Service.DTO.Filtros;
-using Service.DTO.Classificacao;
 using Service.Repository.FiltroTela;
-using Service.DTO.Cenario;
 
 namespace Repository.FiltroTela
 {
@@ -16,12 +13,11 @@ namespace Repository.FiltroTela
         {
             _session = session;
         }
-
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<EmpresaDTO>> EmpresaClassificacaoContabil(FiltroEmpresa filtro)
+        
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarEmpresaClassifContabil(FiltroEmpresa filtro)
         {
-            return await _session.Connection.QueryAsync<EmpresaDTO>(
-                    $@"SELECT empcod IdEmpresa, ltrim(rtrim(empnomfan)) Nome
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                    $@"SELECT empcod as Id, ltrim(rtrim(empnomfan)) as Descricao
                             FROM corpora.empres e
                            WHERE e.empsit = 'A'
                              AND EXISTS (SELECT 1
@@ -39,12 +35,11 @@ namespace Repository.FiltroTela
                         usuario = filtro.Usuario?.ToUpper()
                     });
         }
-
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<ProjetoDTO>> ProjetoClassificacaoContabil(FiltroProjeto filtro)
+        
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarProjetoClassifContabil(FiltroProjeto filtro)
         {
-            return await _session.Connection.QueryAsync<ProjetoDTO>($@"SELECT concat(concat(lpad(prjcod, 5, '0'),' - '), trim(prjnom)) as Nome,
-                                                                              prjcod codprojeto
+            return await _session.Connection.QueryAsync<PayloadComboDTO>($@"SELECT concat(concat(lpad(prjcod, 5, '0'),' - '), trim(prjnom)) as Descricao,
+                                                                              prjcod as Id
                                                                          FROM servdesk.projeto p, servdesk.pgmass a
                                                                         WHERE p.prjsit = 'A'
                                                                           AND a.pgmassver = 0
@@ -63,12 +58,10 @@ namespace Repository.FiltroTela
             });
         }
 
-        // to-do alterar classe de retorno para classe de retorno generica
-        // ID DEVE SER string
-        public async Task<IEnumerable<DiretoriaDTO>> DiretoriaClassificacaoContabil(FiltroDiretoria filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarDiretoriaClassifiContabil(FiltroDiretoria filtro)
         {
-            return await _session.Connection.QueryAsync<DiretoriaDTO>(
-                    $@"SELECT DISTINCT LTRIM(RTRIM(G.GERSIG)) codDiretoria, LTRIM(RTRIM(G.GERDES)) nome
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                    $@"SELECT DISTINCT LTRIM(RTRIM(G.GERSIG)) as Id, LTRIM(RTRIM(G.GERDES)) as Descricao
                               FROM SERVDESK.GERENCIA G
                              WHERE G.GERSIT = 'A'
                                AND EXISTS(SELECT 1 FROM PROJETO P
@@ -82,12 +75,10 @@ namespace Repository.FiltroTela
                     });
         }
 
-        // to-do alterar classe de retorno para classe de retorno generica
-        // ID DEVE SER string
-        public async Task<IEnumerable<GerenciaDTO>> GerenciaClassificacaoContabil(FiltroGerencia filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarGerenciaClassifContabil(FiltroGerencia filtro)
         {
-            return await _session.Connection.QueryAsync<GerenciaDTO>(
-                    $@"SELECT DISTINCT c.gcocod AS CodGerencia, ltrim(rtrim(c.gconom)) Nome
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                    $@"SELECT DISTINCT c.gcocod AS Id, ltrim(rtrim(c.gconom)) as Descricao
                               FROM servdesk.coordenadoria c
                              WHERE c.gcosit = 'A'
                                AND EXISTS (SELECT 1
@@ -107,13 +98,11 @@ namespace Repository.FiltroTela
                     });
         }
 
-        // to-do alterar classe de retorno para classe de retorno generica
-        // ID DEVE SER string
-        public async Task<IEnumerable<GestorDTO>> GestorClassificacaoContabil(FiltroGestor filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarGestorClassifContabil(FiltroGestor filtro)
         {
-            return await _session.Connection.QueryAsync<GestorDTO>(
-                    $@"SELECT DISTINCT ltrim(rtrim(u.usunom)) NomeGestor,
-                                          ltrim(rtrim(u.usulog)) Gestor
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                    $@"SELECT DISTINCT ltrim(rtrim(u.usunom)) as Descricao,
+                                          ltrim(rtrim(u.usulog)) as Id
                              FROM corpora.usuari u
                              WHERE EXISTS (SELECT 1
                                            FROM corpora.empres e
@@ -140,8 +129,7 @@ namespace Repository.FiltroTela
                     });
         }
 
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<GrupoProgramaDTO>> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarGrupoProgramaClassifContabil(FiltroGrupoPrograma filtro)
         {
             string parametroEmpresa = string.Empty;
             if (!string.IsNullOrEmpty(filtro.IdEmpresa))
@@ -153,8 +141,8 @@ namespace Repository.FiltroTela
                                        AND a.pgmasscod = p.pgmasscod
                                        AND a.pgmgrucod = g.pgmgrucod)";
             }
-            return await _session.Connection.QueryAsync<GrupoProgramaDTO>(
-                    $@"SELECT pgmgrucod as IdGrupoPrograma, ltrim(rtrim(pgmgrunom)) Nome
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                    $@"SELECT pgmgrucod as Id, ltrim(rtrim(pgmgrunom)) as Descricao
                          FROM servdesk.pgmgru g
                         WHERE pgmgruver = 0
                           AND g.pgmgrusit = 'A'
@@ -165,13 +153,12 @@ namespace Repository.FiltroTela
                     });
         }
 
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<ProgramaDTO>> ProgramaClassificacaoContabil(FiltroPrograma filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarProgramaClassifContabil(FiltroPrograma filtro)
         {
-            return await _session.Connection.QueryAsync<ProgramaDTO>(
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
                     $@"select 
-                              prg.pgmcod codPrograma, 
-                              ltrim(rtrim(pgmnom)) Nome
+                              prg.pgmcod as Id, 
+                              trim(pgmnom) as Descricao
                         from servdesk.pgmpro prg
                         join servdesk.pgmass pgp on pgp.pgmcod = prg.pgmcod
                         join servdesk.pgmgru gp on  gp.pgmgrucod = pgp.pgmgrucod
@@ -181,13 +168,12 @@ namespace Repository.FiltroTela
                         codGrupoPrograma = Convert.ToInt32(filtro.IdGrupoPrograma)
                     });
         }
-
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<ClassificacaoContabilFiltroDTO>> ClassificacaoContabil()
+        
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoContabil()
         {
-            var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilFiltroDTO>($@"
-                                                    select cc.id_classificacao_contabil  as IdClassificacaoContabil,    
-                                                           ltrim(rtrim(a.empnomfan))     as Nome
+            var resultado = await _session.Connection.QueryAsync<PayloadComboDTO>($@"
+                                                    select cc.id_classificacao_contabil  as Id,    
+                                                           ltrim(rtrim(a.empnomfan))     as Descricao
                                                      from classificacao_contabil cc 
                                                      inner join corpora.empres a on cc.id_empresa = a.empcod
                                                      where 1 = 1
@@ -195,42 +181,33 @@ namespace Repository.FiltroTela
 
             return resultado;
         }
-
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<ClassificacaoEsgFiltroDTO>> ClassificacaoEsg()
+        
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoEsg()
         {
-            var resultado = await _session.Connection.QueryAsync<ClassificacaoEsgFiltroDTO>($@"
+            var resultado = await _session.Connection.QueryAsync<PayloadComboDTO>($@"
                                            select 
-                                                id_classificacao_esg  as IdClassificacaoEsg,
-                                                nome                  as Nome
+                                                id_classificacao_esg  as Id,
+                                                nome                  as Descricao
                                             from classificacao_esg
                                             where 1 = 1");
             return resultado;
         }
-
-        // to-do alterar classe de retorno para classe de retorno generica
-        // alterar query para retornar somente id e descricao
-        public async Task<IEnumerable<CenarioDTO>> Cenario()
+        
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarCenario()
         {
-            var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
+            var resultado = await _session.Connection.QueryAsync<PayloadComboDTO>($@"
                                            select 
-                                                id_cenario          as IdCenario,
-                                                nome                as Nome,
-                                                status              as Status,
-                                                dtcriacao           as DataCriacao,
-                                                uscriacao           as UsuarioCriacao,
-                                                dtalteracao         as DataModificacao,
-                                                usalteracao         as UsuarioModificacao
+                                                id_cenario          as Id,
+                                                nome                as Descricao
                                             from cenario_classif_contabil
                                             where 1 = 1");
             return resultado;
         }
-
-        // to-do alterar classe de retorno para classe de retorno generica
-        public async Task<IEnumerable<CoordenadoriaDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro)
+        
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro)
         {
-            return await _session.Connection.QueryAsync<CoordenadoriaDTO>(
-                $@"SELECT DISTINCT s.gsucod IdCoordenadoria, ltrim(rtrim(s.gsunom)) Nome
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                $@"SELECT DISTINCT s.gsucod as Id, ltrim(rtrim(s.gsunom)) as Descricao
                         FROM servdesk.supervisao s
                     WHERE s.gsusit = 'A'
                         AND s.gcocod = nvl(:idGerencia, s.gcocod)

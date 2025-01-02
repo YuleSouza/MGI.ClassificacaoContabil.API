@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Infra.Data;
+using Service.DTO.Combos;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
-using Service.DTO.Projeto;
 using Service.Repository.Esg;
 using System.Text;
 
@@ -17,9 +17,9 @@ namespace Repository.PainelEsg
             _session = session;
         }
 
-        public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarCalssifInvestimento()
         {
-            return await _session.Connection.QueryAsync<CLassifInvestimentoDTO>(@$"select pgmtipcod as IdClassifInvestimento, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select pgmtipcod as Id, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
         }
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
         {
@@ -192,10 +192,10 @@ namespace Repository.PainelEsg
                 classifinvestimento = filtro.ClassificacaoInvestimento
             });
         }
-        public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
-            return await _session.Connection.QueryAsync<ProjetoEsg>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) Nome,
-                                                                              prjcod Id
+            return await _session.Connection.QueryAsync<PayloadComboDTO>($@"SELECT concat(concat(lpad(prjcod, 5, '0'),' - '), trim(prjnom)) as Descricao,
+                                                                              prjcod as Id
                                                                          FROM servdesk.projeto p, servdesk.pgmass a
                                                                         WHERE p.prjsit = 'A'
                                                                           AND a.pgmassver = 0
@@ -213,21 +213,21 @@ namespace Repository.PainelEsg
                 usuario = filtro.Usuario?.ToUpper()
             });
         }
-        public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarStatusProjeto()
         {
-            return await _session.Connection.QueryAsync<StatusProjetoDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
         }
-        public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoEsg()
         {
-            return await _session.Connection.QueryAsync<ClassificacaoEsgDTO>(@$"select clecod as IdClassif, clenom as Descricao from CLAESG where clesit = 'A'");
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select clecod as Id, clenom as Descricao from CLAESG where clesit = 'A'");
         }
-        public async Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
         {
-            return await _session.Connection.QueryAsync<SubClassificacaoEsgDTO>(@$"select clemetcod as IdSubClassif
-                                                                                      , clemetnom as Descricao 
-                                                                                 from CLAESGMET 
-                                                                                where clemetsit = 'A' 
-                                                                                  and clecod = :clecod",
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select clemetcod as Id
+                                                                                 , clemetnom as Descricao 
+                                                                              from CLAESGMET 
+                                                                             where clemetsit = 'A' 
+                                                                               and clecod = :clecod",
                 new
                 {
                     clecod = idClassificacao

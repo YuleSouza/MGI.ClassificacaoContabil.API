@@ -1,8 +1,8 @@
 ﻿using DTO.Payload;
 using Service.Base;
+using Service.DTO.Combos;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
-using Service.DTO.Projeto;
 using Service.Enum;
 using Service.Helper;
 using Service.Interface.PainelEsg;
@@ -25,21 +25,21 @@ namespace Service.Esg
         }
 
         #region [ Classificação Esg]
-        public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoEsg()
         {
             return await _painelEsgRepository.ConsultarClassificacaoEsg();
         }
-        public async Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
         {            
             return await _painelEsgRepository.ConsultarSubClassificacaoEsg(idClassificacao);
         }
 
         #endregion
-        public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
             return await _painelEsgRepository.ConsultarComboProjetosEsg(filtro);
         }        
-        public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarCalssifInvestimento()
         {
             return await _painelEsgRepository.ConsultarCalssifInvestimento();
         }
@@ -47,7 +47,7 @@ namespace Service.Esg
         {
             return await _painelEsgRepository.ConsultarProjetosPainelEsg(filtro);
         }
-        public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarStatusProjeto()
         {
             return await _painelEsgRepository.ConsultarStatusProjeto();
         }

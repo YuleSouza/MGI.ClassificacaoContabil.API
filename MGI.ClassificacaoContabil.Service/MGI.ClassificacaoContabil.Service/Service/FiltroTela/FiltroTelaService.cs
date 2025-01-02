@@ -15,52 +15,52 @@ namespace Service.FiltroTela
 
         public async Task<PayloadDTO>EmpresaClassificacaoContabil(FiltroEmpresa filtro)
         {
-            var resultado = await _FiltroTelaRepository.EmpresaClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarEmpresaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> ProjetoClassificacaoContabil(FiltroProjeto filtro)
         {
-            var resultado = await _FiltroTelaRepository.ProjetoClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarProjetoClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> DiretoriaClassificacaoContabil(FiltroDiretoria filtro)
         {
-            var resultado = await _FiltroTelaRepository.DiretoriaClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarDiretoriaClassifiContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> GerenciaClassificacaoContabil(FiltroGerencia filtro)
         {
-            var resultado = await _FiltroTelaRepository.GerenciaClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarGerenciaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> GestorClassificacaoContabil(FiltroGestor filtro)
         {
-            var resultado = await _FiltroTelaRepository.GestorClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarGestorClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro)
         {
-            var resultado = await _FiltroTelaRepository.GrupoProgramaClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarGrupoProgramaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> ProgramaClassificacaoContabil(FiltroPrograma filtro)
         {
-            var resultado = await _FiltroTelaRepository.ProgramaClassificacaoContabil(filtro);
+            var resultado = await _FiltroTelaRepository.ConsultarProgramaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> ClassificacaoContabil()
         {
-            var resultado = await _FiltroTelaRepository.ClassificacaoContabil();
+            var resultado = await _FiltroTelaRepository.ConsultarClassificacaoContabil();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> ClassificacaoEsg()
         {
-            var resultado = await _FiltroTelaRepository.ClassificacaoEsg();
+            var resultado = await _FiltroTelaRepository.ConsultarClassificacaoEsg();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
         public async Task<PayloadDTO> Cenario()
         {
-            var resultado = await _FiltroTelaRepository.Cenario();
+            var resultado = await _FiltroTelaRepository.ConsultarCenario();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
 
@@ -70,8 +70,8 @@ namespace Service.FiltroTela
 
             var retorno = coordenadoria.Select(item => new
             {
-                IdCoordenadoria = item.IdCoordenadoria.ToString(),
-                Nome = item.Nome
+                IdCoordenadoria = item.Id.ToString(),
+                Nome = item.Descricao
             }).ToList();
             return new PayloadDTO(string.Empty, true, string.Empty, retorno);
         }

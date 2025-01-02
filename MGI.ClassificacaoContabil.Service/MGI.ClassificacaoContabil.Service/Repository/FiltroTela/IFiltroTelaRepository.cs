@@ -1,24 +1,20 @@
 ﻿using Service.DTO.Filtros;
-using Service.DTO.Empresa;
-using Service.DTO.Projeto;
-using Service.DTO.Cenario;
-using Service.DTO.Classificacao;
+using Service.DTO.Combos;
 
 namespace Service.Repository.FiltroTela
 {
     public interface IFiltroTelaRepository
     {
-        Task<IEnumerable<EmpresaDTO>> EmpresaClassificacaoContabil(FiltroEmpresa filtro);
-        Task<IEnumerable<ProjetoDTO>> ProjetoClassificacaoContabil(FiltroProjeto filtro);
-        Task<IEnumerable<DiretoriaDTO>> DiretoriaClassificacaoContabil(FiltroDiretoria filtro);
-        Task<IEnumerable<GerenciaDTO>> GerenciaClassificacaoContabil(FiltroGerencia filtro);
-        Task<IEnumerable<GestorDTO>> GestorClassificacaoContabil(FiltroGestor filtro);
-        Task<IEnumerable<GrupoProgramaDTO>> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro);
-        Task<IEnumerable<ProgramaDTO>> ProgramaClassificacaoContabil(FiltroPrograma filtro);
-        Task<IEnumerable<ClassificacaoContabilFiltroDTO>> ClassificacaoContabil();
-        Task<IEnumerable<ClassificacaoEsgFiltroDTO>> ClassificacaoEsg();
-        Task<IEnumerable<CenarioDTO>> Cenario();
-
-        Task<IEnumerable<CoordenadoriaDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarEmpresaClassifContabil(FiltroEmpresa filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarProjetoClassifContabil(FiltroProjeto filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarDiretoriaClassifiContabil(FiltroDiretoria filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarGerenciaClassifContabil(FiltroGerencia filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarGestorClassifContabil(FiltroGestor filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarGrupoProgramaClassifContabil(FiltroGrupoPrograma filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarProgramaClassifContabil(FiltroPrograma filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoContabil();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoEsg();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarCenario();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro);
     }
 }

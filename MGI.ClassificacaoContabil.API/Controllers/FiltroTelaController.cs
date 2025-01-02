@@ -22,8 +22,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/comboempresa")]
+        [HttpPost("v1/comboempresa")]
         [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboEmpresa([FromBody] FiltroEmpresa filtro)
         {
@@ -36,8 +35,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/combogrupoprograma")]
+        [HttpPost("v1/combogrupoprograma")]
         [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboGrupoPrograma([FromBody] FiltroGrupoPrograma filtro)
         {
@@ -50,8 +48,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/comboprograma")]
+        [HttpPost("v1/comboprograma")]
         [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboPrograma([FromBody] FiltroPrograma filtro)
         {
@@ -64,8 +61,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/combodiretoria")]
+        [HttpPost("v1/combodiretoria")]
         public async Task<IActionResult> ComboDiretoria([FromBody] FiltroDiretoria filtro)
         {
             var retorno = await _telaFiltrosService.DiretoriaClassificacaoContabil(filtro);
@@ -90,8 +86,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/combogestor")]
+        [HttpPost("v1/combogestor")]
         public async Task<IActionResult> ComboGestor([FromBody] FiltroGestor filtro)
         {
             var retorno = await _telaFiltrosService.GestorClassificacaoContabil(filtro);
@@ -103,8 +98,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/comboprojeto")]
+        [HttpPost("v1/comboprojeto")]
         public async Task<IActionResult> ComboProjeto([FromBody] FiltroProjeto filtro)
         {
             var retorno = await _telaFiltrosService.ProjetoClassificacaoContabil(filtro);
@@ -128,8 +122,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/comboclassificacaocontabil")]
+        [HttpPost("v1/comboclassificacaocontabil")]
         public async Task<IActionResult> ComboClassificacaoContabil()
         {
             var retorno = await _telaFiltrosService.ClassificacaoContabil();
@@ -141,8 +134,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/comboclassificacaoesg")]
+        [HttpPost("v1/comboclassificacaoesg")]
         public async Task<IActionResult> ComboClassificacaoEsg()
         {
             var retorno = await _telaFiltrosService.ClassificacaoEsg();
@@ -154,8 +146,7 @@ namespace API.Controllers
         /// </summary>
         /// <param name="filtro"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("v1/combocenario")]
+        [HttpPost("v1/combocenario")]
         public async Task<IActionResult> ComboCenario()
         {
             var retorno = await _telaFiltrosService.Cenario();
