@@ -1,5 +1,4 @@
-﻿using MGI.ClassificacaoContabil.Service.DTO.Esg.Classificacao;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Service.DTO.Esg
 {

@@ -1,4 +1,4 @@
-﻿namespace MGI.ClassificacaoContabil.Service.DTO.Esg.Classificacao
+﻿namespace Service.DTO.Esg
 {
     public class ValidacaoJustificativaClassif
     {

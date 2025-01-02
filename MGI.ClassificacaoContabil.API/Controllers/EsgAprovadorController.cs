@@ -1,6 +1,5 @@
 ﻿using MGI.ClassificacaoContabil.API.ControllerAtributes;
 using MGI.ClassificacaoContabil.API.Model;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interface.PainelEsg;
 

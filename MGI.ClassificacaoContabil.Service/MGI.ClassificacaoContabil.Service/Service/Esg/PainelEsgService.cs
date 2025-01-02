@@ -1,15 +1,12 @@
 ﻿using DTO.Payload;
-using MGI.ClassificacaoContabil.Service.DTO.Esg.Classificacao;
-using Service.Helper;
-using Microsoft.Extensions.Configuration;
+using Service.Base;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
 using Service.DTO.Projeto;
+using Service.Enum;
+using Service.Helper;
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
-using Service.Base;
-using Service.Enum;
-using System.Linq;
 
 namespace Service.Esg
 {
@@ -18,14 +15,12 @@ namespace Service.Esg
         private readonly IPainelEsgRepository _painelEsgRepository;
         private readonly IEsgAnexoRepository _esgAnexoRepository;        
         private List<string> _aprovacoes = new List<string> { EStatusAprovacao.Pendente, EStatusAprovacao.Aprovado, EStatusAprovacao.Reprovado };
-        private IConfiguration _configuration;
         public PainelEsgService(IPainelEsgRepository painelEsgRepository
             , ITransactionHelper transactionHelper
             , IEsgAnexoRepository esgAnexoRepository
-            , IConfiguration configuration) : base(transactionHelper)
+            ) : base(transactionHelper)
         {
-            _painelEsgRepository = painelEsgRepository;            
-            _configuration = configuration;
+            _painelEsgRepository = painelEsgRepository;
             _esgAnexoRepository = esgAnexoRepository;
         }
 
