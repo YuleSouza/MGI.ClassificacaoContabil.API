@@ -1,65 +1,39 @@
-﻿using Infra.Data;
+﻿using Autofac;
+using Infra.Data;
 using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.Helper;
-using MGI.ClassificacaoContabil.Service.Service.Classificacao;
-using MGI.ClassificacaoContabil.Service.Service.PainelClassificacao;
-using Repository.Cenario;
-using Repository.Classificacao;
-using Repository.Empresa;
-using Repository.FiltroTela;
-using Repository.PainelClassificacao;
-using Repository.Parametrizacao;
-using Service.Cenario;
-using Service.Classificacao;
-using Service.Empresa;
-using Service.FiltroTela;
-using Service.Interface.Cenario;
-using Service.Interface.Classificacao;
-using Service.Interface.Empresa;
-using Service.Interface.FiltroTela;
-using Service.Interface.PainelClassificacao;
-using Service.Interface.Parametrizacao;
-using Service.PainelClassificacao;
-using Service.Parametrizacao;
-using Service.Repository.Cenario;
-using Service.Repository.Classificacao;
-using Service.Repository.Empresa;
-using Service.Repository.FiltroTela;
-using Service.Repository.PainelClassificacao;
-using Service.Repository.Parametrizacao;
+using Service.Helper;
+using System.Reflection;
 
 namespace API.Config
 {
     public static class ApiConfig
     {
-        public static IServiceCollection AddApiConfig(this IServiceCollection services)
+        public static void RegisterServices(this ContainerBuilder builder, string assemblyName, IConfiguration configuration)
         {
-            services.AddScoped<DbSession>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            var assemblies = Assembly.Load(assemblyName);
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerDependency();
+            builder.RegisterType<TransactionHelper>().As<ITransactionHelper>().InstancePerDependency();
+            builder.RegisterAssemblyTypes(assemblies)
+                .Where(t => t.Name.EndsWith("Service"))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+        }
 
-            //Services
-            services.AddScoped<IEmpresaService, EmpresaService>();
-            services.AddScoped<ICenarioService, CenarioService>();
-            services.AddScoped<IClassificacaoEsgService, ClassificacaoEsgService>();
-            services.AddScoped<IParametrizacaoService, ParametrizacaoService>();
-            services.AddScoped<IFiltroTelaService, FiltroTelaService>();
-            services.AddScoped<IPainelClassificacaoService, PainelClassificacaoService>();
-            services.AddScoped<IParametrizacaoCenarioService, ParametrizacaoCenarioService>();
-            services.AddScoped<IParametrizacaoEsgGeralService, ParametrizacaoEsgGeralService>();
-            services.AddScoped<IClassificacaoContabilService, ClassificacaoContabilService>();
-            services.AddScoped<IPainelClassificacaoEsgService, PainelClassificacaoEsgService>();
+        public static void RegisterRepositories(this ContainerBuilder repoBuilder, string assemblyName)
+        {
+            var assemblies = Assembly.Load(assemblyName);
 
-            //Repository            
-            services.AddScoped<IEmpresaRepository, EmpresaRepository>();
-            services.AddScoped<ICenarioRepository, CenarioRepository>();
-            services.AddScoped<IClassificacaoRepository, ClassificacaoRepository>();
-            services.AddScoped<IParametrizacaoRepository, ParametrizacaoRepository>();
-            services.AddScoped<IFiltroTelaRepository, FiltroTelaRepository>();
-            services.AddScoped<IPainelClassificacaoRepository, PainelClassificacaoRepository>();
+            repoBuilder.RegisterAssemblyTypes(assemblies)
+            .Where(t => t.Name.EndsWith("Repository"))
+            .AsImplementedInterfaces()
+            .InstancePerLifetimeScope();
+        }
 
-            services.AddScoped<ITransactionHelper, TransactionHelper>(); 
-
-            return services;
+        public static void RegisterConnection(this ContainerBuilder builder, IConfiguration configuration)
+        {
+            builder.RegisterType<DbSession>()
+           .WithParameter("stringConexao", configuration.GetConnectionString("connectionString")!)
+           .InstancePerLifetimeScope();
         }
     }
 }

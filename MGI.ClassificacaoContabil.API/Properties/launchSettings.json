@@ -27,6 +27,16 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Homolog"
       }
+    },
+    "Localhost": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5541",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Localhost"
+      }
     }
   }
 }

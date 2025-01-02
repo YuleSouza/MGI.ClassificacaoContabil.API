@@ -1,27 +1,25 @@
 ﻿using DTO.Payload;
-using Infra.Interface;
-using Service.Interface.Parametrizacao;
+using Service.Base;
 using Service.DTO.Parametrizacao;
+using Service.Helper;
+using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;
-using MGI.ClassificacaoContabil.Service.Helper;
 
 namespace Service.Parametrizacao
 {
-    public class ParametrizacaoCenarioService : IParametrizacaoCenarioService
+    public class ParametrizacaoCenarioService : ServiceBase, IParametrizacaoCenarioService
     {
         private IParametrizacaoRepository _repository;
-        private ITransactionHelper _transactionHelper;
-        public ParametrizacaoCenarioService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper)
+        public ParametrizacaoCenarioService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper) : base (transactionHelper)
         {
-            _repository = cenarioRepository;
-            _transactionHelper = transactionHelper;
+            _repository = cenarioRepository;            
         }
         public async Task<PayloadDTO> InserirParametrizacaoCenario(ParametrizacaoCenarioDTO parametrizacao)
         {
             var validacao = await Validar(parametrizacao);
             if (!validacao.Sucesso) return validacao;
 
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.InserirParametrizacaoCenario(parametrizacao),
                 "Parametrização classificação esg geral inserida com successo"
             );
@@ -31,7 +29,7 @@ namespace Service.Parametrizacao
             var validacao = await Validar(parametrizacao);
             if (!validacao.Sucesso) return validacao;
 
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.AlterarParametrizacaoCenario(parametrizacao),
                 "Parametrização do cenário alterado com successo"
             );

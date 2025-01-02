@@ -1,26 +1,25 @@
 ﻿using DTO.Payload;
-using MGI.ClassificacaoContabil.Service.Helper;
+using Service.Helper;
 using Service.DTO.Classificacao;
 using Service.DTO.Filtros;
 using Service.Interface.Classificacao;
 using Service.Repository.Classificacao;
+using Service.Base;
 
 namespace MGI.ClassificacaoContabil.Service.Service.Classificacao
 {
-    public class ClassificacaoContabilService : IClassificacaoContabilService
+    public class ClassificacaoContabilService : ServiceBase, IClassificacaoContabilService
     {
-        private IClassificacaoRepository _repository;
-        private readonly ITransactionHelper _transactionHelper;
+        private IClassificacaoRepository _repository;       
 
-        public ClassificacaoContabilService(IClassificacaoRepository classificacaoRepository, ITransactionHelper transactionHelper)
+        public ClassificacaoContabilService(IClassificacaoRepository classificacaoRepository, ITransactionHelper transactionHelper) : base(transactionHelper)
         {
             _repository = classificacaoRepository;
-            _transactionHelper = transactionHelper;
         }
 
         public async Task<PayloadDTO> InserirClassificacaoContabil(ClassificacaoContabilDTO classificacao)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.InserirClassificacaoContabil(classificacao),
                 "Classificação Contábil inserida com successo"
             );
@@ -29,7 +28,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.Classificacao
         {
             var projetos = await _repository.ConsultarProjetoClassificacaoContabil(new FiltroClassificacaoContabil { IdClassificacaoContabil = classificacao.IdClassificacaoContabil });
             var projetoExcluidos = projetos.Where(a => !classificacao.Projetos.Any(b => b.IdClassificacaoContabilProjeto == a.IdClassificacaoContabilProjeto));
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => {
                     await _repository.DeletarProjetosClassificacaoContabil(projetoExcluidos.ToList());
                     await _repository.SalvarClassificacaoContabil(classificacao);
@@ -56,13 +55,13 @@ namespace MGI.ClassificacaoContabil.Service.Service.Classificacao
         }
         public async Task<PayloadDTO> InserirProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.InserirProjetoClassificacaoContabil(projeto)
             , "Projeto Classificação Contábil inserido com successo");
         }
         public async Task<PayloadDTO> AlterarProjetoClassificacaoContabil(ClassificacaoProjetoDTO projeto)
         {
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.AlterarProjetoClassificacaoContabil(projeto)
             , "jeto Classificação Contábil alterado com successo");
         }

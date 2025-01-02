@@ -18,5 +18,7 @@ namespace Service.Repository.FiltroTela
         Task<IEnumerable<ClassificacaoContabilFiltroDTO>> ClassificacaoContabil();
         Task<IEnumerable<ClassificacaoEsgFiltroDTO>> ClassificacaoEsg();
         Task<IEnumerable<CenarioDTO>> Cenario();
+
+        Task<IEnumerable<CoordenadoriaDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro);
     }
 }

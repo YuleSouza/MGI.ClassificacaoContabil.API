@@ -1,5 +1,4 @@
 ﻿using Oracle.ManagedDataAccess.Client;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace Infra.Data
@@ -8,13 +7,13 @@ namespace Infra.Data
     {
         public OracleConnection Connection { get; }
         public IDbTransaction Transaction { get; set; }
-
-        public DbSession(IConfiguration config)
+        public DbSession(string stringConexao)
         {
-            Connection = new OracleConnection(config.GetSection("connectionString").Value);
+            if (string.IsNullOrEmpty(stringConexao))
+                throw new Exception("Sem conexão com a base de dados");
+            Connection = new OracleConnection(stringConexao);
             Connection.Open();
         }
-
         public void Dispose() => Connection?.Dispose();
     }
 }

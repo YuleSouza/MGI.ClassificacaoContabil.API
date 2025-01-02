@@ -1,21 +1,18 @@
 ﻿using DTO.Payload;
-using Infra.Interface;
-using MGI.ClassificacaoContabil.Service.Helper;
+using Service.Base;
 using Service.DTO.Parametrizacao;
+using Service.Helper;
 using Service.Interface.Parametrizacao;
 using Service.Repository.Parametrizacao;
 
 namespace Service.Parametrizacao
 {
-    public class ParametrizacaoService : IParametrizacaoService
+    public class ParametrizacaoService : ServiceBase, IParametrizacaoService
     {
         private IParametrizacaoRepository _repository;
-        private ITransactionHelper _transactionHelper;
-
-        public ParametrizacaoService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper)
+        public ParametrizacaoService(IParametrizacaoRepository cenarioRepository, ITransactionHelper transactionHelper) : base (transactionHelper)
         {
-            _repository = cenarioRepository;
-            _transactionHelper = transactionHelper;
+            _repository = cenarioRepository;            
         }
 
         public async Task<PayloadDTO> InserirParametrizacaoClassificacaoExcecao(ParametrizacaoClassificacaoEsgDTO parametrizacao)
@@ -23,7 +20,7 @@ namespace Service.Parametrizacao
             var validacao = await Validar(parametrizacao);
             if (!validacao.Sucesso) return validacao;
 
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.InserirParametrizacaoClassificacaoExcecao(parametrizacao),
                 "Parametrização classificação esg exceção inserido com successo"
             );
@@ -33,7 +30,7 @@ namespace Service.Parametrizacao
             var validacao = await Validar(parametrizacao);
             if (!validacao.Sucesso) return validacao;
 
-            return await _transactionHelper.ExecuteInTransactionAsync(
+            return await ExecutarTransacao(
                 async () => await _repository.AlterarParametrizacaoClassificacaoExcecao(parametrizacao),
                 "Parametrização da classificação esg exceção alterada com successo"
             );

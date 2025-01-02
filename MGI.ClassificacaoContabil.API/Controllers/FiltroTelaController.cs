@@ -1,7 +1,7 @@
 ﻿using Service.DTO.Filtros;
 using Service.Interface.FiltroTela;
-
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace API.Controllers
 {
@@ -24,6 +24,7 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("v1/comboempresa")]
+        [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboEmpresa([FromBody] FiltroEmpresa filtro)
         {
             var retorno = await _telaFiltrosService.EmpresaClassificacaoContabil(filtro);
@@ -37,6 +38,7 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("v1/combogrupoprograma")]
+        [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboGrupoPrograma([FromBody] FiltroGrupoPrograma filtro)
         {
             var retorno = await _telaFiltrosService.GrupoProgramaClassificacaoContabil(filtro);
@@ -50,6 +52,7 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("v1/comboprograma")]
+        [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboPrograma([FromBody] FiltroPrograma filtro)
         {
             var retorno = await _telaFiltrosService.ProgramaClassificacaoContabil(filtro);
@@ -105,6 +108,18 @@ namespace API.Controllers
         public async Task<IActionResult> ComboProjeto([FromBody] FiltroProjeto filtro)
         {
             var retorno = await _telaFiltrosService.ProjetoClassificacaoContabil(filtro);
+            return Ok(retorno);
+        }
+
+        /// <summary>
+        /// Retorna dados para combo Coordenadoria
+        /// </summary>
+        /// <param name="filtro"></param>
+        /// <returns></returns>
+        [HttpPost("v1/combocoordenadoriajustificavariacao")]
+        public async Task<IActionResult> ComboCoordenadoria([FromBody] FiltroCoordenadoria filtro)
+        {
+            var retorno = await _telaFiltrosService.ConsultarCoordenadoria(filtro);
             return Ok(retorno);
         }
 
