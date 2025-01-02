@@ -51,6 +51,19 @@ namespace Service.Esg
         {
             return await _painelEsgRepository.ConsultarStatusProjeto();
         }
+        public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
+        {
+            var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);            
+            foreach (var item in retorno)
+            {
+                var aprovacoes = await _painelEsgRepository.ConsultarAprovacoesPorId(item.IdJustifClassifEsg);
+                item.Logs = new List<AprovacaoClassifEsg>();
+                item.Logs.AddRange(aprovacoes);
+            }
+            return retorno;
+        }
+
+        #region [Crud]
         public async Task<PayloadDTO> InserirJustificativaEsg(JustificativaClassifEsg justificativa)
         {
             var validacao = new ValidacaoJustificativaClassif()
@@ -82,33 +95,7 @@ namespace Service.Esg
                     return true;
                 }, "Classificacao Inserido com sucesso"
             );
-        }
-
-        public async Task<PayloadDTO> ValidarClassificacaoEsg(ValidacaoJustificativaClassif validacao)
-        {
-            var justificativas = await _painelEsgRepository.ConsultarJustificativaEsg(new FiltroJustificativaClassifEsg()
-            {
-                IdEmpresa = validacao.IdEmpresa,
-                IdProjeto = validacao.IdProjeto
-            });
-            var pendentes = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Pendente && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
-            var aprovados = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Aprovado && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
-            var reprovados = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Reprovado && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
-            if (pendentes > 0 || aprovados > 0 || reprovados > 0)
-                return new PayloadDTO("Classificação e Sub Classificação já existe para o projeto", false);
-            return new PayloadDTO(string.Empty,true);
-        }
-        private async Task<PayloadDTO> ValidarPercentualKpi(ValidacaoJustificativaClassif validacao)
-        {
-            var justificativas = await _painelEsgRepository.ConsultarJustificativaEsg(new FiltroJustificativaClassifEsg()
-            {
-                IdEmpresa = validacao.IdEmpresa,
-                IdProjeto = validacao.IdProjeto,
-                DataClassif = validacao.DataClassif,
-            });
-            decimal totalPercentual = justificativas.Any() ? justificativas.Sum(p => p.PercentualKpi + validacao.Percentual) : 0m;
-            return new PayloadDTO(string.Empty, totalPercentual <= 100,"Total dos percentuais de KPI passou dos 100%, favor ajustar!");
-        }
+        }        
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {
             var justif = await _painelEsgRepository.ConsultarJustificativaEsgPorId(justificativa.IdJustifClassifEsg);
@@ -126,17 +113,6 @@ namespace Service.Esg
                 async () => await _painelEsgRepository.AlterarJustificativaEsg(justificativa)
                 , "Classificacao alterada com sucesso!"
             );
-        }
-        public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
-        {
-            var retorno = await _painelEsgRepository.ConsultarJustificativaEsg(filtro);            
-            foreach (var item in retorno)
-            {
-                var aprovacoes = await _painelEsgRepository.ConsultarAprovacoesPorId(item.IdJustifClassifEsg);
-                item.Logs = new List<AprovacaoClassifEsg>();
-                item.Logs.AddRange(aprovacoes);
-            }
-            return retorno;
         }
         public async Task<PayloadDTO> InserirAprovacao(int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
@@ -160,6 +136,37 @@ namespace Service.Esg
                 }, "");
             // enviar e-mail para o gestores
             return new PayloadDTO("Classificação aprovada com sucesso", true);
+        }        
+        public async Task<PayloadDTO> ExcluirClassificacao(int id, string usuarioExclusao)
+        {
+            return await ExecutarTransacao(
+                async () => {
+                    await _painelEsgRepository.RemoverClassificacao(id);
+                    await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
+                    {
+                        Aprovacao = EStatusAprovacao.Excluido,
+                        IdJustifClassifEsg = id,
+                        UsCriacao = usuarioExclusao
+                    });
+                    return true;    
+                }
+                , "Classificação excluida com sucesso!"
+                );
+        }
+
+        #endregion
+
+        #region [ Validacoes ]
+        private async Task<PayloadDTO> ValidarPercentualKpi(ValidacaoJustificativaClassif validacao)
+        {
+            var justificativas = await _painelEsgRepository.ConsultarJustificativaEsg(new FiltroJustificativaClassifEsg()
+            {
+                IdEmpresa = validacao.IdEmpresa,
+                IdProjeto = validacao.IdProjeto,
+                DataClassif = validacao.DataClassif,
+            });
+            decimal totalPercentual = justificativas.Any() ? justificativas.Sum(p => p.PercentualKpi + validacao.Percentual) : 0m;
+            return new PayloadDTO(string.Empty, totalPercentual <= 100, "Total dos percentuais de KPI passou dos 100%, favor ajustar!");
         }
         private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, string statusAprovacao)
         {
@@ -182,22 +189,21 @@ namespace Service.Esg
             }
             return new PayloadDTO(string.Empty, true);
         }
-        public async Task<PayloadDTO> ExcluirClassificacao(int id, string usuarioExclusao)
+        private async Task<PayloadDTO> ValidarClassificacaoEsg(ValidacaoJustificativaClassif validacao)
         {
-            return await ExecutarTransacao(
-                async () => {
-                    await _painelEsgRepository.RemoverClassificacao(id);
-                    await _painelEsgRepository.InserirAprovacao(new AprovacaoClassifEsg()
-                    {
-                        Aprovacao = EStatusAprovacao.Excluido,
-                        IdJustifClassifEsg = id,
-                        UsCriacao = usuarioExclusao
-                    });
-                    return true;    
-                }
-                , "Classificação excluida com sucesso!"
-                );
+            var justificativas = await _painelEsgRepository.ConsultarJustificativaEsg(new FiltroJustificativaClassifEsg()
+            {
+                IdEmpresa = validacao.IdEmpresa,
+                IdProjeto = validacao.IdProjeto
+            });
+            var pendentes = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Pendente && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
+            var aprovados = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Aprovado && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
+            var reprovados = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Reprovado && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
+            if (pendentes > 0 || aprovados > 0 || reprovados > 0)
+                return new PayloadDTO("Classificação e Sub Classificação já existe para o projeto", false);
+            return new PayloadDTO(string.Empty, true);
         }
-        
+        #endregion
+
     }
 }

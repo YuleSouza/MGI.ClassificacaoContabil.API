@@ -23,12 +23,10 @@ namespace Service.Esg
                 ,"Usuário aprovador alterado com sucesso!"
             );
         }
-
         public async Task<IEnumerable<EsgAprovadorDTO>> ConsultarUsuarioAprovador(string usuario, string email)
         {
             return await _repository.ConsultarUsuarioAprovador(usuario, email);
         }
-
         public async Task<PayloadDTO> InserirUsuarioAprovador(string usuario, string email)
         {
             var validacao = await ValidarUsuarioAprovador(usuario, email);
@@ -38,25 +36,6 @@ namespace Service.Esg
                 , "Usuário aprovador inserido com sucesso!"
             );
         }
-
-        public async Task<PayloadDTO> ValidarUsuarioAprovador(string usuario, string email)
-        {
-            if (!UtilsService.EmailValido(email))
-            {
-                return new(string.Empty, false, "E-mail inválido");
-            }
-
-            var payloadDTO = new PayloadDTO(string.Empty, true, string.Empty);
-            if (await UsuarioJaExiste(usuario, email))
-            {
-                return new PayloadDTO(string.Empty, false, "Usuário já existe");
-            }
-            if (await EmailJaExiste(email))
-            {
-                return new PayloadDTO(string.Empty, false, "E-mail já existe");
-            }
-            return payloadDTO;
-        }        
         private async Task<bool> UsuarioJaExiste(string usuario, string email)
         {
             var usuarioAprovador = await ConsultarUsuarioAprovador(usuario, string.Empty);
@@ -74,5 +53,23 @@ namespace Service.Esg
                 , "Usuário aprovador removido com sucesso!"
             );
         }
+        private async Task<PayloadDTO> ValidarUsuarioAprovador(string usuario, string email)
+        {
+            if (!UtilsService.EmailValido(email))
+            {
+                return new(string.Empty, false, "E-mail inválido");
+            }
+
+            var payloadDTO = new PayloadDTO(string.Empty, true, string.Empty);
+            if (await UsuarioJaExiste(usuario, email))
+            {
+                return new PayloadDTO(string.Empty, false, "Usuário já existe");
+            }
+            if (await EmailJaExiste(email))
+            {
+                return new PayloadDTO(string.Empty, false, "E-mail já existe");
+            }
+            return payloadDTO;
+        }        
     }
 }

@@ -90,20 +90,20 @@ namespace Service.Esg
                 { ".csv", "text/csv" }
             };
         }
-        public Task<PayloadDTO> ApagarAnexo(int id)
+        public Task<PayloadDTO> ExcluirAnexo(int id)
         {
             return ExecutarTransacao(
                     async () => 
                     {
                         var anexo = await _esgAnexoRepository.ConsultarAnexoiPorId(id);
-                        await ApagarArquivoAnexo(anexo.NomeAnexo);
+                        await ExcluirArquivoAnexo(anexo.NomeAnexo);
                         await _esgAnexoRepository.RemoverAnexo(id);
                         return true;
                         
                     },"Registro apagado com sucesso!"
                 );
         }
-        private async Task<PayloadDTO> ApagarArquivoAnexo(string nomeArquivo)
+        private async Task<PayloadDTO> ExcluirArquivoAnexo(string nomeArquivo)
         {
             try
             {
