@@ -17,6 +17,7 @@ namespace Repository.FiltroTela
             _session = session;
         }
 
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<EmpresaDTO>> EmpresaClassificacaoContabil(FiltroEmpresa filtro)
         {
             return await _session.Connection.QueryAsync<EmpresaDTO>(
@@ -38,20 +39,22 @@ namespace Repository.FiltroTela
                         usuario = filtro.Usuario?.ToUpper()
                     });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<ProjetoDTO>> ProjetoClassificacaoContabil(FiltroProjeto filtro)
         {
-            return await _session.Connection.QueryAsync<ProjetoDTO>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) nome,
-                                                                            prjcod codprojeto
-                                                                       FROM servdesk.projeto p, servdesk.pgmass a
-                                                                       WHERE p.prjsit = 'A'
-                                                                       AND a.pgmassver = 0
-                                                                       AND a.pgmasscod = p.pgmasscod
-                                                                       AND p.prjempcus IN :codEmpresa
-                                                                       AND (EXISTS (SELECT 1
-                                                                       FROM servdesk.geradm g
-                                                                       WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
-                                                                       AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
-                                                                       AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))",
+            return await _session.Connection.QueryAsync<ProjetoDTO>($@"SELECT concat(concat(lpad(prjcod, 5, '0'),' - '), trim(prjnom)) as Nome,
+                                                                              prjcod codprojeto
+                                                                         FROM servdesk.projeto p, servdesk.pgmass a
+                                                                        WHERE p.prjsit = 'A'
+                                                                          AND a.pgmassver = 0
+                                                                          AND a.pgmasscod = p.pgmasscod
+                                                                          AND p.prjempcus IN :codEmpresa
+                                                                          AND (EXISTS (SELECT 1
+                                                                                         FROM servdesk.geradm g
+                                                                                        WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
+                                                                                          AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
+                                                                                          AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))",
             new
             {
                 
@@ -59,6 +62,9 @@ namespace Repository.FiltroTela
                 usuario = filtro.Usuario?.ToUpper()
             });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
+        // ID DEVE SER string
         public async Task<IEnumerable<DiretoriaDTO>> DiretoriaClassificacaoContabil(FiltroDiretoria filtro)
         {
             return await _session.Connection.QueryAsync<DiretoriaDTO>(
@@ -75,6 +81,9 @@ namespace Repository.FiltroTela
                         codEmpresaExecutora = filtro.IdEmpresaExecutora
                     });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
+        // ID DEVE SER string
         public async Task<IEnumerable<GerenciaDTO>> GerenciaClassificacaoContabil(FiltroGerencia filtro)
         {
             return await _session.Connection.QueryAsync<GerenciaDTO>(
@@ -97,6 +106,9 @@ namespace Repository.FiltroTela
                         codDiretoria = filtro.IdDiretoria,
                     });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
+        // ID DEVE SER string
         public async Task<IEnumerable<GestorDTO>> GestorClassificacaoContabil(FiltroGestor filtro)
         {
             return await _session.Connection.QueryAsync<GestorDTO>(
@@ -127,6 +139,8 @@ namespace Repository.FiltroTela
                         codProjeto = filtro.IdProjeto
                     });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<GrupoProgramaDTO>> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro)
         {
             string parametroEmpresa = string.Empty;
@@ -150,6 +164,8 @@ namespace Repository.FiltroTela
                         codEmpresa = !string.IsNullOrEmpty(filtro.IdEmpresa) ? (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray() : null,
                     });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<ProgramaDTO>> ProgramaClassificacaoContabil(FiltroPrograma filtro)
         {
             return await _session.Connection.QueryAsync<ProgramaDTO>(
@@ -165,6 +181,8 @@ namespace Repository.FiltroTela
                         codGrupoPrograma = Convert.ToInt32(filtro.IdGrupoPrograma)
                     });
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<ClassificacaoContabilFiltroDTO>> ClassificacaoContabil()
         {
             var resultado = await _session.Connection.QueryAsync<ClassificacaoContabilFiltroDTO>($@"
@@ -177,6 +195,8 @@ namespace Repository.FiltroTela
 
             return resultado;
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<ClassificacaoEsgFiltroDTO>> ClassificacaoEsg()
         {
             var resultado = await _session.Connection.QueryAsync<ClassificacaoEsgFiltroDTO>($@"
@@ -187,6 +207,9 @@ namespace Repository.FiltroTela
                                             where 1 = 1");
             return resultado;
         }
+
+        // to-do alterar classe de retorno para classe de retorno generica
+        // alterar query para retornar somente id e descricao
         public async Task<IEnumerable<CenarioDTO>> Cenario()
         {
             var resultado = await _session.Connection.QueryAsync<CenarioDTO>($@"
@@ -203,6 +226,7 @@ namespace Repository.FiltroTela
             return resultado;
         }
 
+        // to-do alterar classe de retorno para classe de retorno generica
         public async Task<IEnumerable<CoordenadoriaDTO>> ConsultarCoordenadoria(FiltroCoordenadoria filtro)
         {
             return await _session.Connection.QueryAsync<CoordenadoriaDTO>(

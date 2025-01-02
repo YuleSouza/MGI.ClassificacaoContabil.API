@@ -54,7 +54,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [HttpDelete("v1/delete/{idAnexo}")]
         public async Task<IActionResult> DeleteAnexo([FromRoute] int idAnexo)
         {
-            var resultado = await _service.ApagarAnexo(idAnexo);
+            var resultado = await _service.ExcluirAnexo(idAnexo);
             return Ok(resultado);
         }
 

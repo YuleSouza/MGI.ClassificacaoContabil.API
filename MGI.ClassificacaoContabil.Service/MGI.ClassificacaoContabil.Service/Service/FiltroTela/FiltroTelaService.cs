@@ -1,20 +1,16 @@
 ﻿using DTO.Payload;
 using Service.DTO.Filtros;
-using Service.Repository.FiltroTela;
 using Service.Interface.FiltroTela;
-using Infra.Interface;
+using Service.Repository.FiltroTela;
 
 namespace Service.FiltroTela
 {
     public class FiltroTelaService : IFiltroTelaService
     {
         private readonly IFiltroTelaRepository _FiltroTelaRepository;
-
-        private IUnitOfWork _unitOfWork;
-        public FiltroTelaService(IFiltroTelaRepository FiltroTelaRepository, IUnitOfWork unitOfWork)
+        public FiltroTelaService(IFiltroTelaRepository FiltroTelaRepository)
         {
             _FiltroTelaRepository = FiltroTelaRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<PayloadDTO>EmpresaClassificacaoContabil(FiltroEmpresa filtro)
