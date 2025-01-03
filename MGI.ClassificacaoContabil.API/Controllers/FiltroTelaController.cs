@@ -9,12 +9,10 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class FiltroTelaController : ControllerBase
     {
-        private readonly IFiltroTelaService _telaFiltrosService;
-        private readonly ILogger<FiltroTelaController> _logger;
-        public FiltroTelaController(IFiltroTelaService telaFiltrosService, ILogger<FiltroTelaController> logger)
+        private readonly IFiltroTelaService _telaFiltrosService;        
+        public FiltroTelaController(IFiltroTelaService telaFiltrosService)
         {
             _telaFiltrosService = telaFiltrosService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -26,7 +24,7 @@ namespace API.Controllers
         [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboEmpresa([FromBody] FiltroEmpresa filtro)
         {
-            var retorno = await _telaFiltrosService.EmpresaClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarEmpresa(filtro);
             return Ok(retorno);
         }
 
@@ -39,7 +37,7 @@ namespace API.Controllers
         [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboGrupoPrograma([FromBody] FiltroGrupoPrograma filtro)
         {
-            var retorno = await _telaFiltrosService.GrupoProgramaClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarGrupoPrograma(filtro);
             return Ok(retorno);
         }
 
@@ -52,7 +50,7 @@ namespace API.Controllers
         [ResponseCache(Duration = 120)]
         public async Task<IActionResult> ComboPrograma([FromBody] FiltroPrograma filtro)
         {
-            var retorno = await _telaFiltrosService.ProgramaClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarPrograma(filtro);
             return Ok(retorno);
         }
 
@@ -64,7 +62,7 @@ namespace API.Controllers
         [HttpPost("v1/combodiretoria")]
         public async Task<IActionResult> ComboDiretoria([FromBody] FiltroDiretoria filtro)
         {
-            var retorno = await _telaFiltrosService.DiretoriaClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarDiretoria(filtro);
             return Ok(retorno);
         }
 
@@ -77,7 +75,7 @@ namespace API.Controllers
         [Route("v1/combogerencia")]
         public async Task<IActionResult> ComboGerencia([FromBody] FiltroGerencia filtro)
         {
-            var retorno = await _telaFiltrosService.GerenciaClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarGerencia(filtro);
             return Ok(retorno);
         }
 
@@ -89,7 +87,7 @@ namespace API.Controllers
         [HttpPost("v1/combogestor")]
         public async Task<IActionResult> ComboGestor([FromBody] FiltroGestor filtro)
         {
-            var retorno = await _telaFiltrosService.GestorClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarGestor(filtro);
             return Ok(retorno);
         }
 
@@ -101,7 +99,7 @@ namespace API.Controllers
         [HttpPost("v1/comboprojeto")]
         public async Task<IActionResult> ComboProjeto([FromBody] FiltroProjeto filtro)
         {
-            var retorno = await _telaFiltrosService.ProjetoClassificacaoContabil(filtro);
+            var retorno = await _telaFiltrosService.ConsultarProjeto(filtro);
             return Ok(retorno);
         }
 
@@ -125,7 +123,7 @@ namespace API.Controllers
         [HttpPost("v1/comboclassificacaocontabil")]
         public async Task<IActionResult> ComboClassificacaoContabil()
         {
-            var retorno = await _telaFiltrosService.ClassificacaoContabil();
+            var retorno = await _telaFiltrosService.ConsultarClassificacaoContabil();
             return Ok(retorno);
         }
 
@@ -137,7 +135,7 @@ namespace API.Controllers
         [HttpPost("v1/comboclassificacaoesg")]
         public async Task<IActionResult> ComboClassificacaoEsg()
         {
-            var retorno = await _telaFiltrosService.ClassificacaoEsg();
+            var retorno = await _telaFiltrosService.ConsultarClassificacaoEsg();
             return Ok(retorno);
         }
 
@@ -149,7 +147,7 @@ namespace API.Controllers
         [HttpPost("v1/combocenario")]
         public async Task<IActionResult> ComboCenario()
         {
-            var retorno = await _telaFiltrosService.Cenario();
+            var retorno = await _telaFiltrosService.ConsultarCenario();
             return Ok(retorno);
         }
     }

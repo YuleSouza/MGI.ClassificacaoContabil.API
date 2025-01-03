@@ -13,52 +13,52 @@ namespace Service.FiltroTela
             _FiltroTelaRepository = FiltroTelaRepository;
         }
 
-        public async Task<PayloadDTO>EmpresaClassificacaoContabil(FiltroEmpresa filtro)
+        public async Task<PayloadDTO> ConsultarEmpresa(FiltroEmpresa filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarEmpresaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> ProjetoClassificacaoContabil(FiltroProjeto filtro)
+        public async Task<PayloadDTO> ConsultarProjeto(FiltroProjeto filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarProjetoClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> DiretoriaClassificacaoContabil(FiltroDiretoria filtro)
+        public async Task<PayloadDTO> ConsultarDiretoria(FiltroDiretoria filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarDiretoriaClassifiContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> GerenciaClassificacaoContabil(FiltroGerencia filtro)
+        public async Task<PayloadDTO> ConsultarGerencia(FiltroGerencia filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarGerenciaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> GestorClassificacaoContabil(FiltroGestor filtro)
+        public async Task<PayloadDTO> ConsultarGestor(FiltroGestor filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarGestorClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> GrupoProgramaClassificacaoContabil(FiltroGrupoPrograma filtro)
+        public async Task<PayloadDTO> ConsultarGrupoPrograma(FiltroGrupoPrograma filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarGrupoProgramaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> ProgramaClassificacaoContabil(FiltroPrograma filtro)
+        public async Task<PayloadDTO> ConsultarPrograma(FiltroPrograma filtro)
         {
             var resultado = await _FiltroTelaRepository.ConsultarProgramaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> ClassificacaoContabil()
+        public async Task<PayloadDTO> ConsultarClassificacaoContabil()
         {
             var resultado = await _FiltroTelaRepository.ConsultarClassificacaoContabil();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> ClassificacaoEsg()
+        public async Task<PayloadDTO> ConsultarClassificacaoEsg()
         {
             var resultado = await _FiltroTelaRepository.ConsultarClassificacaoEsg();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
-        public async Task<PayloadDTO> Cenario()
+        public async Task<PayloadDTO> ConsultarCenario()
         {
             var resultado = await _FiltroTelaRepository.ConsultarCenario();
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
