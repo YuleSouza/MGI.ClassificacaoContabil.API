@@ -1,17 +1,17 @@
-﻿using Service.DTO.Esg;
+﻿using Service.DTO.Combos;
+using Service.DTO.Esg;
 using Service.DTO.Filtros;
-using Service.DTO.Projeto;
 
 namespace Service.Repository.Esg
 {
     public interface IPainelEsgRepository
     {
         Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro);
-        Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento();
-        Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto();
-        Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro);
-        Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg();
-        Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarCalssifInvestimento();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarStatusProjeto();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarComboProjetosEsg(FiltroProjeto filtro);
+        Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoEsg();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarSubClassificacaoEsg(int idClassificacao);
         Task<int> InserirJustificativaEsg(JustificativaClassifEsg justificativa);        
         Task<bool> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);
         Task<bool> AlterarStatusJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa);

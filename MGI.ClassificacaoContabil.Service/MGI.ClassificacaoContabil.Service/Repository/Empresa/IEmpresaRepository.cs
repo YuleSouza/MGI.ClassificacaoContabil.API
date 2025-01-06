@@ -1,9 +1,9 @@
-﻿using Service.DTO.Empresa;
+﻿using Service.DTO.Combos;
 
 namespace Service.Repository.Empresa
 {
     public interface IEmpresaRepository
     {
-        Task<IEnumerable<EmpresaDTO>> ConsultarEmpresa();
+        Task<IEnumerable<PayloadComboDTO>> ConsultarEmpresa();
     }
 }

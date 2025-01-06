@@ -1,6 +1,4 @@
-﻿using Service.Enum;
-
-namespace Service.DTO.Filtros
+﻿namespace Service.DTO.Filtros
 {
     public class FiltroPainelClassificacaoContabil
     {
