@@ -8,5 +8,6 @@
         public decimal Percentual { get; set; }
         public int IdClassif { get; set; }
         public int IdSubClassif { get; set; }        
+        public string Justificativa { get; set; }
     }
 }

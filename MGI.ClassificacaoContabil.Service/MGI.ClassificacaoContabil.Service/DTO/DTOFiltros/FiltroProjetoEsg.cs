@@ -13,7 +13,6 @@
         public DateTime DataInicio { get; set; }        
         public string StatusAprovacao { get; set; }
         public string? ClassificacaoInvestimento { get; set; }
-        public string BaseOrcamento { get; set; }
-        public string FormatoAcompanhamento { get; set; }
+        public string TipoValor { get; set; }
     }
 }

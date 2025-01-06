@@ -93,6 +93,14 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("v1/classificacao/log/{idJustificativa}")]
+        [ActionDescription("Consultar Logs de aprovação")]
+        public async Task<IActionResult> ConsultarLogAprovacao([FromRoute] int idJustificativa)
+        {
+            var resultado = await _service.ConsultarLogAprovacoesPorId(idJustificativa);
+            return Ok(resultado);
+        }
+
         [HttpPost("v1/classificacao/aprovar/{idClassifEsg}/{aprovacao}/{usuarioAprovacao}")]
         [ActionDescription("Aprovação Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)

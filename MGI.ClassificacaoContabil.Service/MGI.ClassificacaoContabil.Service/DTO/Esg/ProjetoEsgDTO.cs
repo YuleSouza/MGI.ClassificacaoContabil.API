@@ -7,36 +7,18 @@
         public int IdEmpresa { get; set; }
         public string NomeEmpresa { get; set; }
         public string IdGestor {  get; set; }
-        public decimal ValorFormatoAcompanhamento { get; set; }
-        public decimal ValorBaseOrcamento { get; set; }
+        public decimal ValorProjeto { get; set; }        
         public string IdStatusProjeto { get; set; }
         public string DescricaoStatusProjeto { get; set; }
-        public string NomePatrocinador { get; set; }
-        public decimal PercentualAprovados { get; set; }
-        public decimal PercentualPendentes { get; set; }
-        public decimal PercentualReprovados { get; set; }
-        public decimal Variacao
-        {
-            get
-            {
-                return ValorBaseOrcamento - ValorFormatoAcompanhamento;
-            }
-            set
-            {
-                Variacao = value;
-            }
-        }
-        public decimal PercentualVariacao
-        {
-            get
-            {
-                return ValorBaseOrcamento == 0 ? 0 : Math.Round(Variacao / ValorBaseOrcamento * 100, 2);
-            }
-            set
-            {
-                PercentualVariacao = value;
-            }
-        }
+        public string NomePatrocinador { get; set; }                
         public DateTime DtLancamentoProjeto { get; set; }
+        public decimal RealizadoAnoAnterior { get; set; }
+        public decimal RealizadoMesAnterior { get; set; }
+        public decimal OrcadoPartirAnoAtual { get; set; }
+        public decimal PrevistoPartirAnoAtual { get; set; }
+        public decimal ReplanPartirAnoAtual { get; set; }
+        public decimal TedenciaMesAtualAteAnoVigente { get; set; }
+        public decimal CicloPartirAnoSeguinte { get; set; }
+        public decimal TendenciaPartirMesAtual { get; set; }
     }
 }
