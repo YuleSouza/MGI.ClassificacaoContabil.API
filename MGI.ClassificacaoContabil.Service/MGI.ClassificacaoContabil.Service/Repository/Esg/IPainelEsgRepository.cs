@@ -6,7 +6,7 @@ namespace Service.Repository.Esg
 {
     public interface IPainelEsgRepository
     {
-        Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro);
+        Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro);
         Task<IEnumerable<PayloadComboDTO>> ConsultarCalssifInvestimento();
         Task<IEnumerable<PayloadComboDTO>> ConsultarStatusProjeto();
         Task<IEnumerable<PayloadComboDTO>> ConsultarComboProjetosEsg(FiltroProjeto filtro);

@@ -21,7 +21,7 @@ namespace Repository.PainelEsg
         {
             return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select pgmtipcod as Id, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
         }
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
@@ -69,17 +69,9 @@ namespace Repository.PainelEsg
                         ,sub.IdStatusProjeto
                         ,sub.DescricaoStatusProjeto
                         ,trim(sub.Patrocinador)                        as NomePatrocinador
-                        ,sub.ClassifInvestimento                       as ClassifInvestimento
-                        ,sum(nvl(sub.RealizadoAnoAnterior,0))          as RealizadoAnoAnterior
-                        ,sum(nvl(sub.RealizadoMesAnterior,0))          as RealizadoMesAnterior
-                        ,sum(nvl(sub.OrcadoPartirAnoAtual,0))          as OrcadoPartirAnoAtual         
-                        ,sum(nvl(sub.PrevistoPartirAnoAtual,0))        as PrevistoPartirAnoAtual
-                        ,sum(nvl(sub.ReplanPartirAnoAtual,0))          as ReplanPartirAnoAtual
-                        ,sum(nvl(sub.TedenciaMesAtualAteAnoVigente,0)) as TedenciaMesAtualAteAnoVigente
-                        ,sum(nvl(sub.CicloPartirAnoSeguinte,0))        as CicloPartirAnoSeguinte
-                        ,sum(nvl(sub.TendenciaPartirMesAtual,0))       as TendenciaPartirMesAtual
+                        ,sub.ClassifInvestimento                       as ClassifInvestimento                        
                    from (
-                 select p.prjcod                                            as IdProjeto
+                 select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
                         , e.empcod                                         as IdEmpresa
                         , trim(e.empnomfan)                                as NomeEmpresa        
@@ -88,79 +80,14 @@ namespace Repository.PainelEsg
                         , st.prjstacod                                     as IdStatusProjeto
                         , trim(st.prjstades)                               as DescricaoStatusProjeto
                         , p.prjpgmtip                                      as ClassifInvestimento
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'R' 
-                              and orc2.prjorcmes > 0
-                              and to_date('01' || '/' || orc2.prjorcmes || '/' || orc2.prjorcano) between :dataInicial and TRUNC(SYSDATE, 'YEAR') -1) as RealizadoAnoAnterior
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'R' 
-                              and orc2.prjorcmes > 0
-                              and to_date('01' || '/' || orc2.prjorcmes || '/' || orc2.prjorcano) between :dataInicial and TRUNC(TRUNC(SYSDATE, 'MONTH') - 1,'MONTH')) as RealizadoMesAnterior
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'O' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as OrcadoPartirAnoAtual
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'P' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as PrevistoPartirAnoAtual
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = '2' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as ReplanPartirAnoAtual
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'J' and orc2.prjorcmes > 0
-                              and orc2.prjorcmes between to_char(sysdate,'MM') and 12 
-                              and orc2.prjorcano = to_char(sysdate,'YYYY')) as TedenciaMesAtualAteAnoVigente
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = '1' and orc2.prjorcmes > 0
-                              and orc2.prjorcano > to_char(sysdate,'YYYY')) as CicloPartirAnoSeguinte
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = '1' and orc2.prjorcmes > 0
-                              and orc2.prjorcano > 0 
-                              and orc2.prjorcmes > to_char(sysdate,'MM')) as TendenciaPartirMesAtual
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod) as classificacoes
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'A') as aprovados
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'P') as pendentes
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'R') as reprovados
+                        , orc.prjorcval                                    as ValorOrcamento
+                        , orc.prjorctip                                    as TipoValor
                         , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                   from projeto p
                         inner join prjorc orc on (p.prjcod = orc.prjcod 
                                                 and orc.prjorcfse = 0
                                                 and orc.prjorcver = 0 
-                                                and orc.prjorctip in ('O','J','R','2','1') 
+                                                and orc.prjorctip in ('O','J','R','2','1','P') 
                                                 and orc.prjorcmes > 0 and orc.prjorcano > 0)
                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                         inner join corpora.usuari u on (u.USULOG = p.PRJGES)
@@ -171,21 +98,7 @@ namespace Repository.PainelEsg
                    and p.prjesg = 'S'
                 ) sub
                 where 1 = 1 {parametros.ToString()}
-               group by  sub.IdProjeto
-                         , sub.IdEmpresa
-                         , sub.IdProjeto
-                         , sub.nomeprojeto
-                         , sub.NomeEmpresa
-                         , sub.IdGestor
-                         , sub.IdStatusProjeto
-                         , sub.DescricaoStatusProjeto
-                         , sub.Aprovados
-                         , sub.classificacoes
-                         , sub.Pendentes
-                         , sub.Reprovados
-                         , sub.Patrocinador
-                         , sub.ClassifInvestimento
-               order by sub.IdProjeto
+               order by sub.IdProjeto, sub.TipoValor, sub.DtLancamentoProjeto
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
@@ -335,21 +248,21 @@ namespace Repository.PainelEsg
             }
             #endregion
             return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
-                                                                                        j.id_justif_classif_esg as IdJustifClassifEsg
-                                                                                        , empcod              as IdEmpresa
-                                                                                        , dat_anomes          as DataClassif
-                                                                                        , prjcod              as IdProjeto
-                                                                                        , id_classif          as IdClassif
-                                                                                        , trim(c.clenom)      as DescricaoClassif
-                                                                                        , id_sub_classif      as IdSubClassif
-                                                                                        , trim(m.clemetnom)   as DescricaoSubClassif
-                                                                                        , justificativa       as Justificativa
-                                                                                        , j.status_aprovacao  as StatusAprovacao
-                                                                                        , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
-                                                                                        , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
-                                                                                        , j.uscriacao         as Usuario
-                                                                                        , j.perc_kpi          as PercentualKpi                                                                                        
-                                                                                        from justif_classif_esg j 
+                                                                                               j.id_justif_classif_esg as IdJustifClassifEsg
+                                                                                             , empcod              as IdEmpresa
+                                                                                             , dat_anomes          as DataClassif
+                                                                                             , prjcod              as IdProjeto
+                                                                                             , id_classif          as IdClassif
+                                                                                             , trim(c.clenom)      as DescricaoClassif
+                                                                                             , id_sub_classif      as IdSubClassif
+                                                                                             , trim(m.clemetnom)   as DescricaoSubClassif
+                                                                                             , justificativa       as Justificativa
+                                                                                             , j.status_aprovacao  as StatusAprovacao
+                                                                                             , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
+                                                                                             , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
+                                                                                             , j.uscriacao         as Usuario
+                                                                                             , j.perc_kpi          as PercentualKpi
+                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                         where j.prjcod     = :idprojeto 

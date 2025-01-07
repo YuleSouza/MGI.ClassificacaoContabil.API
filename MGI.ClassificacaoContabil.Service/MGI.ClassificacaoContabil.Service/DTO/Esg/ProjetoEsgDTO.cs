@@ -12,13 +12,7 @@
         public string DescricaoStatusProjeto { get; set; }
         public string NomePatrocinador { get; set; }                
         public DateTime DtLancamentoProjeto { get; set; }
-        public decimal RealizadoAnoAnterior { get; set; }
-        public decimal RealizadoMesAnterior { get; set; }
-        public decimal OrcadoPartirAnoAtual { get; set; }
-        public decimal PrevistoPartirAnoAtual { get; set; }
-        public decimal ReplanPartirAnoAtual { get; set; }
-        public decimal TedenciaMesAtualAteAnoVigente { get; set; }
-        public decimal CicloPartirAnoSeguinte { get; set; }
-        public decimal TendenciaPartirMesAtual { get; set; }
+        public string TipoValor {  get; set; }
+        public decimal ValorOrcamento { get; set; }
     }
 }
