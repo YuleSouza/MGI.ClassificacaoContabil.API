@@ -17,5 +17,6 @@
         public string Usuario { get; set; }
         public decimal PercentualKpi { get; set; }
         public DateTime DataClassif { get; set; }
+        public decimal ValorKpi {  get; set; }
     }
 }

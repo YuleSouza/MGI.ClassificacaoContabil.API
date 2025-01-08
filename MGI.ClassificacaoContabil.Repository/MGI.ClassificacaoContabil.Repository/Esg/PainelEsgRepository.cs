@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Infra.Data;
+using Service.DTO.Combos;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
-using Service.DTO.Projeto;
 using Service.Repository.Esg;
 using System.Text;
 
@@ -17,11 +17,11 @@ namespace Repository.PainelEsg
             _session = session;
         }
 
-        public async Task<IEnumerable<CLassifInvestimentoDTO>> ConsultarCalssifInvestimento()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarCalssifInvestimento()
         {
-            return await _session.Connection.QueryAsync<CLassifInvestimentoDTO>(@$"select pgmtipcod as IdClassifInvestimento, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select pgmtipcod as Id, pgmtipnom as Descricao from PGMTIP where pgmtipsit = 'A'");
         }
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();
@@ -61,24 +61,17 @@ namespace Repository.PainelEsg
             }
             #endregion
             return await _session.Connection.QueryAsync<ProjetoEsgDTO>($@"
-                select  sub.IdProjeto
-                        , sub.Nomeprojeto
-                        , sub.IdEmpresa
-                        , sub.NomeEmpresa
-                        , sub.IdGestor
-                        , sub.IdStatusProjeto
-                        , sub.DescricaoStatusProjeto
-                        , trim(sub.Patrocinador) as NomePatrocinador
-                        , sub.ClassifInvestimento as ClassifInvestimento
-                        , case when :BaseOrcamento = 'O' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.OrcadoPartirAnoAtual,0))
-                            when :BaseOrcamento = 'P' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.PrevistoPartirAnoAtual,0))
-                            when :BaseOrcamento = '2' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.ReplanPartirAnoAtual,0)) 
-                            else 0 end as ValorBaseOrcamento
-                        , case when :FormatoAcompanhamento = '1' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TedenciaMesAtualAteAnoVigente,0)) + sum(nvl(sub.CicloPartirAnoSeguinte,0))
-                               when :FormatoAcompanhamento = 'J' then sum(nvl(sub.RealizadoAnoAnterior,0)) + sum(nvl(sub.TendenciaPartirMesAtual,0))
-                               else 0 end as ValorFormatoAcompanhamento
-                from (
-                select p.prjcod                                            as IdProjeto
+                  select sub.IdProjeto
+                        ,sub.Nomeprojeto
+                        ,sub.IdEmpresa
+                        ,sub.NomeEmpresa
+                        ,sub.IdGestor
+                        ,sub.IdStatusProjeto
+                        ,sub.DescricaoStatusProjeto
+                        ,trim(sub.Patrocinador)                        as NomePatrocinador
+                        ,sub.ClassifInvestimento                       as ClassifInvestimento
+                   from (
+                 select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
                         , e.empcod                                         as IdEmpresa
                         , trim(e.empnomfan)                                as NomeEmpresa        
@@ -87,71 +80,14 @@ namespace Repository.PainelEsg
                         , st.prjstacod                                     as IdStatusProjeto
                         , trim(st.prjstades)                               as DescricaoStatusProjeto
                         , p.prjpgmtip                                      as ClassifInvestimento
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'R' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano < to_char(sysdate,'YYYY')) as RealizadoAnoAnterior
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'O' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as OrcadoPartirAnoAtual
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'P' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as PrevistoPartirAnoAtual
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = '2' 
-                              and orc2.prjorcmes > 0
-                              and orc2.prjorcano >= to_char(sysdate,'YYYY')) as ReplanPartirAnoAtual
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = 'J' and orc2.prjorcmes > 0
-                              and orc2.prjorcmes between to_char(sysdate,'MM') and 12 
-                              and orc2.prjorcano = to_char(sysdate,'YYYY')) as TedenciaMesAtualAteAnoVigente
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = '1' and orc2.prjorcmes > 0
-                              and orc2.prjorcano > to_char(sysdate,'YYYY')) as CicloPartirAnoSeguinte
-                        , (select sum(prjorcval) 
-                             from prjorc orc2 
-                            where orc2.prjcod = orc.prjcod 
-                              and orc2.prjorcfse = 0 
-                              and orc2.prjorcver = 0 
-                              and orc2.prjorctip = '1' and orc2.prjorcmes > 0
-                              and orc2.prjorcano > 0 
-                              and orc2.prjorcmes > to_char(sysdate,'MM')) as TendenciaPartirMesAtual
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod) as classificacoes
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'A') as aprovados
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'P') as pendentes
-                        , (select count(*) from justif_classif_esg j where j.prjcod = p.prjcod and j.empcod = e.empcod and j.status_aprovacao = 'R') as reprovados
+                        , orc.prjorcval                                    as ValorOrcamento
+                        , orc.prjorctip                                    as TipoValor
                         , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
                   from projeto p
                         inner join prjorc orc on (p.prjcod = orc.prjcod 
                                                 and orc.prjorcfse = 0
                                                 and orc.prjorcver = 0 
-                                                and orc.prjorctip in ('O','J','R','2','1') 
+                                                and orc.prjorctip in ('O','J','R','2','1','P') 
                                                 and orc.prjorcmes > 0 and orc.prjorcano > 0)
                         inner join corpora.empres e on (e.empcod = p.prjempcus)
                         inner join corpora.usuari u on (u.USULOG = p.PRJGES)
@@ -162,40 +98,27 @@ namespace Repository.PainelEsg
                    and p.prjesg = 'S'
                 ) sub
                 where 1 = 1 {parametros.ToString()}
-               group by  sub.IdProjeto
-                         , sub.IdEmpresa
-                         , sub.IdProjeto
-                         , sub.nomeprojeto
-                         , sub.NomeEmpresa
-                         , sub.IdGestor
-                         , sub.IdStatusProjeto
-                         , sub.DescricaoStatusProjeto
-                         , sub.Aprovados
-                         , sub.classificacoes
-                         , sub.Pendentes
-                         , sub.Reprovados
-                         , sub.Patrocinador
-                         , sub.ClassifInvestimento
-               order by sub.IdProjeto
+               order by sub.IdProjeto, sub.TipoValor, sub.DtLancamentoProjeto
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
                 idGrupoPrograma = filtro.IdGrupoPrograma,
                 iddiretoria = filtro.IdDiretoria,
                 idGerencia = filtro.IdGerencia,
+                anoInicial = filtro.DataInicio.ToString("yyyy"),
+                mesInicial = filtro.DataInicio.ToString("MM"),
                 datainicial = filtro.DataInicio.ToString("01/MM/yyyy"),
                 datafinal = filtro.DataFim.ToString("01/MM/yyyy"),
-                BaseOrcamento = filtro.BaseOrcamento,
-                FormatoAcompanhamento = filtro.FormatoAcompanhamento,
+                tipoValor = filtro.TipoValor,
                 idProjeto = filtro.IdProjeto,
                 idstatusprojeto = filtro.StatusProjeto,
                 classifinvestimento = filtro.ClassificacaoInvestimento
             });
         }
-        public async Task<IEnumerable<ProjetoEsg>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
-            return await _session.Connection.QueryAsync<ProjetoEsg>($@"SELECT to_char(prjcod, '00000') || ' - ' || ltrim(rtrim(prjnom)) Nome,
-                                                                              prjcod Id
+            return await _session.Connection.QueryAsync<PayloadComboDTO>($@"SELECT concat(concat(lpad(prjcod, 5, '0'),' - '), trim(prjnom)) as Descricao,
+                                                                              prjcod as Id
                                                                          FROM servdesk.projeto p, servdesk.pgmass a
                                                                         WHERE p.prjsit = 'A'
                                                                           AND a.pgmassver = 0
@@ -213,21 +136,21 @@ namespace Repository.PainelEsg
                 usuario = filtro.Usuario?.ToUpper()
             });
         }
-        public async Task<IEnumerable<StatusProjetoDTO>> ConsultarStatusProjeto()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarStatusProjeto()
         {
-            return await _session.Connection.QueryAsync<StatusProjetoDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select prjstacod as Id, trim(prjstades) as Descricao from PRJSTA where prjstasit = 'A' order by prjstaord");
         }
-        public async Task<IEnumerable<ClassificacaoEsgDTO>> ConsultarClassificacaoEsg()
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarClassificacaoEsg()
         {
-            return await _session.Connection.QueryAsync<ClassificacaoEsgDTO>(@$"select clecod as IdClassif, clenom as Descricao from CLAESG where clesit = 'A'");
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select clecod as Id, clenom as Descricao from CLAESG where clesit = 'A'");
         }
-        public async Task<IEnumerable<SubClassificacaoEsgDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
+        public async Task<IEnumerable<PayloadComboDTO>> ConsultarSubClassificacaoEsg(int idClassificacao)
         {
-            return await _session.Connection.QueryAsync<SubClassificacaoEsgDTO>(@$"select clemetcod as IdSubClassif
-                                                                                      , clemetnom as Descricao 
-                                                                                 from CLAESGMET 
-                                                                                where clemetsit = 'A' 
-                                                                                  and clecod = :clecod",
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(@$"select clemetcod as Id
+                                                                                 , clemetnom as Descricao 
+                                                                              from CLAESGMET 
+                                                                             where clemetsit = 'A' 
+                                                                               and clecod = :clecod",
                 new
                 {
                     clecod = idClassificacao
@@ -325,21 +248,21 @@ namespace Repository.PainelEsg
             }
             #endregion
             return await _session.Connection.QueryAsync<JustificativaClassifEsgDTO>(@$"select 
-                                                                                        j.id_justif_classif_esg as IdJustifClassifEsg
-                                                                                        , empcod              as IdEmpresa
-                                                                                        , dat_anomes          as DataClassif
-                                                                                        , prjcod              as IdProjeto
-                                                                                        , id_classif          as IdClassif
-                                                                                        , trim(c.clenom)      as DescricaoClassif
-                                                                                        , id_sub_classif      as IdSubClassif
-                                                                                        , trim(m.clemetnom)   as DescricaoSubClassif
-                                                                                        , justificativa       as Justificativa
-                                                                                        , j.status_aprovacao  as StatusAprovacao
-                                                                                        , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
-                                                                                        , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
-                                                                                        , j.uscriacao         as Usuario
-                                                                                        , j.perc_kpi          as PercentualKpi
-                                                                                        from justif_classif_esg j 
+                                                                                               j.id_justif_classif_esg as IdJustifClassifEsg
+                                                                                             , empcod              as IdEmpresa
+                                                                                             , dat_anomes          as DataClassif
+                                                                                             , prjcod              as IdProjeto
+                                                                                             , id_classif          as IdClassif
+                                                                                             , trim(c.clenom)      as DescricaoClassif
+                                                                                             , id_sub_classif      as IdSubClassif
+                                                                                             , trim(m.clemetnom)   as DescricaoSubClassif
+                                                                                             , justificativa       as Justificativa
+                                                                                             , j.status_aprovacao  as StatusAprovacao
+                                                                                             , decode(j.status_aprovacao,'P','Pendente','A','Aprovado','R','Reprovado','Excluído')  as DescricaoStatusAprovacao
+                                                                                             , decode(j.status_aprovacao,'E',1,0) as ClassificacaoBloqueada
+                                                                                             , j.uscriacao         as Usuario
+                                                                                             , j.perc_kpi          as PercentualKpi
+                                                                                         from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                         where j.prjcod     = :idprojeto 
@@ -394,7 +317,7 @@ namespace Repository.PainelEsg
                                                                                                         id_justif_classif_esg = id
                                                                                                     });
         }
-        public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarAprovacoesPorId(int id)
+        public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarLogAprovacoesPorId(int id)
         {
             return await _session.Connection.QueryAsync<AprovacaoClassifEsg>(@"select aprovacao             as Aprovacao
                                                                                     , uscriacao             as UsCriacao

@@ -22,7 +22,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Consultar Projetos Esg")]
         public async Task<IActionResult> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
         {
-            var resultado = await _service.ConsultarProjetosPainelEsg(filtro);
+            var resultado = await _service.ConsultarProjetosEsg(filtro);
             return Ok(resultado);
         }
 
@@ -90,6 +90,14 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> ConsultarJustificativa([FromBody] FiltroJustificativaClassifEsg justificativaClassifEsg)
         {
             var resultado = await _service.ConsultarJustificativaEsg(justificativaClassifEsg);
+            return Ok(resultado);
+        }
+
+        [HttpGet("v1/classificacao/log/{idJustificativa}")]
+        [ActionDescription("Consultar Logs de aprovação")]
+        public async Task<IActionResult> ConsultarLogAprovacao([FromRoute] int idJustificativa)
+        {
+            var resultado = await _service.ConsultarLogAprovacoesPorId(idJustificativa);
             return Ok(resultado);
         }
 
