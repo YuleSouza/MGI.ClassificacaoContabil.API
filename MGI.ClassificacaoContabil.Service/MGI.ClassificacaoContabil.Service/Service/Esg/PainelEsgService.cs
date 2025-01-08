@@ -49,7 +49,7 @@ namespace Service.Esg
         {
             return await _repository.ConsultarStatusProjeto();
         }
-        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosPainelEsg(FiltroProjetoEsg filtro)
+        public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
             var projetosEsg = await _repository.ConsultarProjetosEsg(filtro);
             if (filtro.TipoValor == ETipoOrcamento.Orcado || filtro.TipoValor == ETipoOrcamento.Previsto || filtro.TipoValor == ETipoOrcamento.Replan)
@@ -261,7 +261,7 @@ namespace Service.Esg
                 IdProjeto = validacao.IdProjeto,
                 DataClassif = validacao.DataClassif,
             });
-            decimal totalPercentual = justificativas.Any() ? justificativas.Sum(p => p.PercentualKpi + validacao.Percentual) : 0m;
+            decimal totalPercentual = justificativas.Any() ? justificativas.Where(p => p.StatusAprovacao == EStatusAprovacao.Aprovado).Sum(p => p.PercentualKpi + validacao.Percentual) : 0m;
             return new PayloadDTO(string.Empty, totalPercentual <= 100, "Total dos percentuais de KPI passou dos 100%, favor ajustar!");
         }
         private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, string statusAprovacao)
@@ -299,7 +299,7 @@ namespace Service.Esg
             var pendentes = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Pendente && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
             var aprovados = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Aprovado && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
             var reprovados = justificativas.Count(p => p.StatusAprovacao == EStatusAprovacao.Reprovado && p.IdClassif == validacao.IdClassif && p.IdSubClassif == validacao.IdSubClassif);
-            if (pendentes > 0 || aprovados > 0 || reprovados > 0)
+            if (pendentes > 0 || aprovados > 0)
                 return new PayloadDTO("Classificação e Sub Classificação já existe para o projeto", false);
             return new PayloadDTO(string.Empty, true);
         }

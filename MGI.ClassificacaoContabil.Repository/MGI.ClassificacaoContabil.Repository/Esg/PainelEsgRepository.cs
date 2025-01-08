@@ -69,7 +69,7 @@ namespace Repository.PainelEsg
                         ,sub.IdStatusProjeto
                         ,sub.DescricaoStatusProjeto
                         ,trim(sub.Patrocinador)                        as NomePatrocinador
-                        ,sub.ClassifInvestimento                       as ClassifInvestimento                        
+                        ,sub.ClassifInvestimento                       as ClassifInvestimento
                    from (
                  select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
