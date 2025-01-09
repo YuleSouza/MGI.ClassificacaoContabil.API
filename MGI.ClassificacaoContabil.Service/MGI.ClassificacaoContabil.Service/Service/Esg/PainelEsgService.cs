@@ -170,6 +170,7 @@ namespace Service.Esg
                 Percentual = justificativa.PercentualKpi,
                 IdSubClassif = justificativa.IdSubClassif,
                 IdClassif = justificativa.IdClassif,
+                Justificativa = justificativa.Justificativa
             };
             PayloadDTO classificacaoValida = await ValidarClassificacaoEsg(validacao);
             if (!classificacaoValida.Sucesso) return classificacaoValida;
