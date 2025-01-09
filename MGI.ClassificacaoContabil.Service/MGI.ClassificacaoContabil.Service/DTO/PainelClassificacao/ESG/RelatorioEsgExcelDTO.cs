@@ -10,6 +10,9 @@ namespace Service.DTO.PainelClassificacao
         [Name("BGID")]
         public int IdProjeto { get; set; }
 
+        [Name("Projeto")]
+        public string NomeProjeto {  get; set; }
+
         [Name("Fase")]
         public string NomeFase { get; set; }
 
@@ -28,22 +31,22 @@ namespace Service.DTO.PainelClassificacao
         [Name("Gestor")]
         public string Gestor { get; set; }
 
-        [Name("Mês")]
+        [Name("Mes")]
         public string MesProjeto { get; set; }
 
         [Name("Ano")]
         public string AnoProjeto { get; set; }
 
-        [Name("R$ Orçado")]
+        [Name("R$ Orcado")]
         public decimal ValoBaseOrcamento { get; set; }
 
         [Name("Realizado/Tendendia")]
         public decimal ValorFormatoAcompanhamento { get; set; }
 
-        [Name("Cenário")]
+        [Name("Cenario")]
         public string Cenario {  get; set; }
 
-        [Name("Classificação ESG")]
+        [Name("Classificacao ESG")]
         public string ClassifEsg {  get; set; }
     }
 }

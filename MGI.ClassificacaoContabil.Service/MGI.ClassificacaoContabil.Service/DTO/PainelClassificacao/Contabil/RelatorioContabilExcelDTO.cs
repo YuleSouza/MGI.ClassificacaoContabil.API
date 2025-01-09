@@ -4,14 +4,14 @@ namespace Service.DTO.PainelClassificacao
 {
     public class RelatorioContabilExcelDTO
     {
-        [Name("Cód Externo")]
+        [Name("Cod Externo")]
         public string CodExterno { get; set; }
         public string Data { get; set; }
 
         [Name("Valor Investimento")]
         public decimal ValorInvestimento { get; set; }
 
-        [Name("Qtd. Produção Total")]
+        [Name("Qtd. Producao Total")]
         public string QtdProdutcaoTotal { get; set; }
 
         [Name("Saldo Inicial Andamento")]
@@ -23,10 +23,10 @@ namespace Service.DTO.PainelClassificacao
         [Name("Tx. Transf. Despesas")]
         public string TxTransfDespesa { get; set; }
 
-        [Name("Tx. Produção")]
+        [Name("Tx. Producao")]
         public string TxProducao { get; set; }
 
-        [Name("Tx. Depreciação")]
+        [Name("Tx. Depreciacao")]
         public string TxDepreciacao { get; set; }
     }
 }

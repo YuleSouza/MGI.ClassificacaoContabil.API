@@ -13,7 +13,7 @@ using Service.Repository.PainelClassificacao;
 
 namespace Service.PainelClassificacao
 {
-    public class PainelClassificacaoService : IPainelClassificacaoService
+    public class PainelClassifContabilService : IPainelClassifContabilService
     {
         private readonly IPainelClassificacaoRepository _PainelClassificacaoRepository;
         private Dictionary<int, string> tiposLancamento = new Dictionary<int, string>();
@@ -27,7 +27,7 @@ namespace Service.PainelClassificacao
         private DateTime anoPosterior_fim;
         private DateTime mesAtual;       
 
-        public PainelClassificacaoService(
+        public PainelClassifContabilService(
             IPainelClassificacaoRepository PainelClassificacaoRepository,
             IParametrizacaoCenarioService parametrizacaoCenarioService,
             IParametrizacaoEsgGeralService parametrizacaoEsgGeralService,

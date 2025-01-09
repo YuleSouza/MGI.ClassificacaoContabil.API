@@ -11,11 +11,11 @@ namespace MGI.ClassificacaoContabil.API.Controllers
     [Route("api/[controller]")]
     public class PainelClassificacaoController : ControllerBase
     {
-        private readonly IPainelClassificacaoService _service;
+        private readonly IPainelClassifContabilService _service;
         private readonly IPainelClassificacaoEsgService _serviceEsg;
         private readonly ILogger<PainelClassificacaoController> _logger;
 
-        public PainelClassificacaoController(IPainelClassificacaoService service, 
+        public PainelClassificacaoController(IPainelClassifContabilService service, 
             ILogger<PainelClassificacaoController> logger,
             IPainelClassificacaoEsgService serviceEsg)
         {
@@ -223,11 +223,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> GerarRelatorioContabilEsg(FiltroPainelClassificacaoEsg filtro)
         {
             var retorno = await _serviceEsg.GerarRelatorioEsg(filtro);
-            if (retorno == null)
-            {
-                return BadRequest("Erro ao gerar relatório");
-            }
-            string filename = "relatorio.csv";
+            if (retorno == null) return BadRequest("Erro ao gerar relatório");
             return File(retorno, "text/csv", $"relatorio_esg_{DateTime.Now.Millisecond}.csv");
         }
 

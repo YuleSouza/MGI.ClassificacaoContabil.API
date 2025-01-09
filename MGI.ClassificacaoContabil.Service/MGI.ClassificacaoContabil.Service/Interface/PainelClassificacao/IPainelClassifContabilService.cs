@@ -4,7 +4,7 @@ using Service.DTO.PainelClassificacao;
 
 namespace Service.Interface.PainelClassificacao
 {
-    public interface IPainelClassificacaoService
+    public interface IPainelClassifContabilService
     {
         #region [Filtros]
         Task<PayloadDTO> FiltroPainelEmpresa(FiltroPainelEmpresa filtro);

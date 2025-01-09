@@ -421,7 +421,6 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                 }
             }
             var dadosExcel = from a in dados
-
                              select new RelatorioEsgExcelDTO()
                              {
                                  DiretoriaExecutora = a.DiretoriaExecutora,
@@ -430,6 +429,7 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
                                  GerenciaSolicitante = a.GerenciaSolicitante,
                                  Gestor = a.Gestor,
                                  IdProjeto = a.IdProjeto,
+                                 NomeProjeto = $"{a.IdProjeto} - {a.NomeProjeto}",
                                  NomeFase = a.NomeFase,
                                  NomeEmpresa = a.NomeEmpresa,
                                  ValoBaseOrcamento = a.ValoBaseOrcamento,

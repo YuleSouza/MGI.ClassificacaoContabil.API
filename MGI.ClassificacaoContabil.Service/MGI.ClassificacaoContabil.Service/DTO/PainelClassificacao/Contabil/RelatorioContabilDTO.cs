@@ -5,6 +5,7 @@ namespace Service.DTO.PainelClassificacao
     public class RelatorioContabilDTO
     {
         public string CodExterno { get; set; }
+        public int IdClassificaoContabil { get; set; }
         public string Data {  get; set; }
         public decimal ValorInvestimento { get; set; }
         public string QtdProdutcaoTotal { get; set; }

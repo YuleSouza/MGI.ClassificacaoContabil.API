@@ -513,7 +513,8 @@ namespace Repository.PainelClassificacao
                                       when :TipoValorProjeto = '2' then sub.ValorReplan
                                       when :TipoValorProjeto = 'P' then sub.ValorPrevisto end,0) as ValorProjeto 
                                 from (
-                                select nvl(pro.pgmcod,0) ||'.'||cl.ccocod||pro.pgmnom||' - '||cl.cconom as CodExterno
+                                select nvl(pro.pgmcod,0)|| '.' cl.ccocod ||'.'PROGRAMA' - '||cl.cconom as CodExterno
+                                      , cl.ccocod                                        as IdClassificaoContabil
                                       , orc.prjorcmes ||'/'||orc.prjorcano as Data
                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                                       , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
@@ -600,10 +601,10 @@ namespace Repository.PainelClassificacao
                                        , p.prjnom                                                        as NomeProjeto
                                        , fse.prjfseseq || '.' || fse.prjfsenom                           as NomeFase
                                        , dirSol.gerdes                                                   as DiretoriaSolicitante
-                                       , coalesce(trim(gerSol.gconom),'Não tem')                         as GerenciaSolicitante
+                                       , coalesce(trim(gerSol.gconom),'Nao possui')                      as GerenciaSolicitante
                                        , dirExec.gerdes                                                  as DiretoriaExecutora
-                                       , coalesce(trim(gerExec.gconom),'Não tem')                        as GerenciaExecutora
-                                       , LTRIM(RTRIM(U.USUNOM))                                          as Gestor
+                                       , coalesce(trim(gerExec.gconom),'Nao possui')                     as GerenciaExecutora
+                                       , TRIM(U.USUNOM)                                                  as Gestor
                                        , to_char(p.prjdat,'MM/yyyy')                                     as MesAnoProjeto
                                        , decode(orc2.prjorctip,'O',nvl(orc2.prjorcval,0),0)                as ValorOrcado
                                        , decode(orc2.prjorctip,'J',nvl(orc2.prjorcval,0),0)                as ValorTendencia
