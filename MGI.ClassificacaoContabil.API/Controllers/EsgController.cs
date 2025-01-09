@@ -101,7 +101,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
-        [HttpPost("v1/classificacao/aprovar/{idClassifEsg}/{aprovacao}/{usuarioAprovacao}")]
+        [HttpPost("v1/classificacao/aprovar/{idClassifEsg}/{statusAprovacao}/{usuarioAprovacao}")]
         [ActionDescription("Aprovação Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
