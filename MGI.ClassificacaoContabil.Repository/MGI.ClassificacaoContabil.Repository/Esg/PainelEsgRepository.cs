@@ -133,13 +133,18 @@ namespace Repository.PainelEsg
         }
         public async Task<IEnumerable<PayloadComboDTO>> ConsultarComboProjetosEsg(FiltroProjeto filtro)
         {
+            StringBuilder parametros = new StringBuilder();
+            if (!string.IsNullOrEmpty(filtro.IdEmpresa)) 
+            {
+                parametros.Append(" AND p.prjempcus IN :codEmpresa");
+            }
             return await _session.Connection.QueryAsync<PayloadComboDTO>($@"SELECT concat(concat(lpad(prjcod, 5, '0'),' - '), trim(prjnom)) as Descricao,
                                                                               prjcod as Id
                                                                          FROM servdesk.projeto p, servdesk.pgmass a
                                                                         WHERE p.prjsit = 'A'
                                                                           AND a.pgmassver = 0
                                                                           AND a.pgmasscod = p.pgmasscod
-                                                                          AND p.prjempcus IN :codEmpresa
+                                                                          {parametros}
                                                                           AND (EXISTS (SELECT 1
                                                                                          FROM servdesk.geradm g
                                                                                         WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)

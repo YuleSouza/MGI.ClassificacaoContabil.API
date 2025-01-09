@@ -3,6 +3,7 @@ using Infra.Data;
 using Service.DTO.Combos;
 using Service.DTO.Filtros;
 using Service.Repository.FiltroTela;
+using System.Text;
 
 namespace Repository.FiltroTela
 {
@@ -60,39 +61,49 @@ namespace Repository.FiltroTela
 
         public async Task<IEnumerable<PayloadComboDTO>> ConsultarDiretoriaClassifiContabil(FiltroDiretoria filtro)
         {
+            StringBuilder parametros = new StringBuilder();
+            if (!string.IsNullOrEmpty(filtro.IdEmpresa))
+            {
+                parametros.Append(@" AND EXISTS(SELECT 1 FROM PROJETO P
+                                           WHERE P.GEREMP = G.GEREMP 
+                                           AND P.GERSIG = G.GERSIG AND P.PRJEMPCUS IN :codEmpresa)");
+            }
             return await _session.Connection.QueryAsync<PayloadComboDTO>(
                     $@"SELECT DISTINCT LTRIM(RTRIM(G.GERSIG)) as Id, LTRIM(RTRIM(G.GERDES)) as Descricao
                               FROM SERVDESK.GERENCIA G
                              WHERE G.GERSIT = 'A'
-                               AND EXISTS(SELECT 1 FROM PROJETO P
-                                           WHERE P.GEREMP = G.GEREMP 
-                                           AND P.GERSIG = G.GERSIG AND P.PRJEMPCUS IN :codEmpresa)
                                AND G.GEREMP = NVL(:codEmpresaExecutora, G.GEREMP)
+                                {parametros}
                              ORDER BY 2,1", new
                     {
-                        codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
+                        codEmpresa = string.IsNullOrEmpty(filtro.IdEmpresa) ? new int[1] : (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
                         codEmpresaExecutora = filtro.IdEmpresaExecutora
                     });
         }
 
         public async Task<IEnumerable<PayloadComboDTO>> ConsultarGerenciaClassifContabil(FiltroGerencia filtro)
         {
-            return await _session.Connection.QueryAsync<PayloadComboDTO>(
-                    $@"SELECT DISTINCT c.gcocod AS Id, ltrim(rtrim(c.gconom)) as Descricao
-                              FROM servdesk.coordenadoria c
-                             WHERE c.gcosit = 'A'
-                               AND EXISTS (SELECT 1
+            StringBuilder parametros = new StringBuilder();
+            if (!string.IsNullOrEmpty(filtro.IdEmpresa))
+            {
+                parametros.Append(@"AND EXISTS (SELECT 1
                                       FROM projeto p, justificativa_ciclo j
                                      WHERE p.prjcod = j.prjcod
                                        AND p.geremp = c.geremp
                                        AND p.gersig = c.gersig
                                        AND p.prjempcus IN :codEmpresa
-                                       AND p.gcocod = c.gcocod)
+                                       AND p.gcocod = c.gcocod)");
+            }
+            return await _session.Connection.QueryAsync<PayloadComboDTO>(
+                    $@"SELECT DISTINCT c.gcocod AS Id, ltrim(rtrim(c.gconom)) as Descricao
+                              FROM servdesk.coordenadoria c
+                             WHERE c.gcosit = 'A' 
                                AND c.geremp = nvl(:codEmpresaExecutora, c.geremp)
                                AND c.gersig = nvl(:codDiretoria, c.gersig)
+                                 {parametros}
                              ORDER BY 2, 1", new
                     {
-                        codEmpresa = (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
+                        codEmpresa = string.IsNullOrEmpty(filtro.IdEmpresa) ? new int[1] : (filtro.IdEmpresa ?? "").Split(',').Select(s => Convert.ToInt32(s)).ToArray(),
                         codEmpresaExecutora = filtro.IdEmpresaExecutora,
                         codDiretoria = filtro.IdDiretoria,
                     });
@@ -100,6 +111,11 @@ namespace Repository.FiltroTela
 
         public async Task<IEnumerable<PayloadComboDTO>> ConsultarGestorClassifContabil(FiltroGestor filtro)
         {
+            StringBuilder parametros = new StringBuilder();
+            if (!string.IsNullOrEmpty(filtro.IdEmpresa))
+            {
+                parametros.Append(" AND p.prjempcus IN :codEmpresa ");
+            }
             return await _session.Connection.QueryAsync<PayloadComboDTO>(
                     $@"SELECT DISTINCT ltrim(rtrim(u.usunom)) as Descricao,
                                           ltrim(rtrim(u.usulog)) as Id
@@ -115,7 +131,7 @@ namespace Repository.FiltroTela
                                            AND m.pgmassver = 0
                                            AND m.pgmasscod = p.pgmasscod
                                            AND m.pgmgrucod = nvl(NULL, m.pgmgrucod)
-                                           AND p.prjempcus IN :codEmpresa
+                                           {parametros}
                                            AND gru.pgmgrucod  = nvl(:codGrupoPrograma,  gru.pgmgrucod)  
                                            AND pro.pgmcod   = nvl(:codPrograma,  pro.pgmcod)  
                                            AND p.prjcod = nvl(:codProjeto,  p.prjcod) 
@@ -155,6 +171,11 @@ namespace Repository.FiltroTela
 
         public async Task<IEnumerable<PayloadComboDTO>> ConsultarProgramaClassifContabil(FiltroPrograma filtro)
         {
+            StringBuilder parametros = new StringBuilder();
+            if (!string.IsNullOrEmpty(filtro.IdGrupoPrograma))
+            {
+                parametros.Append(" and pgp.pgmgrucod = :codGrupoPrograma");
+            }
             return await _session.Connection.QueryAsync<PayloadComboDTO>(
                     $@"select 
                               prg.pgmcod as Id, 
@@ -162,7 +183,8 @@ namespace Repository.FiltroTela
                         from servdesk.pgmpro prg
                         join servdesk.pgmass pgp on pgp.pgmcod = prg.pgmcod
                         join servdesk.pgmgru gp on  gp.pgmgrucod = pgp.pgmgrucod
-                        where pgp.pgmgrucod = :codGrupoPrograma
+                        where 1 = 1
+                        {parametros}
                         order by 2, 1", new
                     {
                         codGrupoPrograma = Convert.ToInt32(filtro.IdGrupoPrograma)
