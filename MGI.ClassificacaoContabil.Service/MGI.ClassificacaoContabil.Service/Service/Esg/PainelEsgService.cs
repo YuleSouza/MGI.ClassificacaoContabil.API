@@ -52,63 +52,64 @@ namespace Service.Esg
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
             var projetosEsg = await _repository.ConsultarProjetosEsg(filtro);
-            if (filtro.TipoValor == ETipoOrcamento.Orcado || filtro.TipoValor == ETipoOrcamento.Previsto || filtro.TipoValor == ETipoOrcamento.Replan)
-            {
-                IEnumerable<ProjetoEsgDTO> realizados = Enumerable.Empty<ProjetoEsgDTO>();
-                IEnumerable<ProjetoEsgDTO> orcado = Enumerable.Empty<ProjetoEsgDTO>();
-                IEnumerable<ProjetoEsgDTO> previsto = Enumerable.Empty<ProjetoEsgDTO>();
-                IEnumerable<ProjetoEsgDTO> replan = Enumerable.Empty<ProjetoEsgDTO>();
-                if (filtro.DataInicio < DateTime.Now && filtro.DataFim > DateTime.Now)
-                {
-                    DateTime anoAnterior = new DateTime(DateTime.Now.Year - 1, 12, 1);
-                    realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= anoAnterior && p.TipoValor == ETipoOrcamento.Realizado).ToList();
-                    orcado = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Orcado).ToList();
-                    previsto = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Previsto).ToList();
-                    replan = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Replan).ToList();
+            return projetosEsg.OrderBy(p => p.IdProjeto);
+            //if (filtro.TipoValor == ETipoOrcamento.Orcado || filtro.TipoValor == ETipoOrcamento.Previsto || filtro.TipoValor == ETipoOrcamento.Replan)
+            //{
+            //    IEnumerable<ProjetoEsgDTO> realizados = Enumerable.Empty<ProjetoEsgDTO>();
+            //    IEnumerable<ProjetoEsgDTO> orcado = Enumerable.Empty<ProjetoEsgDTO>();
+            //    IEnumerable<ProjetoEsgDTO> previsto = Enumerable.Empty<ProjetoEsgDTO>();
+            //    IEnumerable<ProjetoEsgDTO> replan = Enumerable.Empty<ProjetoEsgDTO>();
+            //    if (filtro.DataInicio < DateTime.Now && filtro.DataFim > DateTime.Now)
+            //    {
+            //        DateTime anoAnterior = new DateTime(DateTime.Now.Year - 1, 12, 1);
+            //        realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= anoAnterior && p.TipoValor == ETipoOrcamento.Realizado).ToList();
+            //        orcado = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Orcado).ToList();
+            //        previsto = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Previsto).ToList();
+            //        replan = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Replan).ToList();
                     
-                }
-                else if ((filtro.DataInicio < DateTime.Now && filtro.DataInicio.Year == DateTime.Now.Year) && filtro.DataFim > DateTime.Now)
-                {
-                    DateTime inicioAno = new DateTime(DateTime.Now.Year, 1, 1);
-                    DateTime proximoMes = new DateTime(DateTime.Now.Year, filtro.DataInicio.Month + 1, 1);
-                    DateTime mesAnterior = DateTime.Now;
-                    if (filtro.DataInicio.Month > 1)
-                    {
-                        mesAnterior = new DateTime(DateTime.Now.Year, filtro.DataInicio.Month - 1, 1);
-                    }
-                    realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= inicioAno && p.DtLancamentoProjeto <= mesAnterior && p.TipoValor == ETipoOrcamento.Realizado).ToList();
-                    orcado = projetosEsg.Where(p => p.DtLancamentoProjeto > proximoMes && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Orcado).ToList();
-                    previsto = projetosEsg.Where(p => p.DtLancamentoProjeto > proximoMes && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Previsto).ToList();
-                    replan = projetosEsg.Where(p => p.DtLancamentoProjeto > proximoMes && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Replan).ToList();
-                }
-                else if (filtro.DataInicio > DateTime.Now && (filtro.DataFim > DateTime.Now && filtro.DataFim.Year == DateTime.Now.Year))
-                {
-                    realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Realizado).ToList();
-                    orcado = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Orcado).ToList();
-                    previsto = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Previsto).ToList();
-                    replan = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Replan).ToList();
-                }
-                else if (filtro.DataInicio < DateTime.Now && filtro.DataFim < DateTime.Now)
-                {
-                    realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Realizado).ToList();
-                }
-                var result = from a in projetosEsg
-                             select new ProjetoEsgDTO()
-                             {
-                                 ValorProjeto = SomarValores(realizados, orcado, previsto,replan,filtro.TipoValor),
-                                 IdEmpresa = a.IdEmpresa,
-                                 IdProjeto = a.IdProjeto,
-                                 DtLancamentoProjeto = a.DtLancamentoProjeto,
-                                 IdStatusProjeto = a.IdStatusProjeto,
-                                 NomeEmpresa = a.NomeEmpresa,
-                                 NomePatrocinador = a.NomePatrocinador,
-                                 DescricaoStatusProjeto = a.DescricaoStatusProjeto,
-                                 IdGestor = a.IdGestor,
-                                 TipoValor = a.TipoValor,
-                             };
-                return result;
-            }
-            return Enumerable.Empty<ProjetoEsgDTO>();
+            //    }
+            //    else if ((filtro.DataInicio < DateTime.Now && filtro.DataInicio.Year == DateTime.Now.Year) && filtro.DataFim > DateTime.Now)
+            //    {
+            //        DateTime inicioAno = new DateTime(DateTime.Now.Year, 1, 1);
+            //        DateTime proximoMes = new DateTime(DateTime.Now.Year, filtro.DataInicio.Month + 1, 1);
+            //        DateTime mesAnterior = DateTime.Now;
+            //        if (filtro.DataInicio.Month > 1)
+            //        {
+            //            mesAnterior = new DateTime(DateTime.Now.Year, filtro.DataInicio.Month - 1, 1);
+            //        }
+            //        realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= inicioAno && p.DtLancamentoProjeto <= mesAnterior && p.TipoValor == ETipoOrcamento.Realizado).ToList();
+            //        orcado = projetosEsg.Where(p => p.DtLancamentoProjeto > proximoMes && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Orcado).ToList();
+            //        previsto = projetosEsg.Where(p => p.DtLancamentoProjeto > proximoMes && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Previsto).ToList();
+            //        replan = projetosEsg.Where(p => p.DtLancamentoProjeto > proximoMes && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Replan).ToList();
+            //    }
+            //    else if (filtro.DataInicio > DateTime.Now && (filtro.DataFim > DateTime.Now && filtro.DataFim.Year == DateTime.Now.Year))
+            //    {
+            //        realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Realizado).ToList();
+            //        orcado = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Orcado).ToList();
+            //        previsto = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Previsto).ToList();
+            //        replan = projetosEsg.Where(p => p.DtLancamentoProjeto > filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Replan).ToList();
+            //    }
+            //    else if (filtro.DataInicio < DateTime.Now && filtro.DataFim < DateTime.Now)
+            //    {
+            //        realizados = projetosEsg.Where(p => p.DtLancamentoProjeto >= filtro.DataInicio && p.DtLancamentoProjeto <= filtro.DataFim && p.TipoValor == ETipoOrcamento.Realizado).ToList();
+            //    }
+            //    var result = from a in projetosEsg
+            //                 select new ProjetoEsgDTO()
+            //                 {
+            //                     ValorProjeto = SomarValores(realizados, orcado, previsto,replan,filtro.TipoValor),
+            //                     IdEmpresa = a.IdEmpresa,
+            //                     IdProjeto = a.IdProjeto,
+            //                     DtLancamentoProjeto = a.DtLancamentoProjeto,
+            //                     IdStatusProjeto = a.IdStatusProjeto,
+            //                     NomeEmpresa = a.NomeEmpresa,
+            //                     NomePatrocinador = a.NomePatrocinador,
+            //                     DescricaoStatusProjeto = a.DescricaoStatusProjeto,
+            //                     IdGestor = a.IdGestor,
+            //                     TipoValor = a.TipoValor,
+            //                 };
+            //    return result;
+            //}
+            //return Enumerable.Empty<ProjetoEsgDTO>();
         }
 
         private decimal SomarValores(IEnumerable<ProjetoEsgDTO> realizados, IEnumerable<ProjetoEsgDTO> orcado, IEnumerable<ProjetoEsgDTO> previsto, IEnumerable<ProjetoEsgDTO> replan, string tipoValor)

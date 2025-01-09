@@ -98,7 +98,15 @@ namespace Repository.PainelEsg
                    and p.prjesg = 'S'
                 ) sub
                 where 1 = 1 {parametros.ToString()}
-               order by sub.IdProjeto, sub.TipoValor, sub.DtLancamentoProjeto
+               group by sub.IdProjeto
+                     ,sub.Nomeprojeto
+                     ,sub.IdEmpresa
+                     ,sub.NomeEmpresa
+                     ,sub.IdGestor
+                     ,sub.IdStatusProjeto
+                     ,sub.DescricaoStatusProjeto
+                     ,trim(sub.Patrocinador)
+                     ,sub.ClassifInvestimento
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
@@ -129,7 +137,8 @@ namespace Repository.PainelEsg
                                                                                         WHERE upper(g.geradmusu) = RPAD(upper(:usuario),20)
                                                                           AND g.geremp IN (p.prjempcus, p.prjgeremp, p.geremp, 999)
                                                                           AND g.gersig IN (p.prjger, p.gersig, 'AAA')) OR upper(p.prjges) = RPAD(upper(:usuario),20) OR upper(p.prjreq) = RPAD(upper(:usuario),20))
-                                                                          AND p.prjesg = 'S'",
+                                                                          AND p.prjesg = 'S'
+                                                                          AND EXISTS (SELECT 1 FROM prjorc orc WHERE orc.prjcod = p.prjcod)",
             new
             {
                 codEmpresa = filtro.IdEmpresa,
