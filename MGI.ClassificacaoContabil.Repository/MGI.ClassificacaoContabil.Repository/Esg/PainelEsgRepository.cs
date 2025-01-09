@@ -70,6 +70,7 @@ namespace Repository.PainelEsg
                         ,sub.DescricaoStatusProjeto
                         ,trim(sub.Patrocinador)                        as NomePatrocinador
                         ,sub.ClassifInvestimento                       as ClassifInvestimento
+                        ,sum(nvl(sub.TotalLancamento,0)) as ValorOrcamento
                    from (
                  select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -80,9 +81,17 @@ namespace Repository.PainelEsg
                         , st.prjstacod                                     as IdStatusProjeto
                         , trim(st.prjstades)                               as DescricaoStatusProjeto
                         , p.prjpgmtip                                      as ClassifInvestimento
-                        , orc.prjorcval                                    as ValorOrcamento
                         , orc.prjorctip                                    as TipoValor
                         , to_date('01' || '/' || orc.prjorcmes || '/' || orc.prjorcano) as DtLancamentoProjeto
+                        , (select sum(prjorcval) 
+                             from prjorc orc2 
+                            where orc2.prjcod = orc.prjcod 
+                              and orc2.prjorcfse = 0 
+                              and orc2.prjorcver = 0 
+                              and orc2.prjorctip = :TipoValor
+                              and orc2.prjorcmes > 0
+                              and orc2.prjorcano > 0
+                              and to_date('01' || '/' || orc2.prjorcmes || '/' || orc2.prjorcano) between :dataInicial and :datafinal) as TotalLancamento
                   from projeto p
                         inner join prjorc orc on (p.prjcod = orc.prjcod 
                                                 and orc.prjorcfse = 0
@@ -106,18 +115,17 @@ namespace Repository.PainelEsg
                      ,sub.IdStatusProjeto
                      ,sub.DescricaoStatusProjeto
                      ,trim(sub.Patrocinador)
-                     ,sub.ClassifInvestimento
+                     ,sub.ClassifInvestimento 
+               order by sub.IdProjeto
             ", new
             {
                 idEmpresa = filtro.IdEmpresa,
                 idGrupoPrograma = filtro.IdGrupoPrograma,
                 iddiretoria = filtro.IdDiretoria,
                 idGerencia = filtro.IdGerencia,
-                anoInicial = filtro.DataInicio.ToString("yyyy"),
-                mesInicial = filtro.DataInicio.ToString("MM"),
                 datainicial = filtro.DataInicio.ToString("01/MM/yyyy"),
                 datafinal = filtro.DataFim.ToString("01/MM/yyyy"),
-                tipoValor = filtro.TipoValor,
+                TipoValor = filtro.TipoValor,
                 idProjeto = filtro.IdProjeto,
                 idstatusprojeto = filtro.StatusProjeto,
                 classifinvestimento = filtro.ClassificacaoInvestimento
