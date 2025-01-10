@@ -15,15 +15,18 @@ namespace Service.Esg
     public class PainelEsgService : ServiceBase, IPainelEsgService
     {
         private readonly IPainelEsgRepository _repository;
-        private readonly IEsgAnexoRepository _anexoRepository;        
+        private readonly IEsgAnexoRepository _anexoRepository;
+        private readonly IEsgAprovadorRepository _aprovadorRepository;
         private List<string> _aprovacoes = new List<string> { EStatusAprovacao.Pendente, EStatusAprovacao.Aprovado, EStatusAprovacao.Reprovado };
         public PainelEsgService(IPainelEsgRepository painelEsgRepository
             , ITransactionHelper transactionHelper
             , IEsgAnexoRepository esgAnexoRepository
+            , IEsgAprovadorRepository esgAprovadorRepository
             ) : base(transactionHelper)
         {
             _repository = painelEsgRepository;
             _anexoRepository = esgAnexoRepository;
+            _aprovadorRepository = esgAprovadorRepository;
         }
 
         #region [ Classificação Esg]
@@ -91,7 +94,7 @@ namespace Service.Esg
             if (!classificacaoValida.Sucesso) return classificacaoValida;
             PayloadDTO percentualValido = await ValidarPercentualKpi(validacao);
             if (!percentualValido.Sucesso) return percentualValido;
-            return await ExecutarTransacao(
+            var retorno = await ExecutarTransacao(
                 async () =>
                 {
                     justificativa.StatusAprovacao = EStatusAprovacao.Pendente;
@@ -103,11 +106,13 @@ namespace Service.Esg
                         IdJustifClassifEsg = id_classif_esg,
                         Aprovacao = EStatusAprovacao.Pendente,
                         UsCriacao = justificativa.UsCriacao
-                    });
-                    // to-do enviar aprovacao pro email
+                    });                    
                     return true;
                 }, "Classificacao Inserido com sucesso"
             );
+            var usuarios = _aprovadorRepository.ConsultarUsuariosSustentabilidade();
+            // to-do enviar aprovacao pro email
+            return retorno;
         }        
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
         {

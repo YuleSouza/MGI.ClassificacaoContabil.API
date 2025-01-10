@@ -8,5 +8,6 @@ namespace Service.Repository.Esg
         Task<bool> InserirUsuarioAprovador(string usuario, string email);
         Task<bool> RemoverUsuarioAprovador(int id);
         Task<bool> AlterarUsuarioAprovador(string email, int id);
+        Task<IEnumerable<EsgAprovadorDTO>> ConsultarUsuariosSustentabilidade();        
     }
 }
