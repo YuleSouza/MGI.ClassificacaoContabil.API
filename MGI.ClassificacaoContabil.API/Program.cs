@@ -1,4 +1,4 @@
-using MGI.ClassificacaoContabil.API.Config;
+using API.Config;
 
 
 var builder = WebApplication.CreateBuilder(args);

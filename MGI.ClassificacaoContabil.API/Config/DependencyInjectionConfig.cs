@@ -8,7 +8,7 @@ namespace API.Config
 {
     public static class DependencyInjectionConfig
     {
-        public static void RegisterServices(this ContainerBuilder builder, string assemblyName, IConfiguration configuration)
+        public static void RegisterServices(this ContainerBuilder builder, string assemblyName)
         {
             var assemblies = Assembly.Load(assemblyName);
             builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerDependency();

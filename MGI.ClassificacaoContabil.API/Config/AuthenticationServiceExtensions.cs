@@ -1,7 +1,7 @@
 ﻿using API.Handlers;
 using Microsoft.AspNetCore.Authentication;
 
-namespace MGI.ClassificacaoContabil.API.Config
+namespace API.Config
 {
     public static class AuthenticationServiceExtensions
     {

@@ -1,7 +1,8 @@
-﻿namespace MGI.ClassificacaoContabil.API.Config
+﻿using Microsoft.OpenApi.Models;
+using System.Reflection;
+
+namespace API.Config
 {
-    using Microsoft.OpenApi.Models;
-    using System.Reflection;
 
     public static class SwaggerServiceExtensions
     {
