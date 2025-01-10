@@ -44,6 +44,14 @@ namespace Repository.Esg
             return result;
         }
 
+        public Task<IEnumerable<EsgAprovadorDTO>> ConsultarUsuariosSustentabilidade()
+        {
+            return _session.Connection.QueryAsync<EsgAprovadorDTO>(@"SELECT g.GERADMUSU as Usuario, u.UsuMai as Email
+                                                                       FROM GERADM g, corpora.USUARI u 
+                                                                      WHERE g.GERADMUSU = u.USULOG 
+                                                                        AND g.GERADMPFL = 'Sustentabilidade'");
+        }
+
         public async Task<bool> InserirUsuarioAprovador(string usuario, string email)
         {
             int qtdLinhas = await _session.Connection.ExecuteAsync(@"insert into SERVDESK.esg_aprovadores (id_usuario, email) values (:usuario, :email)", new

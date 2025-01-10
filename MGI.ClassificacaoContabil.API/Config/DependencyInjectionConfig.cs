@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace API.Config
 {
-    public static class ApiConfig
+    public static class DependencyInjectionConfig
     {
         public static void RegisterServices(this ContainerBuilder builder, string assemblyName, IConfiguration configuration)
         {
