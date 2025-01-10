@@ -7,8 +7,6 @@ using Service.Enum;
 using Service.Helper;
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
-using System.Collections;
-using System.Linq.Expressions;
 
 namespace Service.Esg
 {
@@ -129,7 +127,7 @@ namespace Service.Esg
             if (!percentualValido.Sucesso) return percentualValido;
             return await ExecutarTransacao(
                 async () => await _repository.AlterarJustificativaEsg(justificativa)
-                , "Classificacao alterada com sucesso!"
+                , "Classificação alterada com sucesso!"
             );
         }
         public async Task<PayloadDTO> InserirAprovacao(int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
