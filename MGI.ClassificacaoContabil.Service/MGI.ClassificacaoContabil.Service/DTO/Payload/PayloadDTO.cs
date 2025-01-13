@@ -1,6 +1,6 @@
 ﻿namespace DTO.Payload
 {
-    public class PayloadDTO
+    public sealed class PayloadDTO
     {
         public string? Mensagem { get; private set; }
         public bool Sucesso { get; private set; }

@@ -1,10 +1,8 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using global::API.Config;
 
 namespace API.Config
 {
-
     public static class AutofacExtensions
     {
         public static void ConfigureAutofac(this ConfigureHostBuilder hostBuilder, IConfiguration configuration)

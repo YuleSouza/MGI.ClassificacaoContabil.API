@@ -9,5 +9,6 @@
         public int IdClassif { get; set; }
         public int IdSubClassif { get; set; }
         public decimal ValorProjeto { get; set; }
+        public string? StatusAprovacao { get; set; }
     }
 }
