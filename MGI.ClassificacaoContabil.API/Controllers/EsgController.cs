@@ -72,7 +72,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> InserirJustificativa([FromBody] JustificativaClassifEsg justificativaClassifEsg)
         {
             var resultado = await _service.InserirJustificativaEsg(justificativaClassifEsg);
-            if (resultado != null) return BadRequest(resultado);
+            if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }
 
@@ -81,7 +81,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> AlterarJustificativa([FromBody] AlteracaoJustificativaClassifEsg justificativaClassifEsg)
         {
             var resultado = await _service.AlterarJustificativaEsg(justificativaClassifEsg);
-            if (resultado != null) return BadRequest(resultado);
+            if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }
 
@@ -106,7 +106,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
             var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
-            if (resultado != null) return BadRequest(resultado);
+            if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }
 
