@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using Infra.Service;
 using Service.DTO.Filtros;
 using Service.Interface.FiltroTela;
 using Service.Repository.FiltroTela;
@@ -15,6 +16,8 @@ namespace Service.FiltroTela
 
         public async Task<PayloadDTO> ConsultarEmpresa(FiltroEmpresa filtro)
         {
+            EmailService emailService = new EmailService();
+            await emailService.EnviarEmailAsync("andre.silva @partner.elo.inf.br","teste envio email","testado");
             var resultado = await _FiltroTelaRepository.ConsultarEmpresaClassifContabil(filtro);
             return new PayloadDTO(string.Empty, true, string.Empty, resultado);
         }
