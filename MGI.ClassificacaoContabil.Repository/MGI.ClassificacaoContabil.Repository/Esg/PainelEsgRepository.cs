@@ -65,9 +65,10 @@ namespace Repository.PainelEsg
                         ,sub.IdGestor
                         ,sub.IdStatusProjeto
                         ,sub.DescricaoStatusProjeto
-                        ,trim(sub.Patrocinador)                        as NomePatrocinador
-                        ,sub.ClassifInvestimento                       as ClassifInvestimento
+                        ,trim(sub.Patrocinador)          as NomePatrocinador
+                        ,sub.ClassifInvestimento         as ClassifInvestimento
                         ,sum(nvl(sub.TotalLancamento,0)) as ValorOrcamento
+                        ,'{filtro.StatusAprovacao}'        as StatusAprovacao
                    from (
                  select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -254,7 +255,7 @@ namespace Repository.PainelEsg
                                                                                               idempresa = filtro.IdEmpresa,
                                                                                               idclassif = filtro.IdClassif,
                                                                                               idsubclassif = filtro.IdSubClassif,
-                                                                                              status_aprovacao = filtro.StatusAprovacao
+                                                                                              statusAprovacao = filtro.StatusAprovacao
                                                                                           });
         }
 

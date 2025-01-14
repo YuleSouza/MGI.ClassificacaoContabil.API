@@ -14,5 +14,6 @@
         public DateTime DtLancamentoProjeto { get; set; }
         public string TipoValor {  get; set; }
         public decimal ValorOrcamento { get; set; }
+        public string StatusAprovacao {  get; set; }
     }
 }
