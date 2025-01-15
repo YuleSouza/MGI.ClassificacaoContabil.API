@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovação de Projeto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px;
+            box-shadow: 0 0 10px #aeaeae;
+            border-radius: 8px;
+            border-style: solid;
+            border-color: #7e7e7e;
+        }
+
+        .project-info {
+            margin-bottom: 30px;
+        }
+
+        .info-row {
+            display: flex;
+            padding:5px;
+        }
+
+        .label {
+            font-weight: 500;
+            width: 150px;
+            color: #333;
+        }
+
+        .value {
+            flex: 1;
+            color: #282828;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            text-align:center;
+            padding-left: 20px;
+            padding-bottom: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-approve {
+            background-color: #4CAF50;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .btn-reject {
+            background-color: #f44336;
+            color: #ffffff;
+            margin-left: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="project-info">
+            <div class="info-row">
+                <div class="label">Projeto:</div>
+                <div class="value">#IDPROJETO - #NOMEPROJETO</div>
+            </div>
+            <div class="info-row">
+                <div class="label">Nome do Gestor:</div>
+                <div class="value">#NOMEGESTOR</div>
+            </div>
+            <div class="info-row">
+                <div class="label">Patrocinador:</div>
+                <div class="value">#PATROCINADOR</div>
+            </div>
+            <div class="info-row">
+                <div class="label">% KPI:</div>
+                <div class="value">#PERCENTUALKPI</div>
+            </div>
+        </div>
+        <div class="buttons">
+            <a class="btn btn-approve" href="#">Aprovar</a>
+            <a class="btn btn-reject" href="#">Reprovar</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using Infra.Service;
 using Service.Base;
 using Service.DTO.Combos;
 using Service.DTO.Esg;
@@ -7,6 +8,7 @@ using Service.Enum;
 using Service.Helper;
 using Service.Interface.PainelEsg;
 using Service.Repository.Esg;
+using EmailAprovacaoDTO = Service.DTO.Esg.EmailAprovacaoDTO;
 
 namespace Service.Esg
 {
@@ -110,6 +112,8 @@ namespace Service.Esg
             );
             var usuarios = _aprovadorRepository.ConsultarUsuariosSustentabilidade();
             // to-do enviar aprovacao pro email
+            // for each nos usuarios
+            // fazer a chamada do EmailService passando os parametros de email destinatario, idprojeto, nome projeto, idclassif, idsubclassif, nome gestor, nome patrocinador, usuario
             return retorno;
         }        
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
@@ -224,8 +228,33 @@ namespace Service.Esg
             return new PayloadDTO(string.Empty, true);
         }
 
-        
+
+
         #endregion
 
+        public async Task<PayloadDTO> EnviarEmail(EmailAprovacaoDTO email)
+        {
+            try
+            {
+                EmailService emailService = new EmailService();
+                await emailService.EnviarEmailAsync(new Infra.Service.EmailAprovacaoDTO()
+                {
+                    EmailDestinatario = email.EmailDestinatario,
+                    IdClassificacao = email.IdClassificacao,
+                    IdProjeto = email.IdProjeto,
+                    IdSubClassificacao = email.IdSubClassificacao,
+                    NomeGestor = email.NomeGestor,
+                    NomePatrocinador = email.NomePatrocinador,
+                    NomeProjeto = email.NomeProjeto,
+                    Usuario = email.Usuario,
+                    PercentualKPI = email.PercentualKPI
+                });
+                return new PayloadDTO("Email Enviado com sucesso", true);
+            }
+            catch (Exception ex)
+            {
+                return new PayloadDTO(string.Empty, false, ex.Message);
+            }
+        }
     }
 }

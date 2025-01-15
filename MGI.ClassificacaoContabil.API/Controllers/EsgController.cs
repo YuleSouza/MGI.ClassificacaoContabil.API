@@ -118,5 +118,14 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }
+
+        [HttpPost("v1/eniar-email")]
+        [ActionDescription("Enviar email para aprovação")]
+        public async Task<IActionResult> EnviarEmail(EmailAprovacaoDTO email)
+        {
+            var resultado = await _service.EnviarEmail(email);
+            if (!resultado.Sucesso) return BadRequest(resultado);
+            return Ok(resultado);
+        }
     }
 }

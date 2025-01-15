@@ -3,12 +3,13 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Identity.Client;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 
 namespace Infra.Service
 {
     public class EmailService
     {
-        public async Task EnviarEmailAsync(string emailDestino, string assunto, string mensagemCorpo)
+        public async Task EnviarEmailAsync(EmailAprovacaoDTO email)
         {            
         }
     }

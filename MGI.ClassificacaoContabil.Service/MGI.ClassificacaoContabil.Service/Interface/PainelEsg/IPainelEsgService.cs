@@ -19,5 +19,6 @@ namespace Service.Interface.PainelEsg
         Task<IEnumerable<AprovacaoClassifEsg>> ConsultarLogAprovacoesPorId(int id);
         Task<PayloadDTO> InserirAprovacao(int idClassifEsg, string statusAprovacao, string usuarioAprovacao);
         Task<PayloadDTO> ExcluirClassificacao(int id, string usCriacao);
+        Task<PayloadDTO> EnviarEmail(EmailAprovacaoDTO email);
     }
 }
