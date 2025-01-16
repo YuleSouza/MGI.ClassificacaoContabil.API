@@ -4,6 +4,7 @@
     {
         public int IdEmpresa { get; set; }
         public int IdProjeto { get; set; }
+        public string NomeProjeto { get; set; }
         public int IdJustifClassifEsg { get; set; }
         public int IdClassif { get; set; }
         public string DescricaoClassif { get; set; }

@@ -3,6 +3,7 @@ using Infra.Data;
 using Service.DTO.Combos;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
+using Service.Enum;
 using Service.Repository.Esg;
 using System.Text;
 
@@ -51,11 +52,6 @@ namespace Repository.PainelEsg
             {
                 parametros.Append(" and sub.IdStatusProjeto = :idstatusprojeto");
             }
-            if (!string.IsNullOrEmpty(filtro.StatusAprovacao))
-            {
-                // TO-DO - definir regra
-                parametros.Append(" and 2 = 2");
-            }
             if (!string.IsNullOrEmpty(filtro.ClassificacaoInvestimento))
             {
                 parametros.Append(" and sub.ClassifInvestimento = :classifinvestimento");
@@ -69,9 +65,10 @@ namespace Repository.PainelEsg
                         ,sub.IdGestor
                         ,sub.IdStatusProjeto
                         ,sub.DescricaoStatusProjeto
-                        ,trim(sub.Patrocinador)                        as NomePatrocinador
-                        ,sub.ClassifInvestimento                       as ClassifInvestimento
+                        ,trim(sub.Patrocinador)          as NomePatrocinador
+                        ,sub.ClassifInvestimento         as ClassifInvestimento
                         ,sum(nvl(sub.TotalLancamento,0)) as ValorOrcamento
+                        ,'{filtro.StatusAprovacao}'        as StatusAprovacao
                    from (
                  select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -185,7 +182,8 @@ namespace Repository.PainelEsg
                                                                                                         id_justif_classif_esg as IdJustifClassifEsg
                                                                                                         , empcod              as IdEmpresa
                                                                                                         , dat_anomes          as DataClassif
-                                                                                                        , prjcod              as IdProjeto
+                                                                                                        , j.prjcod              as IdProjeto
+                                                                                                        , p.prjnom            as NomeProjeto
                                                                                                         , id_classif          as IdClassif
                                                                                                         , c.clenom            as DescricaoClassif
                                                                                                         , id_sub_classif      as IdSubClassif
@@ -194,6 +192,7 @@ namespace Repository.PainelEsg
                                                                                                     from justif_classif_esg j 
                                                                                                             inner join claesg c on (j.id_classif = c.clecod)
                                                                                                             inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
+                                                                                                            inner join projeto p on (j.prjcod = p.prjcod)
                                                                                                     where j.id_justif_classif_esg = :id_justif_classif_esg ",
                                                                                                     new
                                                                                                     {
@@ -218,14 +217,10 @@ namespace Repository.PainelEsg
         {
             #region [ Filtros ]
             StringBuilder parametros = new StringBuilder();            
-            if (filtro.ExibirClassificaoExcluida)
+            if (!string.IsNullOrEmpty(filtro.StatusAprovacao))
             {
-                parametros.Append(" and j.status_aprovacao = 'E'");
-            }
-            else
-            {
-                parametros.Append(" and j.status_aprovacao != 'E'");
-            }
+                parametros.Append(" and j.status_aprovacao = :statusAprovacao");
+            }            
             if (filtro.IdClassif > 0)
             {
                 parametros.Append(" and j.id_classis = :idclassif");
@@ -239,7 +234,8 @@ namespace Repository.PainelEsg
                                                                                                j.id_justif_classif_esg as IdJustifClassifEsg
                                                                                              , empcod              as IdEmpresa
                                                                                              , dat_anomes          as DataClassif
-                                                                                             , prjcod              as IdProjeto
+                                                                                             , j.prjcod              as IdProjeto
+                                                                                             , p.prjnom            as NomeProjeto
                                                                                              , id_classif          as IdClassif
                                                                                              , trim(c.clenom)      as DescricaoClassif
                                                                                              , id_sub_classif      as IdSubClassif
@@ -253,6 +249,7 @@ namespace Repository.PainelEsg
                                                                                          from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
+                                                                                                inner join projeto p on (j.prjcod = p.prjcod)
                                                                                         where j.prjcod     = :idprojeto 
                                                                                           and j.empcod     = :idempresa
                                                                                           {parametros}",
@@ -261,7 +258,8 @@ namespace Repository.PainelEsg
                                                                                               idprojeto = filtro.IdProjeto,
                                                                                               idempresa = filtro.IdEmpresa,
                                                                                               idclassif = filtro.IdClassif,
-                                                                                              idsubclassif = filtro.IdSubClassif
+                                                                                              idsubclassif = filtro.IdSubClassif,
+                                                                                              statusAprovacao = filtro.StatusAprovacao
                                                                                           });
         }
 

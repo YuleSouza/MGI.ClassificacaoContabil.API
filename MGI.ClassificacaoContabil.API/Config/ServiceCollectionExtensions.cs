@@ -1,4 +1,4 @@
-﻿namespace MGI.ClassificacaoContabil.API.Config
+﻿namespace API.Config
 {
     public static class ServiceCollectionExtensions
     {
