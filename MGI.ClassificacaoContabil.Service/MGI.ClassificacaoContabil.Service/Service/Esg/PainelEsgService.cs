@@ -6,6 +6,7 @@ using Service.DTO.Filtros;
 using Service.Enum;
 using Service.Helper;
 using Service.Interface.PainelEsg;
+using Service.Interface.Usuario;
 using Service.Repository.Esg;
 
 namespace Service.Esg
@@ -15,16 +16,19 @@ namespace Service.Esg
         private readonly IPainelEsgRepository _repository;
         private readonly IEsgAnexoRepository _anexoRepository;
         private readonly IEsgAprovadorRepository _aprovadorRepository;
+        private readonly IUsuarioService _usuarioService;
         private List<string> _aprovacoes = new List<string> { EStatusAprovacao.Pendente, EStatusAprovacao.Aprovado, EStatusAprovacao.Reprovado };
         public PainelEsgService(IPainelEsgRepository painelEsgRepository
             , ITransactionHelper transactionHelper
             , IEsgAnexoRepository esgAnexoRepository
             , IEsgAprovadorRepository esgAprovadorRepository
+            , IUsuarioService usuarioService
             ) : base(transactionHelper)
         {
             _repository = painelEsgRepository;
             _anexoRepository = esgAnexoRepository;
             _aprovadorRepository = esgAprovadorRepository;
+            _usuarioService = usuarioService;
         }
 
         #region [ Classificação Esg]
@@ -53,8 +57,7 @@ namespace Service.Esg
         public async Task<IEnumerable<ProjetoEsgDTO>> ConsultarProjetosEsg(FiltroProjetoEsg filtro)
         {
             return await _repository.ConsultarProjetosEsg(filtro);
-        }
-        
+        }        
         public async Task<IEnumerable<JustificativaClassifEsgDTO>> ConsultarJustificativaEsg(FiltroJustificativaClassifEsg filtro)
         {
             var retorno = await _repository.ConsultarJustificativaEsg(filtro);
@@ -70,7 +73,6 @@ namespace Service.Esg
             }
             return retorno;
         }
-
         public async Task<IEnumerable<AprovacaoClassifEsg>> ConsultarLogAprovacoesPorId(int id)
         {
             return await _repository.ConsultarLogAprovacoesPorId(id);
@@ -132,7 +134,7 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> InserirAprovacao(int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
-            var validacao = await ValidarAprovacao(idClassifEsg, statusAprovacao);
+            var validacao = await ValidarAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
             if (!validacao.Sucesso) return validacao;
             await ExecutarTransacao(
                 async () =>
@@ -184,8 +186,12 @@ namespace Service.Esg
             decimal totalPercentual = justificativas.Any() ? justificativas.Where(p => p.StatusAprovacao == EStatusAprovacao.Aprovado).Sum(p => p.PercentualKpi + validacao.Percentual) : 0m;
             return new PayloadDTO(string.Empty, totalPercentual <= 100, "Total dos percentuais de KPI passou dos 100%, favor ajustar!");
         }
-        private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, string statusAprovacao)
+        private async Task<PayloadDTO> ValidarAprovacao(int idClassifEsg, string statusAprovacao, string usuario)
         {
+            if (! await _usuarioService.EhUmUsuarioSustentabilidade(usuario))
+            {
+                return new PayloadDTO("Usuário não tem permissão para aprovar!", false);
+            }
             var classificacao = await _repository.ConsultarJustificativaEsgPorId(idClassifEsg);
             if (classificacao == null)
             {

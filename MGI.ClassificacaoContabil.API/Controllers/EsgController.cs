@@ -1,4 +1,5 @@
 ﻿using MGI.ClassificacaoContabil.API.ControllerAtributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
 using Service.DTO.Filtros;
@@ -17,6 +18,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             _service = service;
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpPost("v1/consultar")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Consultar Projetos Esg")]
@@ -26,6 +28,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpGet("v1/consultar/classif-investimento")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ActionDescription("Consultar Classificação de Investimentos")]
@@ -35,6 +38,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpGet("v1/projeto/status")]
         [ActionDescription("Consultar Status do Projeto")]
         public async Task<IActionResult> ConsultarStatusProjeto()
@@ -43,6 +47,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpPost("v1/projeto")]
         [ActionDescription("Consultar Projetos Painel Esg")]
         public async Task<IActionResult> ConsultarComboProjetosEsg(FiltroProjeto filtro)
@@ -51,6 +56,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpGet("v1/classificacao")]
         [ActionDescription("Consultar todas Classificação Esg")]
         public async Task<IActionResult> ConsultarClassificacaoEsg()
@@ -59,6 +65,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpGet("v1/subclassificacao/{idClassificacao}")]
         [ActionDescription("Consultar Sub Classificação Esg por id")]
         public async Task<IActionResult> ConsultarSubClassificacaoEsg([FromRoute] int idClassificacao)
@@ -67,6 +74,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "SustentabilidadePolicy")]
         [HttpPost("v1/classificacao/inserir")]
         [ActionDescription("Inserir Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> InserirJustificativa([FromBody] JustificativaClassifEsg justificativaClassifEsg)
@@ -76,6 +84,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "SustentabilidadePolicy")]
         [HttpPost("v1/classificacao/alterar")]
         [ActionDescription("Alterar Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> AlterarJustificativa([FromBody] AlteracaoJustificativaClassifEsg justificativaClassifEsg)
@@ -85,6 +94,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpPost("v1/classificacao/consultar")]
         [ActionDescription("Consultar Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> ConsultarJustificativa([FromBody] FiltroJustificativaClassifEsg justificativaClassifEsg)
@@ -93,6 +103,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "PMOAndSustentabilidade")]
         [HttpGet("v1/classificacao/log/{idJustificativa}")]
         [ActionDescription("Consultar Logs de aprovação")]
         public async Task<IActionResult> ConsultarLogAprovacao([FromRoute] int idJustificativa)
@@ -100,7 +111,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             var resultado = await _service.ConsultarLogAprovacoesPorId(idJustificativa);
             return Ok(resultado);
         }
-
+        
         [HttpPost("v1/classificacao/aprovar/{idClassifEsg}/{statusAprovacao}/{usuarioAprovacao}")]
         [ActionDescription("Aprovação Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> Aprovar([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
@@ -110,6 +121,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [Authorize(Policy = "SustentabilidadePolicy")]
         [HttpDelete("v1/classificacao/excluir/{idClassifEsg}/{usuarioExclusao}")]
         [ActionDescription("Exclusão da classificação Esg")]
         public async Task<IActionResult> Excluir([FromRoute] int idClassifEsg, string usuarioExclusao)

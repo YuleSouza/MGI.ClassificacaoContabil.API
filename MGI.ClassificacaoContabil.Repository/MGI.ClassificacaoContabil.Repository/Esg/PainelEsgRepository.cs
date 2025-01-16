@@ -182,7 +182,8 @@ namespace Repository.PainelEsg
                                                                                                         id_justif_classif_esg as IdJustifClassifEsg
                                                                                                         , empcod              as IdEmpresa
                                                                                                         , dat_anomes          as DataClassif
-                                                                                                        , prjcod              as IdProjeto
+                                                                                                        , j.prjcod              as IdProjeto
+                                                                                                        , p.prjnom            as NomeProjeto
                                                                                                         , id_classif          as IdClassif
                                                                                                         , c.clenom            as DescricaoClassif
                                                                                                         , id_sub_classif      as IdSubClassif
@@ -191,6 +192,7 @@ namespace Repository.PainelEsg
                                                                                                     from justif_classif_esg j 
                                                                                                             inner join claesg c on (j.id_classif = c.clecod)
                                                                                                             inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
+                                                                                                            inner join projeto p on (j.prjcod = p.prjcod)
                                                                                                     where j.id_justif_classif_esg = :id_justif_classif_esg ",
                                                                                                     new
                                                                                                     {
@@ -232,7 +234,8 @@ namespace Repository.PainelEsg
                                                                                                j.id_justif_classif_esg as IdJustifClassifEsg
                                                                                              , empcod              as IdEmpresa
                                                                                              , dat_anomes          as DataClassif
-                                                                                             , prjcod              as IdProjeto
+                                                                                             , j.prjcod              as IdProjeto
+                                                                                             , p.prjnom            as NomeProjeto
                                                                                              , id_classif          as IdClassif
                                                                                              , trim(c.clenom)      as DescricaoClassif
                                                                                              , id_sub_classif      as IdSubClassif
@@ -246,6 +249,7 @@ namespace Repository.PainelEsg
                                                                                          from justif_classif_esg j 
                                                                                                 inner join claesg c on (j.id_classif = c.clecod)
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
+                                                                                                inner join projeto p on (j.prjcod = p.prjcod)
                                                                                         where j.prjcod     = :idprojeto 
                                                                                           and j.empcod     = :idempresa
                                                                                           {parametros}",
