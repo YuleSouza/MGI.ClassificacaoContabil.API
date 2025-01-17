@@ -448,10 +448,10 @@ namespace Service.PainelClassificacao
             var dadosExcel = from a in dados
                              where a.DtLancamentoProjeto >= filtro.DataInicio && a.DtLancamentoProjeto <= filtro.DataFim
                              && a.TipoValorProjeto == tipoValor
-                             group a by new { a.CodExterno, a.TxDepreciacao, a.QtdProdutcaoTotal, a.SaldoInicialAndamento, a.TxImobilizado, a.Data, a.TxProducao, a.TxTransfDespesa } into grp
+                             group a by new { a.IdClassifContabil, a.NomeClassifContabil, a.TxDepreciacao, a.QtdProdutcaoTotal, a.SaldoInicialAndamento, a.TxImobilizado, a.Data, a.TxProducao, a.TxTransfDespesa } into grp
                              select new RelatorioContabilExcelDTO()
                              {
-                                 CodExterno = grp.Key.CodExterno,
+                                 CodExterno = $"{grp.Key.IdClassifContabil}.{2} PROGRAMA - {grp.Key.NomeClassifContabil}",
                                  TxDepreciacao = grp.Key.TxDepreciacao,
                                  QtdProdutcaoTotal = grp.Key.QtdProdutcaoTotal,
                                  SaldoInicialAndamento = grp.Key.SaldoInicialAndamento,

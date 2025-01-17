@@ -423,15 +423,15 @@ namespace MGI.ClassificacaoContabil.Service.Service.PainelClassificacao
             var dadosExcel = from a in dados
                              select new RelatorioEsgExcelDTO()
                              {
-                                 DiretoriaExecutora = a.DiretoriaExecutora,
-                                 GerenciaExecutora = a.GerenciaExecutora,
-                                 DiretoriaSolicitante = a.GerenciaSolicitante,
-                                 GerenciaSolicitante = a.GerenciaSolicitante,
+                                 DiretoriaExecutora = UtilsService.RemoverAcentos(a.DiretoriaExecutora),
+                                 GerenciaExecutora = UtilsService.RemoverAcentos(a.GerenciaExecutora),
+                                 DiretoriaSolicitante = UtilsService.RemoverAcentos(a.GerenciaSolicitante),
+                                 GerenciaSolicitante = UtilsService.RemoverAcentos(a.GerenciaSolicitante),
                                  Gestor = a.Gestor,
                                  IdProjeto = a.IdProjeto,
-                                 NomeProjeto = $"{a.IdProjeto} - {a.NomeProjeto}",
-                                 NomeFase = a.NomeFase,
-                                 NomeEmpresa = a.NomeEmpresa,
+                                 NomeProjeto = $"{a.IdProjeto} - {UtilsService.RemoverAcentos(a.NomeProjeto)}",
+                                 NomeFase = UtilsService.RemoverAcentos(a.NomeFase),
+                                 NomeEmpresa = UtilsService.RemoverAcentos(a.NomeEmpresa),
                                  ValoBaseOrcamento = a.ValoBaseOrcamento,
                                  ValorFormatoAcompanhamento = a.ValorFormatoAcompanhamento,
                                  ClassifEsg = a.NomeClassificacaoEsg,

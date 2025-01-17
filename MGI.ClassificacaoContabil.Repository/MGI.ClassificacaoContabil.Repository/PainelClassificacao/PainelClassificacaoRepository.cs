@@ -515,6 +515,7 @@ namespace Repository.PainelClassificacao
                                 from (
                                 select nvl(pro.pgmcod,0)|| '.' cl.ccocod ||'.'PROGRAMA' - '||cl.cconom as CodExterno
                                       , cl.ccocod                                        as IdClassificaoContabil
+                                      , cl.cconom                                        as NomeClassifContabil
                                       , orc.prjorcmes ||'/'||orc.prjorcano as Data
                                       , decode(orc.prjorctip,'O',nvl(orc.prjorcval,0),0) as ValorOrcado
                                       , decode(orc.prjorctip,'J',nvl(orc.prjorcval,0),0) as ValorTendencia
