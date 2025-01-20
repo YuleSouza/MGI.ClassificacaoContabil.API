@@ -13,9 +13,9 @@ namespace Repository.Usuario
         {
             _session = session;
         }
-        public async Task<UsuarioDTO> ConsultarUsuarioPorLogin(string login)
+        public async Task<IEnumerable<UsuarioDTO>> ConsultarUsuarioPorLogin(string login)
         {
-            var resultado = await _session.Connection.QueryFirstOrDefaultAsync<UsuarioDTO>($@"
+            var resultado = await _session.Connection.QueryAsync<UsuarioDTO>($@"
                                            SELECT trim(g.GERADMUSU) as Login
                                                 , u.UsuMai as Email
                                                 , trim(g.GERADMPFL) as Grupo 

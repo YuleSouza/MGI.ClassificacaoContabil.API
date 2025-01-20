@@ -14,13 +14,13 @@ namespace Service.Usuario
             _repository = repository;
             _esgAprovadorRepository = esgAprovadorRepository;
         }
-        public async Task<UsuarioDTO> ConsultarUsuarioPorLogin(string login)
+        public async Task<IEnumerable<UsuarioDTO>> ConsultarUsuarioPorLogin(string login)
         {
             if (!string.IsNullOrEmpty(login))
             {
                 return await _repository.ConsultarUsuarioPorLogin(login.ToUpper());
             }
-            return new UsuarioDTO();
+            return Enumerable.Empty<UsuarioDTO>();
         }
         
         public async Task<bool> EhUmUsuarioSustentabilidade(string login)

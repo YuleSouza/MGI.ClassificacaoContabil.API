@@ -42,27 +42,21 @@ namespace API.Handlers
             //    return Task.FromResult(AuthenticateResult.Fail("Não autorizado."));
 
             var nomeUsuario = Request.Headers["Usuario"];
-            var usuario = _usuarioService.ConsultarUsuarioPorLogin(nomeUsuario).Result;
+            var usuarios = _usuarioService.ConsultarUsuarioPorLogin(nomeUsuario).Result;
 
-            string login = usuario == null || usuario?.Login! == null ? string.Empty : usuario?.Login!;
-            string grupo = usuario == null || usuario?.Grupo! == null ? string.Empty : usuario?.Grupo!;
+            if (!usuarios.Any()) return Task.FromResult(AuthenticateResult.Fail("Não autorizado."));
 
-            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(grupo))
+            var claims = new Claim[] { };
+
+            foreach (var usuario in usuarios)
             {
-                return Task.FromResult(AuthenticateResult.Fail("Não autorizado."));
+                claims = new[] 
+                    {
+                        new Claim(ClaimTypes.Name, usuario.Login),
+                        new Claim("group", usuario.Grupo)
+                    };
             }
 
-            //bool usuarioSustentabilidade = _usuarioService.EhUmUsuarioSustentabilidade(login).Result;
-            //if (!usuarioSustentabilidade)
-            //{
-            //    return Task.FromResult(AuthenticateResult.Fail("Não autorizado."));
-            //}
-
-            var claims = new[] 
-                {
-                    new Claim(ClaimTypes.Name, login),
-                    new Claim("group", grupo)
-                };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);

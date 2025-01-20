@@ -4,6 +4,6 @@ namespace Service.Repository.Usuario
 {
     public interface IUsuarioRepository
     {
-        Task<UsuarioDTO> ConsultarUsuarioPorLogin(string login);
+        Task<IEnumerable<UsuarioDTO>> ConsultarUsuarioPorLogin(string login);
     }
 }
