@@ -44,7 +44,7 @@ namespace API.Handlers
             var nomeUsuario = Request.Headers["Usuario"];
             var usuarios = _usuarioService.ConsultarUsuarioPorLogin(nomeUsuario).Result;
 
-            if (!usuarios.Any()) return Task.FromResult(AuthenticateResult.Fail("Não autorizado."));
+            if (usuarios.Any()) return Task.FromResult(AuthenticateResult.Fail("Não autorizado."));
 
             var claims = new Claim[] { };
 
