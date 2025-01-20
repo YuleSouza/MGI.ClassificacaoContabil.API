@@ -1,6 +1,7 @@
 ﻿using DTO.Payload;
 using MGI.ClassificacaoContabil.API.ControllerAtributes;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Serilog;
 
 public class ExceptionMiddleware
 {
@@ -19,6 +20,7 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
+            Log.Error(ex.ToString());
             await HandleExceptionAsync(httpContext, ex);
         }
     }

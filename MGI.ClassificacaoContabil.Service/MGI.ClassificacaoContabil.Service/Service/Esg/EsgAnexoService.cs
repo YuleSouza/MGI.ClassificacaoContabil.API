@@ -48,20 +48,13 @@ namespace Service.Esg
         }
         public async Task<PayloadDTO> SalvarAnexo(IFormFile arquivo, int idProjeto)
         {
-            try
+            string? diretorio = _configuration.GetSection("dir_anexo").Value;                
+            var filePath = Path.Combine(diretorio, $"{ObterPrefixoAnexo(idProjeto)}{arquivo.FileName}");
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                string? diretorio = _configuration.GetSection("dir_anexo").Value;                
-                var filePath = Path.Combine(diretorio, $"{ObterPrefixoAnexo(idProjeto)}{arquivo.FileName}");
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    arquivo.CopyTo(stream);
-                }
-                return new PayloadDTO("Arquivos salvos com sucesso", true);
+                arquivo.CopyTo(stream);
             }
-            catch (Exception ex)
-            {
-                return new PayloadDTO(string.Empty, false, "Ocorreu um erro ao salvar os arquivos.");
-            }
+            return new PayloadDTO("Arquivos salvos com sucesso", true);
         }
         private string ObterPrefixoAnexo(int idProjeto)
         {

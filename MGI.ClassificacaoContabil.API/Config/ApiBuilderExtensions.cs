@@ -5,7 +5,7 @@
         public static IApplicationBuilder UseBuilderConfiguration(this IApplicationBuilder app)
         {
             IWebHostEnvironment environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
-
+            
             app.UseSwagger();
             if (!environment.IsProduction())
             {
