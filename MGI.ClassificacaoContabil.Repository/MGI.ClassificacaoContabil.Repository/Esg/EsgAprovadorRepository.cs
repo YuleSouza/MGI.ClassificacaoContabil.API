@@ -49,7 +49,7 @@ namespace Repository.Esg
             return _session.Connection.QueryAsync<EsgAprovadorDTO>(@"SELECT g.GERADMUSU as Usuario, u.UsuMai as Email
                                                                        FROM GERADM g, corpora.USUARI u 
                                                                       WHERE g.GERADMUSU = u.USULOG 
-                                                                        AND g.GERADMPFL = 'Sustentabilidade'");
+                                                                        AND trim(g.GERADMPFL) = 'Sustentabilidade'");
         }
 
         public async Task<bool> InserirUsuarioAprovador(string usuario, string email)
