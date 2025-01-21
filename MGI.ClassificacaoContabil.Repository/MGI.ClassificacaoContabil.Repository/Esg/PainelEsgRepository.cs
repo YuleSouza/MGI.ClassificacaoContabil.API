@@ -40,6 +40,10 @@ namespace Repository.PainelEsg
             {
                 parametros.Append(" and sub.IdGrupoPrograma = :idgrupoprogrma ");
             }
+            if (!string.IsNullOrEmpty(filtro.IdGestor))
+            {
+                parametros.Append(" and LTRIM(RTRIM(U.USUNOM)) = :idgestor");
+            }
             if (!string.IsNullOrEmpty(filtro.IdGerencia))
             {
                 parametros.Append(" and sub.IdGerencia = :idgerencia ");
@@ -47,11 +51,7 @@ namespace Repository.PainelEsg
             if (!string.IsNullOrEmpty(filtro.IdDiretoria))
             {
                 parametros.Append(" and TRIM(sub.IdDiretoria) = :iddiretoria ");
-            }
-            if (!string.IsNullOrEmpty(filtro.StatusProjeto))
-            {
-                parametros.Append(" and sub.IdStatusProjeto = :idstatusprojeto");
-            }
+            }            
             if (!string.IsNullOrEmpty(filtro.ClassificacaoInvestimento))
             {
                 parametros.Append(" and sub.ClassifInvestimento = :classifinvestimento");
@@ -121,11 +121,11 @@ namespace Repository.PainelEsg
                 idGrupoPrograma = filtro.IdGrupoPrograma,
                 iddiretoria = filtro.IdDiretoria,
                 idGerencia = filtro.IdGerencia,
+                idgestor = filtro.IdGestor,
                 datainicial = filtro.DataInicio.ToString("01/MM/yyyy"),
                 datafinal = filtro.DataFim.ToString("01/MM/yyyy"),
                 TipoValor = filtro.TipoValor,
                 idProjeto = filtro.IdProjeto,
-                idstatusprojeto = filtro.StatusProjeto,
                 classifinvestimento = filtro.ClassificacaoInvestimento
             });
         }
