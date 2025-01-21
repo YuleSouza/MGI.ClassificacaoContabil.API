@@ -9,6 +9,7 @@ namespace Service.DTO.Esg
         public string Aprovacao { get; set; }
         public string UsCriacao { get; set; }
         public DateTime DtCriacao { get; set; }
+        public string NomeUsuario { get; set; }
         public string MensagemLog
         {
             get
@@ -18,22 +19,22 @@ namespace Service.DTO.Esg
                 {
                     case EStatusAprovacao.Pendente:
                         {
-                            texto = $"Criado em {DtCriacao.ToString("dd/MM/yyyy")} por {UsCriacao}";
+                            texto = $"Criado em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
                             break;
                         }
                     case EStatusAprovacao.Aprovado:
                         {
-                            texto = $"Aprovado em {DtCriacao.ToString("dd/MM/yyyy")} por {UsCriacao}";
+                            texto = $"Aprovado em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
                             break;
                         }
                     case EStatusAprovacao.Reprovado:
                         {
-                            texto = $"Reprovado em {DtCriacao.ToString("dd/MM/yyyy")} por {UsCriacao}";
+                            texto = $"Reprovado em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
                             break;
                         }
                     case EStatusAprovacao.Excluido:
                         {
-                            texto = $"Excluído em {DtCriacao.ToString("dd/MM/yyyy")} por {UsCriacao}";
+                            texto = $"Excluído em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
                             break;
                         }
                     default:

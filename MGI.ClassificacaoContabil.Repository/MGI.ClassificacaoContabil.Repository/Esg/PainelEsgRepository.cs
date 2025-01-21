@@ -69,6 +69,10 @@ namespace Repository.PainelEsg
                         ,sub.ClassifInvestimento         as ClassifInvestimento
                         ,sum(nvl(sub.TotalLancamento,0)) as ValorOrcamento
                         ,'{filtro.StatusAprovacao}'        as StatusAprovacao
+     	                , (SELECT count(*) FROM justif_classif_esg j WHERE j.prjcod = sub.idprojeto AND j.status_aprovacao = 'A') AS  QtdAprovados
+     	                , (SELECT count(*) FROM justif_classif_esg j WHERE j.prjcod = sub.idprojeto AND j.status_aprovacao = 'R') AS  QtdReprovados
+     	                , (SELECT count(*) FROM justif_classif_esg j WHERE j.prjcod = sub.idprojeto AND j.status_aprovacao = 'E') AS  QtdExcluidos
+     	                , (SELECT count(*) FROM justif_classif_esg j WHERE j.prjcod = sub.idprojeto AND j.status_aprovacao = 'P') AS  QtdPendente
                    from (
                  select p.prjcod                                           as IdProjeto
                         , trim(p.prjnom)                                   as NomeProjeto
@@ -206,7 +210,9 @@ namespace Repository.PainelEsg
                                                                                     , dtcriacao             as DtCriacao
                                                                                     , id_aprovacao          as IdAprovacao 
                                                                                     , id_justif_classif_esg as IdJustifClassifEsg
+                                                                                    , u.usunom 				AS NomeUsuario
                                                                                  from aprovacao_justif_classif_esg 
+                                                                                        inner join corpora.USUARI u on (trim(U.USULOG) = uscriacao)
                                                                                 where id_justif_classif_esg = :id_justf_classif_esg"
                 , new
                 {
@@ -251,7 +257,7 @@ namespace Repository.PainelEsg
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                                 inner join projeto p on (j.prjcod = p.prjcod)
                                                                                         where j.prjcod     = :idprojeto 
-                                                                                          and j.empcod     = :idempresa
+                                                                                          and j.empcod     = :idempresa order by j.status_aprovacao desc
                                                                                           {parametros}",
                                                                                           new
                                                                                           {
