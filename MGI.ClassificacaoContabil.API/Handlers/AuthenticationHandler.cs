@@ -53,7 +53,7 @@ namespace API.Handlers
                 claims = new[] 
                     {
                         new Claim(ClaimTypes.Name, usuario.Login),
-                        new Claim("group", usuario.Grupo)
+                        new Claim(ClaimTypes.Role, usuario.Grupo)
                     };
             }
 
