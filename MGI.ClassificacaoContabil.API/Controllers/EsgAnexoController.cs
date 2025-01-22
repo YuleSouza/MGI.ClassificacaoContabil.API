@@ -48,7 +48,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             {
                 return BadRequest(arquivoGravado);
             }
-            return Ok();
+            return Ok(new { mensagem = "Upload feito com sucess!", sucesso = true  });
         }
 
         [HttpDelete("v1/delete/{idAnexo}")]
