@@ -225,7 +225,7 @@ namespace Repository.PainelEsg
             StringBuilder parametros = new StringBuilder();            
             if (!string.IsNullOrEmpty(filtro.StatusAprovacao))
             {
-                parametros.Append(" and j.status_aprovacao = :statusAprovacao");
+                parametros.Append(" and j.status_aprovacao = :statusAprovacao ");
             }            
             if (filtro.IdClassif > 0)
             {
@@ -257,8 +257,8 @@ namespace Repository.PainelEsg
                                                                                                 inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                                 inner join projeto p on (j.prjcod = p.prjcod)
                                                                                         where j.prjcod     = :idprojeto 
-                                                                                          and j.empcod     = :idempresa order by j.status_aprovacao desc
-                                                                                          {parametros}",
+                                                                                          and j.empcod     = :idempresa 
+                                                                                          {parametros} order by j.status_aprovacao desc",
                                                                                           new
                                                                                           {
                                                                                               idprojeto = filtro.IdProjeto,
