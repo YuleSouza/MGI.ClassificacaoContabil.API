@@ -1,5 +1,6 @@
 ﻿using Service.DTO.Combos;
 using Service.DTO.Esg;
+using Service.DTO.Esg.Email;
 using Service.DTO.Filtros;
 
 namespace Service.Repository.Esg
@@ -20,5 +21,6 @@ namespace Service.Repository.Esg
         Task<JustificativaClassifEsgDTO> ConsultarJustificativaEsgPorId(int id);
         Task<IEnumerable<AprovacaoClassifEsg>> ConsultarLogAprovacoesPorId(int id);
         Task<bool> RemoverClassificacao(int id);
+        Task<EmailAprovacaoDTO> ConsultarDadosEmail(int id);
     }
 }

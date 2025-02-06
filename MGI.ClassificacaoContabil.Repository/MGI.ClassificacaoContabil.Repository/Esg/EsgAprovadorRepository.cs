@@ -46,7 +46,7 @@ namespace Repository.Esg
 
         public Task<IEnumerable<EsgAprovadorDTO>> ConsultarUsuariosSustentabilidade()
         {
-            return _session.Connection.QueryAsync<EsgAprovadorDTO>(@"SELECT g.GERADMUSU as Usuario, u.UsuMai as Email
+            return _session.Connection.QueryAsync<EsgAprovadorDTO>(@"SELECT g.GERADMUSU as Usuario, trim(u.UsuMai) as Email
                                                                        FROM GERADM g, corpora.USUARI u 
                                                                       WHERE g.GERADMUSU = u.USULOG 
                                                                         AND trim(g.GERADMPFL) = 'Sustentabilidade'");

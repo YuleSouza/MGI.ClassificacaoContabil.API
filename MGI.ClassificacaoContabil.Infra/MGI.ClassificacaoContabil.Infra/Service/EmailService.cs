@@ -5,12 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Identity.Client;
-using System.IdentityModel.Tokens.Jwt;
-
-
 
 namespace Infra.Service
-{   
+{
     public class EmailService : IEmailService
     {
         private readonly IKeyVaultService _keyVaultService;
@@ -27,20 +24,7 @@ namespace Infra.Service
         {
             await SetAuthentication();
             string[] scopes = new[] { _emailAutenticacaoServicoDTO.Scope };
-            var app = ConfidentialClientApplicationBuilder.Create(_emailAutenticacaoServicoDTO.ClientId)
-                .WithClientSecret(_emailAutenticacaoServicoDTO.ClientSecret)
-                .WithAuthority(new Uri($"https://login.microsoftonline.com/{_emailAutenticacaoServicoDTO.TenantId}"))
-            .Build();
-
-            var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
-            string accessToken = authResult.AccessToken;
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(authResult.AccessToken);
-            var roles = jwt.Claims.Where(c => c.Type == "Role").Select(c => c.Value);
-            var listaRoles = string.Join(", ", roles);
-            var containRoles = roles.Contains("Mail.Send");
-
+            string accessToken = await GetAccessToken(scopes);
             var authProvider = new CustomAuthenticationProvider(accessToken);
             var graphClient = new GraphServiceClient(authProvider);
 
@@ -95,8 +79,7 @@ namespace Infra.Service
                 TemplateDirectory = emailAuth.GetSection("templateDirectory").Value!,
             };
         }
-
-        public async Task<List<Recipient>> ProcessEmailString(string emails)
+        private async Task<List<Recipient>> ProcessEmailString(string emails)
         {
             string[] emailArray = emails.Split(';');            
             List<Recipient> recipients = new List<Recipient>();
@@ -114,6 +97,16 @@ namespace Infra.Service
                 }
             }
             return recipients;
+        }
+        private async Task<string> GetAccessToken(string[] scopes)
+        {
+            var app = ConfidentialClientApplicationBuilder.Create(_emailAutenticacaoServicoDTO.ClientId)
+                .WithClientSecret(_emailAutenticacaoServicoDTO.ClientSecret)
+                .WithAuthority(new Uri($"https://login.microsoftonline.com/{_emailAutenticacaoServicoDTO.TenantId}"))
+            .Build();
+
+            var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
+            return authResult.AccessToken;
         }
     }
 }

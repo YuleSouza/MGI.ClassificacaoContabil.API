@@ -100,12 +100,13 @@ namespace Service.Esg
             if (!classificacaoValida.Sucesso) return classificacaoValida;
             PayloadDTO percentualValido = await ValidarPercentualKpi(validacao);
             if (!percentualValido.Sucesso) return percentualValido;
+            int id_classif_esg = 0;
             var retorno = await ExecutarTransacao(
                 async () =>
                 {
                     justificativa.StatusAprovacao = EStatusAprovacao.Pendente;
                     justificativa.DataClassif = new DateTime(justificativa.DataClassif.Year, justificativa.DataClassif.Month, 1);
-                    int id_classif_esg = await _repository.InserirJustificativaEsg(justificativa);
+                    id_classif_esg = await _repository.InserirJustificativaEsg(justificativa);
                     int anexos = await _anexoRepository.InserirAnexoJustificativaEsg(justificativa.Anexos);
                     await _repository.InserirAprovacao(new AprovacaoClassifEsg()
                     {
@@ -116,8 +117,10 @@ namespace Service.Esg
                     return true;
                 }, "Classificacao Inserido com sucesso"
             );
-            var usuarios = _aprovadorRepository.ConsultarUsuariosSustentabilidade();
-            // to-do enviar aprovacao pro email
+            
+            var dadosEmail = await _repository.ConsultarDadosEmail(id_classif_esg);
+            dadosEmail.UsuarioCripto = justificativa.UsuarioCripto;
+            //await EnviarEmail(dadosEmail);
             return retorno;
         }        
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
@@ -242,19 +245,21 @@ namespace Service.Esg
         {
             try
             {
+                var usuarios = await _aprovadorRepository.ConsultarUsuariosSustentabilidade();
+                string emails = string.Join(';', usuarios.Select(p => p.Email).ToArray());
                 await _emailService.EnviarEmailAsync(new Infra.DTO.EmailAprovacaoDTO()
                 {
                     EmailDestinatario = email.EmailDestinatario,
-                    IdClassificacao = email.IdClassificacao,
                     IdProjeto = email.IdProjeto,
-                    IdSubClassificacao = email.IdSubClassificacao,
                     NomeGestor = email.NomeGestor,
                     NomePatrocinador = email.NomePatrocinador,
                     NomeProjeto = email.NomeProjeto,
                     Usuario = email.Usuario,
                     PercentualKPI = email.PercentualKPI,
                     NomeClassificacao = email.NomeClassificacao,
-                    NomeSubClassificacao = email.NomeSubClassificacao
+                    NomeSubClassificacao = email.NomeSubClassificacao,
+                    UsuarioCripto = email.UsuarioCripto
+                    
                 });
                 return new PayloadDTO("Email Enviado com sucesso", true);
             }

@@ -2,8 +2,8 @@
 using Infra.Data;
 using Service.DTO.Combos;
 using Service.DTO.Esg;
+using Service.DTO.Esg.Email;
 using Service.DTO.Filtros;
-using Service.Enum;
 using Service.Repository.Esg;
 using System.Text;
 
@@ -370,6 +370,24 @@ namespace Repository.PainelEsg
                 id_justif_classif_esg = id
             });
             return result == 1;
+        }
+
+        public Task<EmailAprovacaoDTO> ConsultarDadosEmail(int id)
+        {
+            return _session.Connection.QueryFirstOrDefaultAsync<EmailAprovacaoDTO>(@"SELECT j.prjcod AS IdProjeto
+	                                                                                        , trim(P.PRJNOM) AS NomeProjeto
+                                                                                            , TRIM(U.USUNOM) as NomeGestor
+                                                                                            , TRIM(usu.usunom)  as Patrocinador
+                                                                                            , j.PERC_KPI AS PercentualKpi
+                                                                                            , trim(c.clenom)      as NomeClassificacao
+                                                                                            , trim(m.clemetnom)   as NomeSubClassificacao
+                                                                                    FROM justif_classif_esg j 
+		                                                                                    INNER JOIN projeto p ON (j.prjcod = p.prjcod)
+		                                                                                    INNER JOIN corpora.usuari u on (u.USULOG = p.PRJGES)
+		                                                                                    inner join corpora.usuari usu on (p.prjreq = usu.usulog)
+		                                                                                    inner join claesg c on (j.id_classif = c.clecod)
+		                                                                                    inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
+                                                                                    WHERE ID_JUSTIF_CLASSIF_ESG = :id", new { id = id });
         }
     }
 }
