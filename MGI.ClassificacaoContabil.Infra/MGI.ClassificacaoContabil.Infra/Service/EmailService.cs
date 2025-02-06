@@ -38,8 +38,9 @@ namespace Infra.Service
             template = template.Replace("#NOMEGESTOR", email.NomeGestor);
             template = template.Replace("#PATROCINADOR", email.NomePatrocinador);
             template = template.Replace("#PERCENTUALKPI", email.PercentualKPI.ToString());
-            template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao.ToString());
-            template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao.ToString());
+            template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao);
+            template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao);
+            template = template.Replace("#USUARIO", email.UsuarioCripto);
 
             var message = new Message()
             {

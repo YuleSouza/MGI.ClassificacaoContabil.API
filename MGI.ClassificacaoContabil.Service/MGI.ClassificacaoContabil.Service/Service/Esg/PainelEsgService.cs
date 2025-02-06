@@ -249,7 +249,7 @@ namespace Service.Esg
                 string emails = string.Join(';', usuarios.Select(p => p.Email).ToArray());
                 await _emailService.EnviarEmailAsync(new Infra.DTO.EmailAprovacaoDTO()
                 {
-                    EmailDestinatario = email.EmailDestinatario,
+                    EmailDestinatario = "andre.silva@partner.elo.inf.br;andretdswork@gmail.com",
                     IdProjeto = email.IdProjeto,
                     NomeGestor = email.NomeGestor,
                     NomePatrocinador = email.NomePatrocinador,
