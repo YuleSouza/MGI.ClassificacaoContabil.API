@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
+using Service.DTO.Esg.Email;
 using Service.DTO.Filtros;
 using Service.Interface.PainelEsg;
 
@@ -127,6 +128,15 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> Excluir([FromRoute] int idClassifEsg, string usuarioExclusao)
         {
             var resultado = await _service.ExcluirClassificacao(idClassifEsg, usuarioExclusao);
+            if (!resultado.Sucesso) return BadRequest(resultado);
+            return Ok(resultado);
+        }
+
+        [HttpPost("v1/enviar-email")]
+        [ActionDescription("Enviar email para aprovação")]
+        public async Task<IActionResult> EnviarEmail(EmailAprovacaoDTO email)
+        {
+            var resultado = await _service.EnviarEmail(email);
             if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }

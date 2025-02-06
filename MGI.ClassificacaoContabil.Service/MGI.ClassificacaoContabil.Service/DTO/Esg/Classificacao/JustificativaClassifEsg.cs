@@ -13,6 +13,7 @@ namespace Service.DTO.Esg
         public string UsCriacao { get; set; }
         public string StatusAprovacao { get; set; }
         public decimal PercentualKpi { get; set; }
+        public String UsuarioCripto {  get; set; }
         public List<AnexoJustificaitvaClassifEsgDTO>? Anexos { get; set; }
         public List<IFormFile> ArquivosAnexos { get; set; }
     }

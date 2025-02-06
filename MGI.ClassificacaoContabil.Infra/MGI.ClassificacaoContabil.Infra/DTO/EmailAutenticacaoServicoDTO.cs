@@ -4,7 +4,10 @@
     {
         public string TenantId { get; set; }
         public string ClientId { get; set; }
-        public string clientSecret { get; set; }
-        public string[] Scopes { get; set; }
+        public string ClientSecret { get; set; }
+        public string Scope { get; set; }
+        public string SenderEmail { get; set; }
+        public string Uri { get; set; }
+        public string TemplateDirectory { get; set; }
     }
 }

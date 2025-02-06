@@ -1,7 +1,10 @@
 ﻿using DTO.Payload;
+using Infra.Service;
+using Infra.Service.Interfaces;
 using Service.Base;
 using Service.DTO.Combos;
 using Service.DTO.Esg;
+using Service.DTO.Esg.Email;
 using Service.DTO.Filtros;
 using Service.Enum;
 using Service.Helper;
@@ -17,18 +20,21 @@ namespace Service.Esg
         private readonly IEsgAnexoRepository _anexoRepository;
         private readonly IEsgAprovadorRepository _aprovadorRepository;
         private readonly IUsuarioService _usuarioService;
+        private readonly IEmailService _emailService;
         private List<string> _aprovacoes = new List<string> { EStatusAprovacao.Pendente, EStatusAprovacao.Aprovado, EStatusAprovacao.Reprovado };
         public PainelEsgService(IPainelEsgRepository painelEsgRepository
             , ITransactionHelper transactionHelper
             , IEsgAnexoRepository esgAnexoRepository
             , IEsgAprovadorRepository esgAprovadorRepository
             , IUsuarioService usuarioService
+            , IEmailService emailService
             ) : base(transactionHelper)
         {
             _repository = painelEsgRepository;
             _anexoRepository = esgAnexoRepository;
             _aprovadorRepository = esgAprovadorRepository;
             _usuarioService = usuarioService;
+            _emailService = emailService;
         }
 
         #region [ Classificação Esg]
@@ -230,8 +236,31 @@ namespace Service.Esg
             return new PayloadDTO(string.Empty, true);
         }
 
-        
         #endregion
+
+        public async Task<PayloadDTO> EnviarEmail(EmailAprovacaoDTO email)
+        {
+            try
+            {
+                await _emailService.EnviarEmailAsync(new Infra.DTO.EmailAprovacaoDTO()
+                {
+                    EmailDestinatario = email.EmailDestinatario,
+                    IdClassificacao = email.IdClassificacao,
+                    IdProjeto = email.IdProjeto,
+                    IdSubClassificacao = email.IdSubClassificacao,
+                    NomeGestor = email.NomeGestor,
+                    NomePatrocinador = email.NomePatrocinador,
+                    NomeProjeto = email.NomeProjeto,
+                    Usuario = email.Usuario,
+                    PercentualKPI = email.PercentualKPI
+                });
+                return new PayloadDTO("Email Enviado com sucesso", true);
+            }
+            catch (Exception ex)
+            {
+                return new PayloadDTO(string.Empty, false, ex.Message);
+            }
+        }
 
     }
 }

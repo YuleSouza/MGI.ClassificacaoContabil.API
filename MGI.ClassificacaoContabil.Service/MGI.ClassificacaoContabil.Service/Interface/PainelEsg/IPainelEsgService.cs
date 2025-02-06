@@ -1,6 +1,7 @@
 ﻿using DTO.Payload;
 using Service.DTO.Combos;
 using Service.DTO.Esg;
+using Service.DTO.Esg.Email;
 using Service.DTO.Filtros;
 
 namespace Service.Interface.PainelEsg
@@ -19,5 +20,6 @@ namespace Service.Interface.PainelEsg
         Task<IEnumerable<AprovacaoClassifEsg>> ConsultarLogAprovacoesPorId(int id);
         Task<PayloadDTO> InserirAprovacao(int idClassifEsg, string statusAprovacao, string usuarioAprovacao);
         Task<PayloadDTO> ExcluirClassificacao(int id, string usCriacao);
+        Task<PayloadDTO> EnviarEmail(EmailAprovacaoDTO email);
     }
 }

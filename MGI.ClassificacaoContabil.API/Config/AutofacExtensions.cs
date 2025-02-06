@@ -12,6 +12,7 @@ namespace API.Config
             {
                 containerBuilder.RegisterRepositories("MGI.ClassificacaoContabil.Repository");
                 containerBuilder.RegisterServices("MGI.ClassificacaoContabil.Service");
+                containerBuilder.RegisterServices("MGI.ClassificacaoContabil.Infra");
                 containerBuilder.RegisterConnection(configuration);
             });
         }
