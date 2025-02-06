@@ -252,7 +252,9 @@ namespace Service.Esg
                     NomePatrocinador = email.NomePatrocinador,
                     NomeProjeto = email.NomeProjeto,
                     Usuario = email.Usuario,
-                    PercentualKPI = email.PercentualKPI
+                    PercentualKPI = email.PercentualKPI,
+                    NomeClassificacao = email.NomeClassificacao,
+                    NomeSubClassificacao = email.NomeSubClassificacao
                 });
                 return new PayloadDTO("Email Enviado com sucesso", true);
             }

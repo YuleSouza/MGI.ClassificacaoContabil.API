@@ -54,6 +54,8 @@ namespace Infra.Service
             template = template.Replace("#NOMEGESTOR", email.NomeGestor);
             template = template.Replace("#PATROCINADOR", email.NomePatrocinador);
             template = template.Replace("#PERCENTUALKPI", email.PercentualKPI.ToString());
+            template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao.ToString());
+            template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao.ToString());
 
             var message = new Message()
             {
@@ -63,16 +65,7 @@ namespace Infra.Service
                     ContentType = BodyType.Html,
                     Content = template
                 },
-                ToRecipients = new List<Recipient>()
-                {
-                    new Recipient
-                    {
-                        EmailAddress = new EmailAddress
-                        {
-                            Address = email.EmailDestinatario
-                        }
-                    }
-                }
+                ToRecipients = await ProcessEmailString(email.EmailDestinatario)
             };
 
             try
@@ -101,6 +94,26 @@ namespace Infra.Service
                 Uri = emailAuth.GetSection("uri").Value!,
                 TemplateDirectory = emailAuth.GetSection("templateDirectory").Value!,
             };
+        }
+
+        public async Task<List<Recipient>> ProcessEmailString(string emails)
+        {
+            string[] emailArray = emails.Split(';');            
+            List<Recipient> recipients = new List<Recipient>();
+            foreach (string email in emailArray)
+            {
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    recipients.Add(new Recipient
+                    {
+                        EmailAddress = new EmailAddress
+                        {
+                            Address = email.Trim()
+                        }
+                    });
+                }
+            }
+            return recipients;
         }
     }
 }
