@@ -120,7 +120,7 @@ namespace Service.Esg
             
             var dadosEmail = await _repository.ConsultarDadosEmail(id_classif_esg);
             dadosEmail.UsuarioCripto = justificativa.UsuarioCripto;
-            //await EnviarEmail(dadosEmail);
+            await EnviarEmail(dadosEmail);
             return retorno;
         }        
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)

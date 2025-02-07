@@ -28,27 +28,13 @@ namespace Infra.Service
             var authProvider = new CustomAuthenticationProvider(accessToken);
             var graphClient = new GraphServiceClient(authProvider);
 
-            string basePath = AppContext.BaseDirectory;
-            string currentDirectory = Directory.GetCurrentDirectory();
-            string templatePath = Path.Combine(currentDirectory, @"..\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\Template\prototipo_aprovacao_email.html");
-            string fullPath = Path.GetFullPath(templatePath);
-            var template = File.ReadAllText(@"C:\Projetos\mgi-classificacao-contabil-api\MGI.ClassificacaoContabil.Infra\MGI.ClassificacaoContabil.Infra\Template\prototipo_aprovacao_email.html");
-            template = template.Replace("#IDPROJETO", email.IdProjeto.ToString());
-            template = template.Replace("#NOMEPROJETO", email.NomeProjeto);
-            template = template.Replace("#NOMEGESTOR", email.NomeGestor);
-            template = template.Replace("#PATROCINADOR", email.NomePatrocinador);
-            template = template.Replace("#PERCENTUALKPI", email.PercentualKPI.ToString());
-            template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao);
-            template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao);
-            template = template.Replace("#USUARIO", email.UsuarioCripto);
-
             var message = new Message()
             {
                 Subject = "Aprovação de Projeto",
                 Body = new ItemBody()
                 {
                     ContentType = BodyType.Html,
-                    Content = template
+                    Content = await GetTemplateApproval(email)
                 },
                 ToRecipients = await ProcessEmailString(email.EmailDestinatario)
             };
@@ -63,7 +49,6 @@ namespace Infra.Service
             }
             catch (ServiceException)
             {
-
             }
         }
         private async Task SetAuthentication()
@@ -108,6 +93,23 @@ namespace Infra.Service
 
             var authResult = await app.AcquireTokenForClient(scopes).ExecuteAsync();
             return authResult.AccessToken;
+        }
+        private async Task<string> GetTemplateApproval(EmailAprovacaoDTO email)
+        {
+            var template = await GetTemplateContent("prototipo_aprovacao_email.html");
+            template = template.Replace("#IDPROJETO", email.IdProjeto.ToString());
+            template = template.Replace("#NOMEPROJETO", email.NomeProjeto);
+            template = template.Replace("#NOMEGESTOR", email.NomeGestor);
+            template = template.Replace("#PATROCINADOR", email.NomePatrocinador);
+            template = template.Replace("#PERCENTUALKPI", email.PercentualKPI.ToString());
+            template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao);
+            template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao);
+            template = template.Replace("#USUARIO", email.UsuarioCripto);
+            return template;
+        }
+        private async Task<string> GetTemplateContent(string templateFileName)
+        {
+            return File.ReadAllText($@"{_emailAutenticacaoServicoDTO.TemplateDirectory}{templateFileName}");
         }
     }
 }
