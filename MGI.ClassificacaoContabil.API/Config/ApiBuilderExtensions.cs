@@ -1,4 +1,6 @@
-﻿namespace API.Config
+﻿using Microsoft.Extensions.FileProviders;
+
+namespace API.Config
 {
     public static class ApiBuilderExtensions
     {
@@ -25,6 +27,15 @@
             {
                 endpoints.MapControllers();
             });
+            app.UseRouting();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(environment.ContentRootPath, "Template")),
+                RequestPath = "/Template"
+            });
+
+
             return app;
         }
     }

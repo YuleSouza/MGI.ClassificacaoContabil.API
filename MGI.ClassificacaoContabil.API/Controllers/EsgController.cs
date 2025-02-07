@@ -122,6 +122,15 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             return Ok(resultado);
         }
 
+        [HttpGet("v2/classificacao/aprovar/{idClassifEsg}/{statusAprovacao}/{usuarioAprovacao}")]
+        [ActionDescription("Aprovação Classificação e Justificativa Painel Esg")]
+        public async Task<IActionResult> AprovarFromEmail([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
+        {
+            var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
+            if (!resultado.Sucesso) return BadRequest(resultado);
+            return Redirect("/Template/Confirmacao.html");
+        }
+
         [Authorize(Roles = "Sustentabilidade")]
         [HttpDelete("v1/classificacao/excluir/{idClassifEsg}/{usuarioExclusao}")]
         [ActionDescription("Exclusão da classificação Esg")]
@@ -131,6 +140,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }
+
 
         [HttpPost("v1/enviar-email")]
         [ActionDescription("Enviar email para aprovação")]
