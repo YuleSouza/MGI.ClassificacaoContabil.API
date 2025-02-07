@@ -127,7 +127,13 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         public async Task<IActionResult> AprovarFromEmail([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
             var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
-            if (!resultado.Sucesso) return BadRequest(resultado);
+            if (!resultado.Sucesso)
+            {
+                //string currentDirectory = Directory.GetCurrentDirectory();
+                //var content = System.IO.File.ReadAllText($"{currentDirectory}/Template/ErroAprovacao.html");
+                //content = content.Replace("#Erro", resultado.Mensagem);
+                return Redirect("/Template/ErroAprovacao.html");
+            }
             return Redirect("/Template/Confirmacao.html");
         }
 
