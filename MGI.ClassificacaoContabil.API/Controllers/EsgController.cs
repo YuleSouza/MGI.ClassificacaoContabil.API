@@ -129,9 +129,6 @@ namespace MGI.ClassificacaoContabil.API.Controllers
             var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
             if (!resultado.Sucesso)
             {
-                //string currentDirectory = Directory.GetCurrentDirectory();
-                //var content = System.IO.File.ReadAllText($"{currentDirectory}/Template/ErroAprovacao.html");
-                //content = content.Replace("#Erro", resultado.Mensagem);
                 return Redirect("/Template/ErroAprovacao.html");
             }
             return Redirect("/Template/Confirmacao.html");
