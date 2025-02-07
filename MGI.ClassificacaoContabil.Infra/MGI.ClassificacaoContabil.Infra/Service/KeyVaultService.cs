@@ -11,19 +11,19 @@ namespace MGI.ClassificacaoContabil.Infra.Service
 
         public KeyVaultService()
         {
-            string tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
-            var options = new ClientSecretCredentialOptions
-            {
-                AdditionallyAllowedTenants = { "*" }
-            };
+            //string tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
+            //var options = new ClientSecretCredentialOptions
+            //{
+            //    AdditionallyAllowedTenants = { "*" }
+            //};
 
-            var credentials = new ClientSecretCredential(
-                tenantId,
-                Environment.GetEnvironmentVariable("AZURE_CLIENT_ID"),
-                Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET"), options
-            );
+            //var credentials = new ClientSecretCredential(
+            //    tenantId,
+            //    Environment.GetEnvironmentVariable("AZURE_CLIENT_ID"),
+            //    Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET"), options
+            //);
             
-            _secreteClient = new SecretClient(new Uri(_keyVaultUrl), credentials);
+            //_secreteClient = new SecretClient(new Uri(_keyVaultUrl), credentials);
         }
 
         public async Task<string> ConsultarSegredo(string nome)
