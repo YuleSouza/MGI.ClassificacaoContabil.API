@@ -63,6 +63,7 @@ namespace Infra.Service
                 SenderEmail = emailAuth.GetSection("senderEmail").Value!,
                 Uri = emailAuth.GetSection("uri").Value!,
                 TemplateDirectory = emailAuth.GetSection("templateDirectory").Value!,
+                UrlAprovacao = emailAuth.GetSection("urlAprovacao").Value!,                
             };
         }
         private async Task<List<Recipient>> ProcessEmailString(string emails)
@@ -105,6 +106,8 @@ namespace Infra.Service
             template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao);
             template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao);
             template = template.Replace("#USUARIO", email.UsuarioCripto);
+            template = template.Replace("#URL_APROVACAO", @$"{_emailAutenticacaoServicoDTO.UrlAprovacao}{email.IdClassifEsg}/A/{email.Usuario}");
+            template = template.Replace("#URL_REPROVACAO", @$"{_emailAutenticacaoServicoDTO.UrlAprovacao}{email.IdClassifEsg}/R/{email.Usuario}");
             return template;
         }
         private async Task<string> GetTemplateContent(string templateFileName)

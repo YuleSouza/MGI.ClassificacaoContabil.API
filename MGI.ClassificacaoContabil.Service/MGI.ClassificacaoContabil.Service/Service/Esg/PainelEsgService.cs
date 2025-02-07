@@ -120,6 +120,7 @@ namespace Service.Esg
             
             var dadosEmail = await _repository.ConsultarDadosEmail(id_classif_esg);
             dadosEmail.UsuarioCripto = justificativa.UsuarioCripto;
+            dadosEmail.IdClassifEsg = id_classif_esg;
             await EnviarEmail(dadosEmail);
             return retorno;
         }        
@@ -254,11 +255,12 @@ namespace Service.Esg
                     NomeGestor = email.NomeGestor,
                     NomePatrocinador = email.NomePatrocinador,
                     NomeProjeto = email.NomeProjeto,
-                    Usuario = email.Usuario,
+                    Usuario = "T_FILIPEMF",
                     PercentualKPI = email.PercentualKPI,
                     NomeClassificacao = email.NomeClassificacao,
                     NomeSubClassificacao = email.NomeSubClassificacao,
-                    UsuarioCripto = email.UsuarioCripto
+                    UsuarioCripto = email.UsuarioCripto,
+                    IdClassifEsg = email.IdClassifEsg
                     
                 });
                 return new PayloadDTO("Email Enviado com sucesso", true);

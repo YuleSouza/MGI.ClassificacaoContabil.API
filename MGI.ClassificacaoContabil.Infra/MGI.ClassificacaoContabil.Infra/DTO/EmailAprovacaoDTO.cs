@@ -12,5 +12,6 @@
         public string NomeClassificacao { get; set; }
         public string NomeSubClassificacao { get; set; }
         public string UsuarioCripto { get; set; }
+        public int IdClassifEsg { get; set; }
     }
 }

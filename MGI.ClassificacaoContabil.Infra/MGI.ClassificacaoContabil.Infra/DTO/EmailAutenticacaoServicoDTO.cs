@@ -9,5 +9,6 @@
         public string SenderEmail { get; set; }
         public string Uri { get; set; }
         public string TemplateDirectory { get; set; }
+        public string UrlAprovacao {  get; set; }
     }
 }
