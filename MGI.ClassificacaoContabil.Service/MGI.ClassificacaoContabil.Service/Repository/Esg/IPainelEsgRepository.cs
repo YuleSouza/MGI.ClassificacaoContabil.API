@@ -22,5 +22,6 @@ namespace Service.Repository.Esg
         Task<IEnumerable<AprovacaoClassifEsg>> ConsultarLogAprovacoesPorId(int id);
         Task<bool> RemoverClassificacao(int id);
         Task<EmailAprovacaoDTO> ConsultarDadosEmail(int id);
+        Task<string> ConsultarNomeUsuarioAprovador(string usuario);
     }
 }

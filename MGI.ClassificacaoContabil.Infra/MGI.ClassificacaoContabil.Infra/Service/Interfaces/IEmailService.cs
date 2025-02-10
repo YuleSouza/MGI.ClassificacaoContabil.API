@@ -4,6 +4,7 @@ namespace Infra.Service.Interfaces
 {
     public interface IEmailService
     {
-        Task EnviarEmailAsync(EmailAprovacaoDTO email);
+        Task EnviarEmailAprovacao(EmailAprovacaoDTO email);
+        Task EnviarEmailGestor(GestorEmailDTO email);
     }
 }

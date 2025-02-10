@@ -374,20 +374,26 @@ namespace Repository.PainelEsg
 
         public Task<EmailAprovacaoDTO> ConsultarDadosEmail(int id)
         {
-            return _session.Connection.QueryFirstOrDefaultAsync<EmailAprovacaoDTO>(@"SELECT j.prjcod AS IdProjeto
-	                                                                                        , trim(P.PRJNOM) AS NomeProjeto
-                                                                                            , TRIM(U.USUNOM) as NomeGestor
-                                                                                            , TRIM(usu.usunom)  as Patrocinador
-                                                                                            , j.PERC_KPI AS PercentualKpi
+            return _session.Connection.QueryFirstOrDefaultAsync<EmailAprovacaoDTO>(@"SELECT j.prjcod              as IdProjeto
+	                                                                                        , trim(P.PRJNOM)      as NomeProjeto
+                                                                                            , TRIM(U.USUNOM)      as NomeGestor
+                                                                                            , TRIM(usu.usunom)    as NomePatrocinador
+                                                                                            , j.PERC_KPI          as PercentualKpi
                                                                                             , trim(c.clenom)      as NomeClassificacao
                                                                                             , trim(m.clemetnom)   as NomeSubClassificacao
+                                                                                            , trim(U.usumai)      as EmailGestor
                                                                                     FROM justif_classif_esg j 
-		                                                                                    INNER JOIN projeto p ON (j.prjcod = p.prjcod)
-		                                                                                    INNER JOIN corpora.usuari u on (u.USULOG = p.PRJGES)
+		                                                                                    inner join projeto p ON (j.prjcod = p.prjcod)
+		                                                                                    inner join corpora.usuari u on (u.USULOG = p.PRJGES)
 		                                                                                    inner join corpora.usuari usu on (p.prjreq = usu.usulog)
 		                                                                                    inner join claesg c on (j.id_classif = c.clecod)
 		                                                                                    inner join claesgmet m on (c.clecod = m.clecod and m.clemetcod = j.id_sub_classif)
                                                                                     WHERE ID_JUSTIF_CLASSIF_ESG = :id", new { id = id });
+        }
+        public Task<string> ConsultarNomeUsuarioAprovador(string usuario)
+        {
+            return _session.Connection.QueryFirstOrDefaultAsync<string>(@"SELECT TRIM(U.USUNOM) as NomeUsuario
+                                                                            FROM corpora.usuari u WHERE trim(u.USULOG) = :usuario ", new { usuario });
         }
     }
 }

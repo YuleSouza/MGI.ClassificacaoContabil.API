@@ -149,7 +149,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Enviar email para aprovação")]
         public async Task<IActionResult> EnviarEmail(EmailAprovacaoDTO email)
         {
-            var resultado = await _service.EnviarEmail(email);
+            var resultado = await _service.EnviarEmailAprovacao(email);
             if (!resultado.Sucesso) return BadRequest(resultado);
             return Ok(resultado);
         }

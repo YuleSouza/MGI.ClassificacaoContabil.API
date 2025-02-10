@@ -121,7 +121,7 @@ namespace Service.Esg
             var dadosEmail = await _repository.ConsultarDadosEmail(id_classif_esg);
             dadosEmail.UsuarioCripto = justificativa.UsuarioCripto;
             dadosEmail.IdClassifEsg = id_classif_esg;
-            await EnviarEmail(dadosEmail);
+            await EnviarEmailAprovacao(dadosEmail);
             return retorno;
         }        
         public async Task<PayloadDTO> AlterarJustificativaEsg(AlteracaoJustificativaClassifEsg justificativa)
@@ -162,7 +162,21 @@ namespace Service.Esg
                     });
                     return true;
                 }, "");
-            // enviar e-mail para o gestores
+
+            var dadosEmail = await _repository.ConsultarDadosEmail(idClassifEsg);
+            await EnviarEmailGestor(new GestorEmailDTO()
+            {
+                IdProjeto = idClassifEsg,
+                NomeGestor = dadosEmail.NomeGestor,
+                NomeProjeto = dadosEmail.NomeProjeto,
+                Aprovacao = statusAprovacao == "R" ? "Reprovado" : "Aprovado",
+                EmailDestinatario = dadosEmail.EmailGestor,
+                NomePatrocinador = dadosEmail.NomePatrocinador,
+                NomeClassificacao = dadosEmail.NomeClassificacao,
+                NomeSubClassificacao = dadosEmail.NomeSubClassificacao,
+                PercentualKPI = dadosEmail.PercentualKPI,
+                Usuario = usuarioAprovacao,
+            });
             return new PayloadDTO("Classificação aprovada com sucesso", true);
         }        
         public async Task<PayloadDTO> ExcluirClassificacao(int id, string usuarioExclusao)
@@ -215,7 +229,7 @@ namespace Service.Esg
             var pendentes = logsAprovacao.Where(p => p.Aprovacao == EStatusAprovacao.Pendente);
             var aprovados = logsAprovacao.Where(p => p.Aprovacao == EStatusAprovacao.Aprovado);
             var reprovados = logsAprovacao.Where(p => p.Aprovacao == EStatusAprovacao.Reprovado);
-            if (pendentes.Any() && (aprovados.Any() || reprovados.Any()))
+            if (aprovados.Any() || reprovados.Any())
             {
                 return new PayloadDTO("Classificação não pode ser aprovada ou reprovada.", false);
             }
@@ -242,20 +256,21 @@ namespace Service.Esg
 
         #endregion
 
-        public async Task<PayloadDTO> EnviarEmail(EmailAprovacaoDTO email)
+        #region [ Envio de email ]
+        public async Task<PayloadDTO> EnviarEmailAprovacao(EmailAprovacaoDTO email)
         {
             try
             {
                 var usuarios = await _aprovadorRepository.ConsultarUsuariosSustentabilidade();
                 string emails = string.Join(';', usuarios.Select(p => p.Email).ToArray());
-                await _emailService.EnviarEmailAsync(new Infra.DTO.EmailAprovacaoDTO()
+                await _emailService.EnviarEmailAprovacao(new Infra.DTO.EmailAprovacaoDTO()
                 {
-                    EmailDestinatario = "andre.silva@partner.elo.inf.br;andretdswork@gmail.com",
+                    EmailDestinatario = "andre.silva@partner.elo.inf.br",
                     IdProjeto = email.IdProjeto,
                     NomeGestor = email.NomeGestor,
                     NomePatrocinador = email.NomePatrocinador,
                     NomeProjeto = email.NomeProjeto,
-                    Usuario = "T_FILIPEMF",
+                    Usuario = email.Usuario,
                     PercentualKPI = email.PercentualKPI,
                     NomeClassificacao = email.NomeClassificacao,
                     NomeSubClassificacao = email.NomeSubClassificacao,
@@ -270,6 +285,30 @@ namespace Service.Esg
                 return new PayloadDTO(string.Empty, false, ex.Message);
             }
         }
+        public async Task<PayloadDTO> EnviarEmailGestor(GestorEmailDTO email)
+        {
+            try
+            {
+                await _emailService.EnviarEmailGestor(new Infra.DTO.GestorEmailDTO()
+                {
+                    EmailDestinatario = "andre.silva@partner.elo.inf.br",
+                    IdProjeto = email.IdProjeto,
+                    NomePatrocinador = email.NomePatrocinador,
+                    NomeProjeto = email.NomeProjeto,
+                    Usuario = await _repository.ConsultarNomeUsuarioAprovador(email.Usuario),
+                    PercentualKPI = email.PercentualKPI,
+                    NomeClassificacao = email.NomeClassificacao,
+                    NomeSubClassificacao = email.NomeSubClassificacao,
+                    Aprovacao = email.Aprovacao
+                });
+                return new PayloadDTO("Email Enviado com sucesso", true);
+            }
+            catch (Exception ex)
+            {
+                return new PayloadDTO(string.Empty, false, ex.Message);
+            }
+        }
 
+        #endregion
     }
 }

@@ -13,6 +13,7 @@ namespace Infra.Service
         private readonly IKeyVaultService _keyVaultService;
         private readonly IConfiguration _configuration;
         private EmailAutenticacaoServicoDTO _emailAutenticacaoServicoDTO;
+        private GraphServiceClient _graphServiceClient;
 
         public EmailService(IKeyVaultService keyVaultService, IConfiguration configuration)
         {
@@ -20,14 +21,9 @@ namespace Infra.Service
             _configuration = configuration;
         }
 
-        public async Task EnviarEmailAsync(EmailAprovacaoDTO email)
+        public async Task EnviarEmailAprovacao(EmailAprovacaoDTO email)
         {
-            await SetAuthentication();
-            string[] scopes = new[] { _emailAutenticacaoServicoDTO.Scope };
-            string accessToken = await GetAccessToken(scopes);
-            var authProvider = new CustomAuthenticationProvider(accessToken);
-            var graphClient = new GraphServiceClient(authProvider);
-
+            await SetGraphClient();
             var message = new Message()
             {
                 Subject = "Aprovação de Projeto",
@@ -39,9 +35,31 @@ namespace Infra.Service
                 ToRecipients = await ProcessEmailString(email.EmailDestinatario)
             };
 
+            await EnviarEmail(message);
+        }
+
+        public async Task EnviarEmailGestor(GestorEmailDTO email)
+        {
+            await SetGraphClient();
+            var message = new Message()
+            {
+                Subject = "Aprovação de Projeto",
+                Body = new ItemBody()
+                {
+                    ContentType = BodyType.Html,
+                    Content = await GetTemplateManger(email)
+                },
+                ToRecipients = await ProcessEmailString(email.EmailDestinatario)
+            };
+
+            await EnviarEmail(message);
+        }
+
+        private async Task EnviarEmail(Message message)
+        {
             try
             {
-                var send = graphClient.Users[_emailAutenticacaoServicoDTO.SenderEmail].SendMail;
+                var send = _graphServiceClient.Users[_emailAutenticacaoServicoDTO.SenderEmail].SendMail;
                 await send.PostAsync(new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody()
                 {
                     Message = message,
@@ -50,6 +68,14 @@ namespace Infra.Service
             catch (ServiceException)
             {
             }
+        }
+        private async Task SetGraphClient()
+        {
+            await SetAuthentication();
+            string[] scopes = new[] { _emailAutenticacaoServicoDTO.Scope };
+            string accessToken = await GetAccessToken(scopes);
+            var authProvider = new CustomAuthenticationProvider(accessToken);
+            _graphServiceClient = new GraphServiceClient(authProvider);
         }
         private async Task SetAuthentication()
         {
@@ -110,9 +136,25 @@ namespace Infra.Service
             template = template.Replace("#URL_REPROVACAO", @$"{_emailAutenticacaoServicoDTO.UrlAprovacao}{email.IdClassifEsg}/R/{email.Usuario}");
             return template;
         }
+
+        private async Task<string> GetTemplateManger(GestorEmailDTO email)
+        {
+            var template = await GetTemplateContent("prototipo_gestor_email.html");
+            template = template.Replace("#IDPROJETO", email.IdProjeto.ToString());
+            template = template.Replace("#NOMEPROJETO", email.NomeProjeto);            
+            template = template.Replace("#PATROCINADOR", email.NomePatrocinador);
+            template = template.Replace("#PERCENTUALKPI", email.PercentualKPI.ToString());
+            template = template.Replace("#CLASSIFICACAO", email.NomeClassificacao);
+            template = template.Replace("#SUBCLASSIFICACAO", email.NomeSubClassificacao);
+            template = template.Replace("#APROVACAO", email.Aprovacao.ToUpper());
+            template = template.Replace("#USUARIO", email.Usuario);
+            return template;
+        }
         private async Task<string> GetTemplateContent(string templateFileName)
         {
             return File.ReadAllText($@"{_emailAutenticacaoServicoDTO.TemplateDirectory}{templateFileName}");
         }
+
+        
     }
 }
