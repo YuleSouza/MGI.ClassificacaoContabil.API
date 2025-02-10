@@ -126,7 +126,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         [ActionDescription("Aprovação Classificação e Justificativa Painel Esg")]
         public async Task<IActionResult> AprovarFromEmail([FromRoute] int idClassifEsg, string statusAprovacao, string usuarioAprovacao)
         {
-            var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao);
+            var resultado = await _service.InserirAprovacao(idClassifEsg, statusAprovacao, usuarioAprovacao.ToUpper());
             if (!resultado.Sucesso)
             {
                 return Redirect("/Template/ErroAprovacao.html");

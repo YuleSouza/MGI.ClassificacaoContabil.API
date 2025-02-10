@@ -121,6 +121,7 @@ namespace Service.Esg
             var dadosEmail = await _repository.ConsultarDadosEmail(id_classif_esg);
             dadosEmail.UsuarioCripto = justificativa.UsuarioCripto;
             dadosEmail.IdClassifEsg = id_classif_esg;
+            dadosEmail.Usuario = justificativa.UsCriacao;
             await EnviarEmailAprovacao(dadosEmail);
             return retorno;
         }        
@@ -166,7 +167,7 @@ namespace Service.Esg
             var dadosEmail = await _repository.ConsultarDadosEmail(idClassifEsg);
             await EnviarEmailGestor(new GestorEmailDTO()
             {
-                IdProjeto = idClassifEsg,
+                IdProjeto = dadosEmail.IdProjeto,
                 NomeGestor = dadosEmail.NomeGestor,
                 NomeProjeto = dadosEmail.NomeProjeto,
                 Aprovacao = statusAprovacao == "R" ? "Reprovado" : "Aprovado",
@@ -289,13 +290,14 @@ namespace Service.Esg
         {
             try
             {
+                string usuario = await _repository.ConsultarNomeUsuarioAprovador(email.Usuario);
                 await _emailService.EnviarEmailGestor(new Infra.DTO.GestorEmailDTO()
                 {
                     EmailDestinatario = "andre.silva@partner.elo.inf.br",
                     IdProjeto = email.IdProjeto,
                     NomePatrocinador = email.NomePatrocinador,
                     NomeProjeto = email.NomeProjeto,
-                    Usuario = await _repository.ConsultarNomeUsuarioAprovador(email.Usuario),
+                    Usuario = usuario.ToUpper(),
                     PercentualKPI = email.PercentualKPI,
                     NomeClassificacao = email.NomeClassificacao,
                     NomeSubClassificacao = email.NomeSubClassificacao,
