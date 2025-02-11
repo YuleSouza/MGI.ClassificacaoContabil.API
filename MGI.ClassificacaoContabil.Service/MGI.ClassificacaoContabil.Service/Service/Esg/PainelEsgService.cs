@@ -266,7 +266,7 @@ namespace Service.Esg
                 string emails = string.Join(';', usuarios.Select(p => p.Email).ToArray());
                 await _emailService.EnviarEmailAprovacao(new Infra.DTO.EmailAprovacaoDTO()
                 {
-                    EmailDestinatario = "andre.silva@partner.elo.inf.br",
+                    EmailDestinatario = emails,
                     IdProjeto = email.IdProjeto,
                     NomeGestor = email.NomeGestor,
                     NomePatrocinador = email.NomePatrocinador,
@@ -293,7 +293,7 @@ namespace Service.Esg
                 string usuario = await _repository.ConsultarNomeUsuarioAprovador(email.Usuario);
                 await _emailService.EnviarEmailGestor(new Infra.DTO.GestorEmailDTO()
                 {
-                    EmailDestinatario = "andre.silva@partner.elo.inf.br",
+                    EmailDestinatario = email.EmailDestinatario,
                     IdProjeto = email.IdProjeto,
                     NomePatrocinador = email.NomePatrocinador,
                     NomeProjeto = email.NomeProjeto,
