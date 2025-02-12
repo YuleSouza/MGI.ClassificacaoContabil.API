@@ -213,7 +213,8 @@ namespace Repository.PainelEsg
                                                                                     , u.usunom 				AS NomeUsuario
                                                                                  from aprovacao_justif_classif_esg 
                                                                                         inner join corpora.USUARI u on (trim(U.USULOG) = uscriacao)
-                                                                                where id_justif_classif_esg = :id_justf_classif_esg"
+                                                                                where id_justif_classif_esg = :id_justf_classif_esg
+                                                                                order by dtcriacao"
                 , new
                 {
                     id_justf_classif_esg = id

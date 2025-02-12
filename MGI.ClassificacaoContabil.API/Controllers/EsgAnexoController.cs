@@ -1,4 +1,5 @@
 ﻿using DTO.Payload;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO.Esg;
 using Service.Interface.PainelEsg;
@@ -52,6 +53,7 @@ namespace MGI.ClassificacaoContabil.API.Controllers
         }
 
         [HttpDelete("v1/delete/{idAnexo}")]
+        [Authorize(Roles = "Sustentabilidade")]
         public async Task<IActionResult> DeleteAnexo([FromRoute] int idAnexo)
         {
             var resultado = await _service.ExcluirAnexo(idAnexo);

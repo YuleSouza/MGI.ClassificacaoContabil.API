@@ -19,22 +19,22 @@ namespace Service.DTO.Esg
                 {
                     case EStatusAprovacao.Pendente:
                         {
-                            texto = $"Criado em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
+                            texto = $"Criado em {DtCriacao.ToString("dd/MM/yyyy HH:mm")} por {NomeUsuario}";
                             break;
                         }
                     case EStatusAprovacao.Aprovado:
                         {
-                            texto = $"Aprovado em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
+                            texto = $"Aprovado em {DtCriacao.ToString("dd/MM/yyyy HH:mm")} por {NomeUsuario}";
                             break;
                         }
                     case EStatusAprovacao.Reprovado:
                         {
-                            texto = $"Reprovado em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
+                            texto = $"Reprovado em {DtCriacao.ToString("dd/MM/yyyy HH:mm")} por {NomeUsuario}";
                             break;
                         }
                     case EStatusAprovacao.Excluido:
                         {
-                            texto = $"Excluído em {DtCriacao.ToString("dd/MM/yyyy")} por {NomeUsuario}";
+                            texto = $"Excluído em {DtCriacao.ToString("dd/MM/yyyy HH:mm")} por {NomeUsuario}";
                             break;
                         }
                     default:
